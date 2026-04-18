@@ -16,11 +16,22 @@ export default function ForgePage() {
   const { publicKey, connected } = useWallet()
   const [modalOpen, setModalOpen] = useState(false)
 
-  // Show only agents owned by current wallet (or unowned if disconnected)
+  // "My agents" = agents I created (or unowned if disconnected)
+  // "Training" = agents others created that I've contributed XP to
   const walletAddr = publicKey?.toBase58() ?? null
-  const agents = walletAddr
+  const myAgents = walletAddr
     ? allAgents.filter((a) => a.walletAddress === walletAddr || !a.walletAddress)
     : allAgents.filter((a) => !a.walletAddress)
+  const trainingAgents = walletAddr
+    ? allAgents.filter(
+        (a) =>
+          a.walletAddress !== walletAddr &&
+          (a.trainers ?? []).some(
+            (t) => t.walletAddress === walletAddr && t.xpContributed > 0,
+          ),
+      )
+    : []
+  const agents = myAgents
 
   return (
     <main className="min-h-screen p-6">
@@ -88,7 +99,7 @@ export default function ForgePage() {
           </motion.div>
         )}
 
-        {/* Agent grid */}
+        {/* Agent grid — my agents */}
         <div className="space-y-3">
           {agents.map((agent, i) => (
             <motion.div
@@ -104,6 +115,36 @@ export default function ForgePage() {
             </motion.div>
           ))}
         </div>
+
+        {/* Training others' agents */}
+        {trainingAgents.length > 0 && (
+          <div className="mt-10">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <h2 className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                Training · {trainingAgents.length}
+              </h2>
+            </div>
+            <p className="text-xs text-zinc-600 mb-4">
+              Agents you&apos;re teaching. XP you contribute here splits royalties when they ship.
+            </p>
+            <div className="space-y-3">
+              {trainingAgents.map((agent, i) => (
+                <motion.div
+                  key={agent.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <AgentCard
+                    agent={agent}
+                    onClick={() => router.push(`/forge/${agent.id}`)}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <CreateAgentModal

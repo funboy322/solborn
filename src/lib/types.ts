@@ -54,6 +54,16 @@ export interface ChainCheckpoint {
   timestamp: number
 }
 
+/** A single trainer's contribution record on a shared agent. */
+export interface Trainer {
+  walletAddress: string
+  xpContributed: number      // total XP this trainer has poured in
+  messagesCount: number      // total messages sent
+  firstSeenAt: number
+  lastSeenAt: number
+  displayName?: string       // future: X handle / ENS / shortened addr
+}
+
 export interface ForgeAgent {
   id: string
   name: string
@@ -81,9 +91,11 @@ export interface ForgeAgent {
   maxEnergy: number
   lastEnergyUpdate: number
   // Wallet / on-chain
-  walletAddress?: string
+  walletAddress?: string       // creator / original owner
   birthTxSignature?: string
   chainHistory?: ChainCheckpoint[]
+  // Multi-trainer (phase 4)
+  trainers?: Trainer[]         // contribution records, keyed by walletAddress
 }
 
 export interface NFTMetadata {

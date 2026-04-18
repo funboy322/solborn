@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { ChatInterface } from '@/components/agent/ChatInterface'
 import { StageIndicator } from '@/components/agent/StageIndicator'
 import { TraitRadar } from '@/components/agent/TraitRadar'
+import { TrainersPanel } from '@/components/agent/TrainersPanel'
 import { EvolutionModal } from '@/components/agent/EvolutionModal'
 import { ProjectGenerator } from '@/components/agent/ProjectGenerator'
 import { StreakBadge } from '@/components/agent/StreakBadge'
@@ -97,7 +98,9 @@ export default function AgentPage({ params }: PageProps) {
   }
 
   const config = STAGE_CONFIG[agent.stage]
-  const isOwner = !agent.walletAddress || (connected && publicKey?.toBase58() === agent.walletAddress)
+  const currentWallet = publicKey?.toBase58() ?? null
+  const isOwner = !agent.walletAddress || (connected && currentWallet === agent.walletAddress)
+  const isTrainingOther = !!agent.walletAddress && connected && currentWallet !== agent.walletAddress
 
   async function handleMintNFT() {
     if (!agent || minting || !connected || !publicKey || !signTransaction) return
@@ -151,10 +154,13 @@ export default function AgentPage({ params }: PageProps) {
           <WalletButton />
         </div>
 
-        {!isOwner && (
-          <div className="mb-4 px-4 py-2.5 rounded-xl text-xs text-amber-300 flex items-center gap-2"
-            style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)' }}>
-            ⚠️ This agent belongs to a different wallet.
+        {isTrainingOther && (
+          <div className="mb-4 px-4 py-2.5 rounded-xl text-xs text-emerald-300 flex items-center gap-2"
+            style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>
+              You&apos;re <strong className="font-semibold">training</strong> this agent. Your XP contribution is tracked and splits future royalties.
+            </span>
           </div>
         )}
 
@@ -192,9 +198,12 @@ export default function AgentPage({ params }: PageProps) {
 
             {/* Traits */}
             <div className="glass p-4">
-              <h2 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">Traits</h2>
+              <h2 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">Skills</h2>
               <TraitRadar traits={agent.traits} color={config.color} />
             </div>
+
+            {/* Trainers (multi-trainer) */}
+            <TrainersPanel agent={agent} currentWallet={currentWallet} />
 
             {/* Stats */}
             <div className="glass p-4">

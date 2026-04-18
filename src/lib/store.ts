@@ -1,7 +1,7 @@
 'use client'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { ForgeAgent, CreateAgentInput, AgentMessage, AgentSkills, AgentStage, ChainCheckpoint } from './types'
+import type { ForgeAgent, CreateAgentInput, AgentMessage, AgentSkills, AgentStage, ChainCheckpoint, Trainer } from './types'
 import { DEFAULT_SKILLS, STAGE_CONFIG, STAGE_ORDER, MAX_ENERGY, ENERGY_REGEN_PER_MIN } from './constants'
 import { nanoid } from './utils'
 
@@ -27,6 +27,8 @@ interface ForgeStore {
   // Wallet / on-chain
   addChainCheckpoint: (agentId: string, cp: ChainCheckpoint) => void
   bindWallet: (agentId: string, walletAddress: string) => void
+  // Multi-trainer
+  registerTraining: (agentId: string, walletAddress: string, xpGained: number) => void
   getActiveAgent: () => ForgeAgent | undefined
 }
 
@@ -88,6 +90,18 @@ export const useForgeStore = create<ForgeStore>()(
           birthTxSignature: input.birthTxSignature,
           chainHistory: input.birthTxSignature
             ? [{ kind: 'birth', stage: 'baby', txSignature: input.birthTxSignature, timestamp: now }]
+            : [],
+          // Multi-trainer: creator seeded as first trainer with 0 XP
+          trainers: input.walletAddress
+            ? [
+                {
+                  walletAddress: input.walletAddress,
+                  xpContributed: 0,
+                  messagesCount: 0,
+                  firstSeenAt: now,
+                  lastSeenAt: now,
+                },
+              ]
             : [],
         }
         set((state) => ({ agents: [...state.agents, agent], activeAgentId: agent.id }))
@@ -279,6 +293,43 @@ export const useForgeStore = create<ForgeStore>()(
         }))
       },
 
+      registerTraining: (agentId, walletAddress, xpGained) => {
+        const now = Date.now()
+        set((state) => ({
+          agents: state.agents.map((a) => {
+            if (a.id !== agentId) return a
+            const existing = (a.trainers ?? []).find(
+              (t) => t.walletAddress === walletAddress,
+            )
+            let trainers: Trainer[]
+            if (existing) {
+              trainers = (a.trainers ?? []).map((t) =>
+                t.walletAddress === walletAddress
+                  ? {
+                      ...t,
+                      xpContributed: t.xpContributed + Math.max(0, xpGained),
+                      messagesCount: t.messagesCount + 1,
+                      lastSeenAt: now,
+                    }
+                  : t,
+              )
+            } else {
+              trainers = [
+                ...(a.trainers ?? []),
+                {
+                  walletAddress,
+                  xpContributed: Math.max(0, xpGained),
+                  messagesCount: 1,
+                  firstSeenAt: now,
+                  lastSeenAt: now,
+                },
+              ]
+            }
+            return { ...a, trainers }
+          }),
+        }))
+      },
+
       getActiveAgent: () => {
         const { agents, activeAgentId } = get()
         return agents.find((a) => a.id === activeAgentId)
@@ -286,7 +337,7 @@ export const useForgeStore = create<ForgeStore>()(
     }),
     {
       name: 'solborn-store',
-      version: 3,
+      version: 4,
       migrate: (persisted: unknown, version: number) => {
         const state = persisted as { agents?: ForgeAgent[] }
         if (!state?.agents) return state
@@ -310,7 +361,7 @@ export const useForgeStore = create<ForgeStore>()(
             senior: 'teen',
             adult: 'adult',
           }
-          state.agents = state.agents.map((a) => {
+          const migrated = state.agents.map((a) => {
             const oldTraits = a.traits as unknown as {
               curiosity?: number
               creativity?: number
@@ -342,6 +393,28 @@ export const useForgeStore = create<ForgeStore>()(
               },
             }
           })
+          state.agents = migrated
+        }
+
+        // v3 → v4: seed trainers from existing walletAddress + total XP
+        if (version < 4) {
+          const now = Date.now()
+          state.agents = state.agents.map((a) => {
+            if (a.trainers && a.trainers.length > 0) return a
+            if (!a.walletAddress) return { ...a, trainers: [] }
+            return {
+              ...a,
+              trainers: [
+                {
+                  walletAddress: a.walletAddress,
+                  xpContributed: a.xp ?? 0,
+                  messagesCount: a.totalInteractions ?? 0,
+                  firstSeenAt: a.createdAt ?? now,
+                  lastSeenAt: a.lastInteraction ?? now,
+                },
+              ],
+            }
+          })
         }
 
         return state
@@ -350,9 +423,31 @@ export const useForgeStore = create<ForgeStore>()(
   )
 )
 
-/** Agents scoped to the current wallet (or unowned if no wallet). */
+/** Agents created by this wallet (or unowned if no wallet). */
 export function useAgentsForWallet(walletAddress: string | null | undefined): ForgeAgent[] {
   const agents = useForgeStore((s) => s.agents)
   if (!walletAddress) return agents.filter((a) => !a.walletAddress)
   return agents.filter((a) => a.walletAddress === walletAddress)
+}
+
+/** Agents this wallet is training but did NOT create. */
+export function useAgentsTrainedBy(walletAddress: string | null | undefined): ForgeAgent[] {
+  const agents = useForgeStore((s) => s.agents)
+  if (!walletAddress) return []
+  return agents.filter(
+    (a) =>
+      a.walletAddress !== walletAddress &&
+      (a.trainers ?? []).some(
+        (t) => t.walletAddress === walletAddress && t.xpContributed > 0,
+      ),
+  )
+}
+
+/** Top trainers of an agent sorted by XP contribution, with % shares. */
+export function rankTrainers(agent: ForgeAgent): Array<Trainer & { share: number }> {
+  const list = agent.trainers ?? []
+  const total = list.reduce((sum, t) => sum + t.xpContributed, 0) || 1
+  return [...list]
+    .sort((a, b) => b.xpContributed - a.xpContributed)
+    .map((t) => ({ ...t, share: t.xpContributed / total }))
 }

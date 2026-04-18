@@ -53,10 +53,16 @@ function sanitizeMessages(messages: ChatMsg[]): ChatMsg[] {
 export async function POST(req: NextRequest) {
   let agent: ForgeAgent
   let rawMessages: ChatMsg[]
+  let trainerWallet: string | null = null
   try {
-    const body = (await req.json()) as { agent: ForgeAgent; messages: ChatMsg[] }
+    const body = (await req.json()) as {
+      agent: ForgeAgent
+      messages: ChatMsg[]
+      trainerWallet?: string | null
+    }
     agent = body.agent
     rawMessages = body.messages ?? []
+    trainerWallet = body.trainerWallet ?? null
   } catch {
     return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
       status: 400,
@@ -79,7 +85,9 @@ export async function POST(req: NextRequest) {
   }
 
   const lastUserMessage = messages[messages.length - 1].content
-  const walletAddress = agent.walletAddress ?? null
+  // Memory is scoped to the TRAINER (whoever is teaching right now),
+  // not the creator. Falls back to creator wallet if no trainer connected.
+  const activeWallet = trainerWallet ?? agent.walletAddress ?? null
 
   // ── Memory retrieval (non-blocking fallback if disabled) ──
   let memoryContext = ''
@@ -87,8 +95,8 @@ export async function POST(req: NextRequest) {
     try {
       const [memories, profile] = await Promise.all([
         retrieveMemories({ agentId: agent.id, query: lastUserMessage, topK: 5 }),
-        walletAddress
-          ? getUserProfile(agent.id, walletAddress)
+        activeWallet
+          ? getUserProfile(agent.id, activeWallet)
           : Promise.resolve(null),
       ])
       memoryContext = formatMemoryContext(memories, profile)
@@ -117,13 +125,13 @@ export async function POST(req: NextRequest) {
             if (facts.length === 0) return
             await storeFacts({
               agentId: agent.id,
-              walletAddress,
+              walletAddress: activeWallet,
               facts,
             })
-            if (walletAddress) {
+            if (activeWallet) {
               await refreshUserProfile({
                 agentId: agent.id,
-                walletAddress,
+                walletAddress: activeWallet,
                 newFacts: facts,
               })
             }

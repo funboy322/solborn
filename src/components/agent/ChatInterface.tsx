@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { AchievementToastStack } from '@/components/agent/AchievementToast'
 import { EnergyBar } from '@/components/agent/EnergyBar'
 import { useForgeStore } from '@/lib/store'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { STAGE_CONFIG, ENERGY_PER_MESSAGE, MAX_ENERGY, ENERGY_REGEN_PER_MIN } from '@/lib/constants'
 import { nanoid } from '@/lib/utils'
 import { applyTraitBoosts } from '@/lib/ai/trait-analyzer'
@@ -114,6 +115,9 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
   const incrementLongResponses = useForgeStore((s) => s.incrementLongResponses)
   const consumeEnergy = useForgeStore((s) => s.consumeEnergy)
   const regenEnergy = useForgeStore((s) => s.regenEnergy)
+  const registerTraining = useForgeStore((s) => s.registerTraining)
+  const { publicKey } = useWallet()
+  const trainerWallet = publicKey?.toBase58() ?? null
   const stageConfig = STAGE_CONFIG[agent.stage]
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -199,6 +203,7 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           agent,
+          trainerWallet,
           // Send only non-empty messages, exclude empty streaming placeholder
           messages: allMessages
             .filter((m) => m.content.trim().length > 0)
@@ -247,6 +252,12 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
         setSpamWarnings((prev) => [...prev, nanoid()])
       }
 
+      // Register training contribution under the connected wallet.
+      // Credits the teacher, not the agent's creator.
+      if (trainerWallet) {
+        registerTraining(agent.id, trainerWallet, totalXP)
+      }
+
       // Trait boosts from xp-calculator (Partial<AgentTraits> → TraitBoost[])
       if (breakdown.traitBoosts && Object.keys(breakdown.traitBoosts).length > 0) {
         const boostArray = Object.entries(breakdown.traitBoosts).map(([trait, amount]) => ({
@@ -286,7 +297,7 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
       setIsLoading(false)
       setStreamingId(null)
     }
-  }, [messages, isLoading, agent, gainXP, updateTraits, unlockAchievement, updateStreak, incrementLongResponses, consumeEnergy, regenEnergy, triggerScreenShake])
+  }, [messages, isLoading, agent, gainXP, updateTraits, unlockAchievement, updateStreak, incrementLongResponses, consumeEnergy, regenEnergy, triggerScreenShake, registerTraining, trainerWallet])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
