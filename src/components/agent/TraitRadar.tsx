@@ -1,10 +1,10 @@
 'use client'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import type { AgentTraits } from '@/lib/types'
+import type { AgentSkills } from '@/lib/types'
 
-// Per-trait color gradients — each trait gets its own distinct identity
-const TRAIT_CONFIG: Record<keyof AgentTraits, {
+// Per-skill color gradients — each gets its own distinct identity
+const TRAIT_CONFIG: Record<keyof AgentSkills, {
   label: string
   emoji: string
   gradient: [string, string]
@@ -16,34 +16,34 @@ const TRAIT_CONFIG: Record<keyof AgentTraits, {
     gradient: ['#a78bfa', '#7c3aed'],
     glow: '#a78bfa',
   },
+  solanaKnowledge: {
+    label: 'Solana',
+    emoji: '◎',
+    gradient: ['#14f195', '#9945ff'],
+    glow: '#14f195',
+  },
+  codingSkill: {
+    label: 'Coding',
+    emoji: '⚡',
+    gradient: ['#38bdf8', '#0ea5e9'],
+    glow: '#38bdf8',
+  },
   creativity: {
     label: 'Creativity',
     emoji: '✨',
     gradient: ['#f472b6', '#ec4899'],
     glow: '#f472b6',
   },
-  technical: {
-    label: 'Technical',
-    emoji: '⚡',
-    gradient: ['#38bdf8', '#0ea5e9'],
-    glow: '#38bdf8',
-  },
-  hustle: {
-    label: 'Hustle',
-    emoji: '🔥',
+  founderMindset: {
+    label: 'Founder',
+    emoji: '🚀',
     gradient: ['#fb923c', '#ea580c'],
     glow: '#fb923c',
-  },
-  vision: {
-    label: 'Vision',
-    emoji: '🎯',
-    gradient: ['#34d399', '#059669'],
-    glow: '#34d399',
   },
 }
 
 interface TraitBarProps {
-  traitKey: keyof AgentTraits
+  traitKey: keyof AgentSkills
   value: number
   isHighest: boolean
   delay: number
@@ -166,12 +166,12 @@ function TraitBar({ traitKey, value, isHighest, delay }: TraitBarProps) {
 }
 
 interface TraitRadarProps {
-  traits: AgentTraits
+  traits: AgentSkills
   color: string
 }
 
 export function TraitRadar({ traits, color: _color }: TraitRadarProps) {
-  const traitKeys = Object.keys(traits) as (keyof AgentTraits)[]
+  const traitKeys = Object.keys(traits) as (keyof AgentSkills)[]
   const maxValue = Math.max(...traitKeys.map((k) => traits[k]))
   const highestKey = traitKeys.find((k) => traits[k] === maxValue) ?? traitKeys[0]
 

@@ -1,8 +1,8 @@
 'use client'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { ForgeAgent, CreateAgentInput, AgentMessage, AgentTraits, AgentStage, ChainCheckpoint } from './types'
-import { DEFAULT_TRAITS, STAGE_CONFIG, STAGE_ORDER, MAX_ENERGY, ENERGY_REGEN_PER_MIN } from './constants'
+import type { ForgeAgent, CreateAgentInput, AgentMessage, AgentSkills, AgentStage, ChainCheckpoint } from './types'
+import { DEFAULT_SKILLS, STAGE_CONFIG, STAGE_ORDER, MAX_ENERGY, ENERGY_REGEN_PER_MIN } from './constants'
 import { nanoid } from './utils'
 
 interface ForgeStore {
@@ -16,7 +16,7 @@ interface ForgeStore {
   setActiveAgent: (id: string | null) => void
   updateAgentNFT: (agentId: string, mintAddress: string) => void
   setGeneratedProject: (agentId: string, project: ForgeAgent['generatedProject']) => void
-  updateTraits: (agentId: string, traits: AgentTraits) => void
+  updateTraits: (agentId: string, traits: AgentSkills) => void
   unlockAchievement: (agentId: string, achievementId: string) => void
   updateStreak: (agentId: string, streak: number, bestStreak: number) => void
   incrementLongResponses: (agentId: string) => void
@@ -30,20 +30,20 @@ interface ForgeStore {
   getActiveAgent: () => ForgeAgent | undefined
 }
 
-function evolveTraits(traits: AgentTraits, stage: AgentStage): AgentTraits {
-  const boosts: Record<AgentStage, Partial<AgentTraits>> = {
+function evolveTraits(traits: AgentSkills, stage: AgentStage): AgentSkills {
+  const boosts: Record<AgentStage, Partial<AgentSkills>> = {
     baby: {},
-    junior: { curiosity: 10, creativity: 15, technical: 15 },
-    senior: { technical: 25, hustle: 15, vision: 10 },
-    adult: { vision: 25, creativity: 15, hustle: 20, technical: 15 },
+    toddler: { curiosity: 10, creativity: 10, solanaKnowledge: 10, codingSkill: 5 },
+    teen: { codingSkill: 20, solanaKnowledge: 15, founderMindset: 10, creativity: 5 },
+    adult: { founderMindset: 25, creativity: 10, solanaKnowledge: 15, codingSkill: 15 },
   }
   const boost = boosts[stage] ?? {}
   return {
     curiosity: Math.min(100, traits.curiosity + (boost.curiosity ?? 0)),
     creativity: Math.min(100, traits.creativity + (boost.creativity ?? 0)),
-    technical: Math.min(100, traits.technical + (boost.technical ?? 0)),
-    hustle: Math.min(100, traits.hustle + (boost.hustle ?? 0)),
-    vision: Math.min(100, traits.vision + (boost.vision ?? 0)),
+    codingSkill: Math.min(100, traits.codingSkill + (boost.codingSkill ?? 0)),
+    solanaKnowledge: Math.min(100, traits.solanaKnowledge + (boost.solanaKnowledge ?? 0)),
+    founderMindset: Math.min(100, traits.founderMindset + (boost.founderMindset ?? 0)),
   }
 }
 
@@ -69,7 +69,7 @@ export const useForgeStore = create<ForgeStore>()(
           stage: 'baby',
           xp: 0,
           xpToNext: STAGE_CONFIG.baby.xpToNext,
-          traits: { ...DEFAULT_TRAITS },
+          traits: { ...DEFAULT_SKILLS },
           messages: [],
           createdAt: now,
           lastInteraction: now,
@@ -286,11 +286,13 @@ export const useForgeStore = create<ForgeStore>()(
     }),
     {
       name: 'solborn-store',
-      version: 2,
-      migrate: (persisted: unknown) => {
-        // Migrate pre-energy agents
+      version: 3,
+      migrate: (persisted: unknown, version: number) => {
         const state = persisted as { agents?: ForgeAgent[] }
-        if (state?.agents) {
+        if (!state?.agents) return state
+
+        // v1 → v2: energy fields
+        if (version < 2) {
           state.agents = state.agents.map((a) => ({
             ...a,
             energy: a.energy ?? MAX_ENERGY,
@@ -299,6 +301,49 @@ export const useForgeStore = create<ForgeStore>()(
             chainHistory: a.chainHistory ?? [],
           }))
         }
+
+        // v2 → v3: rename stages + remap skills
+        if (version < 3) {
+          const stageMap: Record<string, AgentStage> = {
+            baby: 'baby',
+            junior: 'toddler',
+            senior: 'teen',
+            adult: 'adult',
+          }
+          state.agents = state.agents.map((a) => {
+            const oldTraits = a.traits as unknown as {
+              curiosity?: number
+              creativity?: number
+              technical?: number
+              hustle?: number
+              vision?: number
+            }
+            // Remap legacy (technical/hustle/vision) → new skills if still present.
+            const curiosity = oldTraits.curiosity ?? 50
+            const creativity = oldTraits.creativity ?? 25
+            const codingSkill =
+              (a.traits as Partial<AgentSkills>).codingSkill ?? oldTraits.technical ?? 10
+            const solanaKnowledge =
+              (a.traits as Partial<AgentSkills>).solanaKnowledge ??
+              Math.round(((oldTraits.technical ?? 10) + (oldTraits.vision ?? 20)) * 0.35)
+            const founderMindset =
+              (a.traits as Partial<AgentSkills>).founderMindset ??
+              Math.round(((oldTraits.hustle ?? 30) + (oldTraits.vision ?? 20)) / 2)
+
+            return {
+              ...a,
+              stage: stageMap[a.stage] ?? a.stage,
+              traits: {
+                curiosity: Math.min(100, Math.max(0, curiosity)),
+                creativity: Math.min(100, Math.max(0, creativity)),
+                codingSkill: Math.min(100, Math.max(0, codingSkill)),
+                solanaKnowledge: Math.min(100, Math.max(0, solanaKnowledge)),
+                founderMindset: Math.min(100, Math.max(0, founderMindset)),
+              },
+            }
+          })
+        }
+
         return state
       },
     }

@@ -39,19 +39,19 @@ const SUGGESTED_PROMPTS: Record<ForgeAgent['stage'], string[]> = {
     "I'll explain what a startup is",
     'Do you know what blockchain means?',
   ],
-  junior: [
+  toddler: [
     'Let me explain how DeFi works',
     'What do you think about product-market fit?',
     'Here is how Solana programs work...',
   ],
-  senior: [
+  teen: [
     'Design a token staking program',
-    "Review my go-to-market strategy",
+    'Review my go-to-market strategy',
     'Write a Solana program in Rust',
   ],
   adult: [
-    'Generate your first project',
-    "What's your vision for the future?",
+    'Generate your first Blink',
+    "What's your vision for this project?",
     "Let's deploy to Solana!",
   ],
 }

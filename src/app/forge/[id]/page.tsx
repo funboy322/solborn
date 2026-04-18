@@ -42,7 +42,7 @@ export default function AgentPage({ params }: PageProps) {
 
   const [showEvolution, setShowEvolution] = useState(false)
   const [evolutionFrom, setEvolutionFrom] = useState<AgentStage>('baby')
-  const [evolutionTo, setEvolutionTo] = useState<AgentStage>('junior')
+  const [evolutionTo, setEvolutionTo] = useState<AgentStage>('toddler')
   const prevStageRef = useRef(agent?.stage)
 
   useEffect(() => {

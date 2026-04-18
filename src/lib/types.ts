@@ -1,14 +1,21 @@
 // Core domain types for SolBorn
 
-export type AgentStage = 'baby' | 'junior' | 'senior' | 'adult'
+export type AgentStage = 'baby' | 'toddler' | 'teen' | 'adult'
 
-export interface AgentTraits {
-  curiosity: number      // 0-100
-  creativity: number     // 0-100
-  technical: number      // 0-100
-  hustle: number         // 0-100
-  vision: number         // 0-100
+/**
+ * Agent skills (0-100). Rebranded from AgentTraits in v3.
+ * These are the 5 dimensions that actually drive agent behaviour in prompts.
+ */
+export interface AgentSkills {
+  curiosity: number        // asks follow-ups, wants to learn
+  solanaKnowledge: number  // grasp of Solana/Web3 concepts
+  codingSkill: number      // ability to reason about code
+  creativity: number       // original connections, ideas
+  founderMindset: number   // business, ship-it, strategy
 }
+
+/** Backwards-compatible alias — code written against AgentTraits keeps working. */
+export type AgentTraits = AgentSkills
 
 export interface AgentMessage {
   id: string
@@ -54,7 +61,7 @@ export interface ForgeAgent {
   stage: AgentStage
   xp: number
   xpToNext: number
-  traits: AgentTraits
+  traits: AgentSkills
   messages: AgentMessage[]
   mintAddress?: string       // mock cNFT address
   nftMetadata?: NFTMetadata
@@ -69,14 +76,14 @@ export interface ForgeAgent {
   lastStreakDate?: string          // YYYY-MM-DD
   bestStreak: number
   longResponseCount: number        // messages > 200 chars from AI
-  // Energy (new)
-  energy: number                   // current energy (0..maxEnergy)
-  maxEnergy: number                // cap
-  lastEnergyUpdate: number         // ms timestamp for regen calc
-  // Wallet / on-chain (new)
-  walletAddress?: string           // owning wallet (base58)
-  birthTxSignature?: string        // 0.1 SOL birth payment tx
-  chainHistory?: ChainCheckpoint[] // evolution checkpoints
+  // Energy
+  energy: number
+  maxEnergy: number
+  lastEnergyUpdate: number
+  // Wallet / on-chain
+  walletAddress?: string
+  birthTxSignature?: string
+  chainHistory?: ChainCheckpoint[]
 }
 
 export interface NFTMetadata {

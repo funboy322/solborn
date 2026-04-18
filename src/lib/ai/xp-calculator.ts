@@ -4,42 +4,48 @@
  * The premise: you are raising a baby from zero. What YOU type matters.
  * Lazy inputs ("hi", "ok", "k") → near-zero XP.
  * Rich teaching (explanations, examples, domain vocabulary, questions that prompt learning)
- * → big XP rewards.
+ * → big XP rewards, split across the 5 skill dimensions.
  */
 
-import type { AgentStage, AgentTraits } from '../types'
+import type { AgentStage, AgentSkills } from '../types'
 
 export interface XPBreakdown {
   total: number
   reasons: string[]
   quality: 'spam' | 'low' | 'decent' | 'good' | 'great'
-  traitBoosts: Partial<AgentTraits>
+  /** Per-skill deltas to apply via applyTraitBoosts. */
+  traitBoosts: Partial<AgentSkills>
 }
 
-const WEB3_TERMS = [
+const SOLANA_TERMS = [
   'solana', 'blockchain', 'wallet', 'token', 'nft', 'cnft', 'compressed',
-  'smart contract', 'program', 'anchor', 'rust', 'pda', 'mint', 'airdrop',
+  'smart contract', 'program', 'anchor', 'pda', 'mint', 'airdrop',
   'staking', 'validator', 'consensus', 'proof', 'defi', 'dex', 'amm',
   'liquidity', 'yield', 'lending', 'borrowing', 'oracle', 'bridge',
-  'dao', 'governance', 'treasury', 'vault', 'escrow', 'ledger',
+  'dao', 'governance', 'treasury', 'vault', 'escrow',
   'spl', 'metaplex', 'jito', 'helius', 'phantom', 'devnet', 'mainnet',
+  'bubblegum', 'blink', 'actions', 'cpi', 'jupiter', 'raydium', 'marinade',
+  'pyth', 'switchboard', 'seahorse', 'mev',
 ]
 
-const STARTUP_TERMS = [
+const FOUNDER_TERMS = [
   'startup', 'founder', 'mvp', 'pivot', 'runway', 'burn', 'revenue',
   'product', 'market', 'customer', 'user', 'problem', 'solution',
   'competitive', 'moat', 'traction', 'growth', 'retention', 'churn',
   'ltv', 'cac', 'funnel', 'conversion', 'pitch',
   'seed', 'series a', 'vc', 'angel', 'cap table', 'valuation',
   'go-to-market', 'gtm', 'roadmap', 'sprint', 'iteration', 'ship',
+  'hypothesis', 'distribution', 'network effect', 'virality',
 ]
 
-const TECHNICAL_TERMS = [
+const CODING_TERMS = [
   'function', 'variable', 'class', 'array', 'object', 'api', 'database',
   'server', 'client', 'frontend', 'backend', 'framework', 'library',
-  'typescript', 'javascript', 'python', 'react', 'next', 'node',
+  'typescript', 'javascript', 'python', 'rust', 'react', 'next', 'node',
   'compile', 'deploy', 'test', 'debug', 'cache', 'async', 'promise',
   'state', 'hook', 'component', 'query', 'mutation', 'schema',
+  'struct', 'trait', 'enum', 'macro', 'generic', 'interface',
+  'lifetime', 'mutable', 'immutable', 'borrow', 'ownership',
 ]
 
 const TEACHING_PATTERNS = [
@@ -83,6 +89,14 @@ function hasAny(text: string, patterns: RegExp[]): boolean {
   return patterns.some((p) => p.test(text))
 }
 
+function addBoost(
+  boosts: Partial<AgentSkills>,
+  key: keyof AgentSkills,
+  amount: number,
+): void {
+  boosts[key] = (boosts[key] ?? 0) + amount
+}
+
 export function calculateTeachingXP(
   userMessage: string,
   aiResponse: string,
@@ -90,7 +104,7 @@ export function calculateTeachingXP(
 ): XPBreakdown {
   const text = userMessage.trim()
   const reasons: string[] = []
-  const traitBoosts: Partial<AgentTraits> = {}
+  const traitBoosts: Partial<AgentSkills> = {}
   let xp = 0
 
   if (text.length === 0 || hasAny(text, LAZY_PATTERNS)) {
@@ -127,52 +141,53 @@ export function calculateTeachingXP(
     reasons.push(`+5 rich vocabulary`)
   }
 
-  const web3 = matchCount(text, WEB3_TERMS)
-  const startup = matchCount(text, STARTUP_TERMS)
-  const technical = matchCount(text, TECHNICAL_TERMS)
+  const solana = matchCount(text, SOLANA_TERMS)
+  const founder = matchCount(text, FOUNDER_TERMS)
+  const coding = matchCount(text, CODING_TERMS)
 
-  if (web3 > 0) {
-    const bonus = Math.min(15, web3 * 4)
+  if (solana > 0) {
+    const bonus = Math.min(15, solana * 4)
     xp += bonus
-    reasons.push(`+${bonus} Web3/Solana concepts`)
-    traitBoosts.vision = (traitBoosts.vision ?? 0) + Math.min(3, web3)
-    traitBoosts.technical = (traitBoosts.technical ?? 0) + Math.min(2, web3)
+    reasons.push(`+${bonus} Solana knowledge`)
+    addBoost(traitBoosts, 'solanaKnowledge', Math.min(4, solana))
+    addBoost(traitBoosts, 'curiosity', 1)
   }
-  if (startup > 0) {
-    const bonus = Math.min(10, startup * 3)
+  if (founder > 0) {
+    const bonus = Math.min(10, founder * 3)
     xp += bonus
-    reasons.push(`+${bonus} startup concepts`)
-    traitBoosts.hustle = (traitBoosts.hustle ?? 0) + Math.min(3, startup)
+    reasons.push(`+${bonus} founder mindset`)
+    addBoost(traitBoosts, 'founderMindset', Math.min(3, founder))
   }
-  if (technical > 0) {
-    const bonus = Math.min(10, technical * 3)
+  if (coding > 0) {
+    const bonus = Math.min(10, coding * 3)
     xp += bonus
-    reasons.push(`+${bonus} technical concepts`)
-    traitBoosts.technical = (traitBoosts.technical ?? 0) + Math.min(3, technical)
+    reasons.push(`+${bonus} coding concepts`)
+    addBoost(traitBoosts, 'codingSkill', Math.min(3, coding))
   }
 
   if (hasAny(text, TEACHING_PATTERNS)) {
     xp += 8
     reasons.push(`+8 explanation`)
-    traitBoosts.creativity = (traitBoosts.creativity ?? 0) + 1
+    addBoost(traitBoosts, 'creativity', 1)
   }
 
   if (hasAny(text, QUESTION_PATTERNS)) {
     xp += 4
     reasons.push(`+4 question`)
-    traitBoosts.curiosity = (traitBoosts.curiosity ?? 0) + 2
+    addBoost(traitBoosts, 'curiosity', 2)
   }
 
-  if (/```|\bfunction\s*\(|\bconst\s+\w+\s*=/.test(text)) {
+  // Code blocks → big coding boost
+  if (/```|\bfn\s+\w+|\bpub\s+fn|\bfunction\s*\(|\bconst\s+\w+\s*=/.test(text)) {
     xp += 15
     reasons.push(`+15 code example!`)
-    traitBoosts.technical = (traitBoosts.technical ?? 0) + 5
+    addBoost(traitBoosts, 'codingSkill', 5)
   }
 
   const stageMultiplier: Record<AgentStage, number> = {
     baby: 1.8,
-    junior: 1.2,
-    senior: 0.9,
+    toddler: 1.2,
+    teen: 0.9,
     adult: 0.6,
   }
   const mult = stageMultiplier[stage]
@@ -181,7 +196,7 @@ export function calculateTeachingXP(
     reasons.push(`×${mult.toFixed(1)} ${stage}`)
   }
 
-  if ((stage === 'senior' || stage === 'adult') && web3 + technical >= 3) {
+  if ((stage === 'teen' || stage === 'adult') && solana + coding >= 3) {
     xp += 10
     reasons.push(`+10 advanced`)
   }

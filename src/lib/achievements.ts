@@ -48,8 +48,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'junior_promoted',
-    title: 'Promoted!',
-    description: 'Evolve to Junior Founder',
+    title: 'First Steps',
+    description: 'Evolve to Toddler Founder',
     emoji: '📈',
     xpBonus: 30,
     color: '#34d399',
@@ -57,12 +57,12 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'senior_promoted',
-    title: 'Senior Status',
-    description: 'Evolve to Senior Founder',
+    title: 'Teen Years',
+    description: 'Evolve to Teen Founder',
     emoji: '💼',
     xpBonus: 50,
     color: '#f59e0b',
-    condition: (a: ForgeAgent) => a.stage === 'senior' || a.stage === 'adult',
+    condition: (a: ForgeAgent) => a.stage === 'teen' || a.stage === 'adult',
   },
   {
     id: 'visionary',
