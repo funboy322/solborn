@@ -1,0 +1,36 @@
+<svg viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Black background -->
+  <rect width="600" height="600" fill="#000000"/>
+
+  <!-- Teal swoosh behind -->
+  <path d="M 340 120 Q 560 200 540 420 Q 520 560 360 540 Q 200 520 180 400 Q 280 480 340 120 Z" fill="#00E5A0"/>
+  <ellipse cx="400" cy="380" rx="150" ry="170" fill="#00D49A" transform="rotate(15 400 380)"/>
+
+  <!-- Purple head -->
+  <circle cx="270" cy="290" r="210" fill="#6B5CE7"/>
+
+  <!-- Shadow on head (depth) -->
+  <circle cx="270" cy="290" r="210" fill="url(#headShade)"/>
+
+  <!-- Left eye -->
+  <ellipse cx="200" cy="255" rx="40" ry="46" fill="#111111"/>
+  <ellipse cx="190" cy="243" rx="12" ry="14" fill="#2a2a2a"/>
+
+  <!-- Right eye -->
+  <ellipse cx="340" cy="255" rx="40" ry="46" fill="#111111"/>
+  <ellipse cx="330" cy="243" rx="12" ry="14" fill="#2a2a2a"/>
+
+  <!-- Pacifier ring (outer) -->
+  <circle cx="268" cy="370" r="62" fill="none" stroke="#C8BFB0" stroke-width="18"/>
+  <!-- Pacifier shield -->
+  <ellipse cx="268" cy="370" rx="32" ry="28" fill="#B0C878"/>
+  <!-- Pacifier nipple -->
+  <ellipse cx="268" cy="400" rx="14" ry="20" fill="#C8BFB0"/>
+
+  <defs>
+    <radialGradient id="headShade" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.08)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.25)"/>
+    </radialGradient>
+  </defs>
+</svg>

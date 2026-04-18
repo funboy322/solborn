@@ -29,8 +29,8 @@ export default function ForgePage() {
         <div className="flex items-center gap-4 mb-8 pt-4">
           <Button variant="ghost" size="sm" onClick={() => router.push('/')}>
             <ArrowLeft size={16} />
-            Home
           </Button>
+          <img src="/logo.svg" alt="SolBorn" className="w-8 h-8 rounded-xl cursor-pointer" onClick={() => router.push('/')} />
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-zinc-100">The Forge</h1>
             <p className="text-sm text-zinc-500">

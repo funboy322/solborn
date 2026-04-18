@@ -402,13 +402,13 @@ function StickyNav({
           onClick={() => router.push('/')}
           whileHover={{ scale: 1.02 }}
         >
-          <motion.span
-            className="text-xl"
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            ◎
-          </motion.span>
+          <motion.img
+            src="/logo.svg"
+            alt="SolBorn"
+            className="w-8 h-8 rounded-xl"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+          />
           <span className="font-bold text-zinc-100 tracking-tight">SolBorn</span>
           <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/25 font-mono">
             Beta
@@ -427,6 +427,17 @@ function StickyNav({
               My Agents ({(agents as unknown[]).length})
             </Button>
           )}
+          <a
+            href="https://x.com/solbornxyz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex items-center justify-center w-8 h-8 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-white/5 transition-all"
+            title="Follow on X"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
           <WalletButton />
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
             <Button
@@ -529,7 +540,7 @@ export default function HomePage() {
               animate={{ opacity: [1, 0.3, 1] }}
               transition={{ duration: 1.5, repeat: Infinity }}
             />
-            Colosseum Frontier Hackathon 2026
+            🏆 Colosseum Frontier 2026
           </motion.div>
 
           {/* Headline */}
@@ -724,28 +735,39 @@ export default function HomePage() {
       {/* ── Footer ── */}
       <footer className="py-10 px-6 border-t border-white/5">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-zinc-600">◎</span>
+          <div className="flex items-center gap-2.5">
+            <img src="/logo.svg" alt="SolBorn" className="w-6 h-6 rounded-lg" />
             <span className="text-zinc-600 text-sm">SolBorn · Open Source · Colosseum 2026</span>
           </div>
           <div className="flex items-center gap-5 text-xs text-zinc-700">
             <a
-              href="https://github.com"
+              href="https://x.com/ungspirit"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 hover:text-zinc-400 transition-colors"
+            >
+              built by{' '}
+              <span className="text-violet-400 hover:text-violet-300">@ungspirit</span>
+            </a>
+            <a
+              href="https://x.com/solbornxyz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 hover:text-zinc-400 transition-colors"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+              @SolBornXYZ
+            </a>
+            <a
+              href="https://github.com/funboy322/solborn"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 hover:text-zinc-400 transition-colors"
             >
               <ExternalLink size={13} />
               GitHub
-            </a>
-            <a
-              href="https://colosseum.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 hover:text-zinc-400 transition-colors"
-            >
-              <ExternalLink size={13} />
-              Colosseum 2026
             </a>
           </div>
         </div>
