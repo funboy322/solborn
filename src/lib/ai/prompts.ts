@@ -1,7 +1,7 @@
 import { STAGE_CONFIG } from '../constants'
 import type { ForgeAgent } from '../types'
 
-export function buildSystemPrompt(agent: ForgeAgent): string {
+export function buildSystemPrompt(agent: ForgeAgent, memoryContext?: string): string {
   const stagePrompt = STAGE_CONFIG[agent.stage].systemPrompt
   const traitSummary = `
 Your current traits:
@@ -15,7 +15,9 @@ Your personality: ${agent.personality}
 Your name: ${agent.name}
   `.trim()
 
-  return `${stagePrompt}\n\n${traitSummary}\n\nYou are building toward deploying your first Solana project. Always stay in character as ${agent.name}.`
+  const memoryBlock = memoryContext?.trim() ? `\n\n${memoryContext.trim()}` : ''
+
+  return `${stagePrompt}\n\n${traitSummary}${memoryBlock}\n\nYou are building toward deploying your first Solana project. Always stay in character as ${agent.name}.`
 }
 
 export function buildGenerateProjectPrompt(agent: ForgeAgent): string {

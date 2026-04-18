@@ -1,7 +1,17 @@
 import { createOpenAI } from '@ai-sdk/openai'
 import { streamText } from 'ai'
 import { NextRequest } from 'next/server'
+import { after } from 'next/server'
 import { buildSystemPrompt } from '@/lib/ai/prompts'
+import {
+  retrieveMemories,
+  getUserProfile,
+  formatMemoryContext,
+  extractFacts,
+  storeFacts,
+  refreshUserProfile,
+  isMemoryEnabled,
+} from '@/lib/ai/memory'
 import type { ForgeAgent } from '@/lib/types'
 
 export const maxDuration = 30
@@ -44,7 +54,7 @@ export async function POST(req: NextRequest) {
   let agent: ForgeAgent
   let rawMessages: ChatMsg[]
   try {
-    const body = await req.json() as { agent: ForgeAgent; messages: ChatMsg[] }
+    const body = (await req.json()) as { agent: ForgeAgent; messages: ChatMsg[] }
     agent = body.agent
     rawMessages = body.messages ?? []
   } catch {
@@ -59,7 +69,6 @@ export async function POST(req: NextRequest) {
     return new Response('AI not configured', { status: 500 })
   }
 
-  const systemPrompt = buildSystemPrompt(agent)
   const messages = sanitizeMessages(rawMessages)
 
   if (messages.length === 0) {
@@ -69,6 +78,27 @@ export async function POST(req: NextRequest) {
     return new Response('Last message must be from user', { status: 400 })
   }
 
+  const lastUserMessage = messages[messages.length - 1].content
+  const walletAddress = agent.walletAddress ?? null
+
+  // ── Memory retrieval (non-blocking fallback if disabled) ──
+  let memoryContext = ''
+  if (isMemoryEnabled()) {
+    try {
+      const [memories, profile] = await Promise.all([
+        retrieveMemories({ agentId: agent.id, query: lastUserMessage, topK: 5 }),
+        walletAddress
+          ? getUserProfile(agent.id, walletAddress)
+          : Promise.resolve(null),
+      ])
+      memoryContext = formatMemoryContext(memories, profile)
+    } catch (e) {
+      console.warn('[chat] memory retrieve failed:', e instanceof Error ? e.message : e)
+    }
+  }
+
+  const systemPrompt = buildSystemPrompt(agent, memoryContext)
+
   async function runStream(modelId: string) {
     return streamText({
       model: groq(modelId),
@@ -77,13 +107,38 @@ export async function POST(req: NextRequest) {
       temperature: 0.85,
       maxOutputTokens: 500,
       abortSignal: req.signal,
+      onFinish: ({ text }) => {
+        // ── Background: extract & store facts after stream completes ──
+        // `after()` lets this run on Vercel past the response being sent.
+        if (!isMemoryEnabled() || !text || text.length < 20) return
+        after(async () => {
+          try {
+            const facts = await extractFacts(lastUserMessage, text)
+            if (facts.length === 0) return
+            await storeFacts({
+              agentId: agent.id,
+              walletAddress,
+              facts,
+            })
+            if (walletAddress) {
+              await refreshUserProfile({
+                agentId: agent.id,
+                walletAddress,
+                newFacts: facts,
+              })
+            }
+          } catch (e) {
+            console.warn('[chat] background memory write failed:', e instanceof Error ? e.message : e)
+          }
+        })
+      },
     })
   }
 
   try {
     const result = await runStream(PRIMARY_MODEL)
     return result.toTextStreamResponse({
-      headers: { 'X-Model': PRIMARY_MODEL },
+      headers: { 'X-Model': PRIMARY_MODEL, 'X-Memory': isMemoryEnabled() ? '1' : '0' },
     })
   } catch (e) {
     console.error('[chat] primary failed, fallback:', e)
