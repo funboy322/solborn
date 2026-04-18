@@ -1,4 +1,4 @@
-import { createOpenAI } from '@ai-sdk/openai'
+import { createGroq } from '@ai-sdk/groq'
 import { streamText } from 'ai'
 import { NextRequest } from 'next/server'
 import { after } from 'next/server'
@@ -18,8 +18,7 @@ export const maxDuration = 30
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const groq = createOpenAI({
-  baseURL: 'https://api.groq.com/openai/v1',
+const groq = createGroq({
   apiKey: process.env.GROQ_API_KEY ?? '',
 })
 
