@@ -77,7 +77,7 @@ const FEATURES = [
   {
     icon: Trophy,
     title: 'Hackathon Ready',
-    desc: 'Built for Colosseum Frontier Hackathon 2026. Fully open source and auditable.',
+    desc: 'Open source and fully auditable. Ship your own agents and build on top of SolBorn.',
     color: '#f43f5e',
     bg: 'rgba(244,63,94,0.08)',
     border: 'rgba(244,63,94,0.2)',
@@ -347,7 +347,7 @@ function StatsBar() {
     { label: 'Built on Solana', icon: '◎' },
     { label: 'On-chain Identity', icon: '⚡' },
     { label: 'Open Source', icon: '🔓' },
-    { label: 'Colosseum 2026', icon: '🏆' },
+    { label: 'Open Source', icon: '🔓' },
   ]
 
   return (
@@ -528,20 +528,6 @@ export default function HomePage() {
 
         {/* Hero content */}
         <div className="relative max-w-3xl mx-auto text-center z-10">
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full mb-8 border border-violet-500/20 bg-violet-500/8 text-violet-300 text-sm"
-          >
-            <motion.span
-              className="w-2 h-2 rounded-full bg-violet-400"
-              animate={{ opacity: [1, 0.3, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            />
-            🏆 Colosseum Frontier 2026
-          </motion.div>
 
           {/* Headline */}
           <motion.h1
@@ -737,7 +723,7 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <img src="/logo.svg" alt="SolBorn" className="w-6 h-6 rounded-lg" />
-            <span className="text-zinc-600 text-sm">SolBorn · Open Source · Colosseum 2026</span>
+            <span className="text-zinc-600 text-sm">SolBorn · Open Source · Solana</span>
           </div>
           <div className="flex items-center gap-5 text-xs text-zinc-700">
             <a
