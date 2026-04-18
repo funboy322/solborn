@@ -403,7 +403,7 @@ function StickyNav({
           whileHover={{ scale: 1.02 }}
         >
           <motion.img
-            src="/logo.svg"
+            src="/logo.png"
             alt="SolBorn"
             className="w-8 h-8 rounded-xl"
             animate={{ scale: [1, 1.05, 1] }}
@@ -722,7 +722,7 @@ export default function HomePage() {
       <footer className="py-10 px-6 border-t border-white/5">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <img src="/logo.svg" alt="SolBorn" className="w-6 h-6 rounded-lg" />
+            <img src="/logo.png" alt="SolBorn" className="w-6 h-6 rounded-lg" />
             <span className="text-zinc-600 text-sm">SolBorn · Open Source · Solana</span>
           </div>
           <div className="flex items-center gap-5 text-xs text-zinc-700">
