@@ -1,26 +1,668 @@
 @import "tailwindcss";
 
+/* ============================================================
+   SOLBORN — Premium Visual System
+   Aesthetics: Linear × pump.fun × tensor.trade
+   ============================================================ */
+
+/* ── 1. Design Tokens ─────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Base surfaces */
+  --background: #07070d;
+  --surface: #0d0d16;
+  --surface-elevated: #111120;
+  --card: rgba(255, 255, 255, 0.035);
+  --card-hover: rgba(255, 255, 255, 0.065);
+  --border: rgba(255, 255, 255, 0.07);
+  --border-hover: rgba(255, 255, 255, 0.18);
+
+  /* Text */
+  --text-primary: #f0f0f8;
+  --text-secondary: #8888aa;
+  --text-muted: #44445a;
+
+  /* Accent palette */
+  --accent-violet: #a78bfa;
+  --accent-violet-dim: rgba(167, 139, 250, 0.15);
+  --accent-violet-glow: rgba(167, 139, 250, 0.35);
+
+  --accent-emerald: #34d399;
+  --accent-emerald-dim: rgba(52, 211, 153, 0.12);
+  --accent-emerald-glow: rgba(52, 211, 153, 0.32);
+
+  --accent-amber: #f59e0b;
+  --accent-amber-dim: rgba(245, 158, 11, 0.12);
+  --accent-amber-glow: rgba(245, 158, 11, 0.32);
+
+  --accent-rose: #f43f5e;
+  --accent-rose-dim: rgba(244, 63, 94, 0.12);
+  --accent-rose-glow: rgba(244, 63, 94, 0.32);
+
+  --accent-cyan: #22d3ee;
+  --accent-cyan-dim: rgba(34, 211, 238, 0.12);
+  --accent-cyan-glow: rgba(34, 211, 238, 0.32);
+
+  /* Stage-specific color tokens */
+  --stage-0-color: #64748b;
+  --stage-0-glow: rgba(100, 116, 139, 0.3);
+  --stage-0-bg: rgba(100, 116, 139, 0.06);
+
+  --stage-1-color: #34d399;
+  --stage-1-glow: rgba(52, 211, 153, 0.32);
+  --stage-1-bg: rgba(52, 211, 153, 0.06);
+
+  --stage-2-color: #60a5fa;
+  --stage-2-glow: rgba(96, 165, 250, 0.32);
+  --stage-2-bg: rgba(96, 165, 250, 0.06);
+
+  --stage-3-color: #a78bfa;
+  --stage-3-glow: rgba(167, 139, 250, 0.35);
+  --stage-3-bg: rgba(167, 139, 250, 0.06);
+
+  --stage-4-color: #f59e0b;
+  --stage-4-glow: rgba(245, 158, 11, 0.35);
+  --stage-4-bg: rgba(245, 158, 11, 0.06);
+
+  --stage-5-color: #f43f5e;
+  --stage-5-glow: rgba(244, 63, 94, 0.38);
+  --stage-5-bg: rgba(244, 63, 94, 0.07);
+
+  /* Motion */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ── 2. Keyframe Animations ───────────────────────────────── */
+
+/* Animated mesh gradient shift */
+@keyframes mesh-drift {
+  0%   { transform: translate(0%, 0%) rotate(0deg) scale(1); }
+  33%  { transform: translate(3%, 5%) rotate(120deg) scale(1.08); }
+  66%  { transform: translate(-4%, 2%) rotate(240deg) scale(0.94); }
+  100% { transform: translate(0%, 0%) rotate(360deg) scale(1); }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes mesh-drift-2 {
+  0%   { transform: translate(0%, 0%) rotate(0deg) scale(1.1); }
+  50%  { transform: translate(-5%, 6%) rotate(180deg) scale(0.9); }
+  100% { transform: translate(0%, 0%) rotate(360deg) scale(1.1); }
 }
 
+/* Glow pulse */
+@keyframes glow-pulse-violet {
+  0%, 100% { box-shadow: 0 0 20px rgba(167, 139, 250, 0.2), 0 0 60px rgba(167, 139, 250, 0.06); }
+  50%       { box-shadow: 0 0 35px rgba(167, 139, 250, 0.38), 0 0 90px rgba(167, 139, 250, 0.14); }
+}
+@keyframes glow-pulse-emerald {
+  0%, 100% { box-shadow: 0 0 20px rgba(52, 211, 153, 0.18), 0 0 60px rgba(52, 211, 153, 0.06); }
+  50%       { box-shadow: 0 0 35px rgba(52, 211, 153, 0.35), 0 0 90px rgba(52, 211, 153, 0.12); }
+}
+@keyframes glow-pulse-amber {
+  0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.18), 0 0 60px rgba(245, 158, 11, 0.06); }
+  50%       { box-shadow: 0 0 35px rgba(245, 158, 11, 0.35), 0 0 90px rgba(245, 158, 11, 0.12); }
+}
+@keyframes glow-pulse-rose {
+  0%, 100% { box-shadow: 0 0 20px rgba(244, 63, 94, 0.18), 0 0 60px rgba(244, 63, 94, 0.06); }
+  50%       { box-shadow: 0 0 35px rgba(244, 63, 94, 0.36), 0 0 90px rgba(244, 63, 94, 0.12); }
+}
+@keyframes glow-pulse-cyan {
+  0%, 100% { box-shadow: 0 0 20px rgba(34, 211, 238, 0.18), 0 0 60px rgba(34, 211, 238, 0.06); }
+  50%       { box-shadow: 0 0 35px rgba(34, 211, 238, 0.35), 0 0 90px rgba(34, 211, 238, 0.12); }
+}
+
+/* Gradient text shift */
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Shimmer scan */
+@keyframes shimmer-scan {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* XP bar shine sweep */
+@keyframes xp-shine {
+  0%   { left: -60%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.6; }
+  100% { left: 120%; opacity: 0; }
+}
+
+/* Pulse ring */
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 0.6; }
+  70%  { transform: scale(1.55); opacity: 0; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+@keyframes pulse-ring-inner {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.75; }
+}
+
+/* Neon underline travel */
+@keyframes neon-travel {
+  0%   { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Float for particles */
+@keyframes float-up {
+  0%   { transform: translateY(0px) translateX(0px) scale(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(-120px) translateX(20px) scale(1); opacity: 0; }
+}
+@keyframes float-up-b {
+  0%   { transform: translateY(0px) translateX(0px) scale(0); opacity: 0; }
+  10%  { opacity: 0.7; }
+  90%  { opacity: 0.2; }
+  100% { transform: translateY(-90px) translateX(-30px) scale(0.8); opacity: 0; }
+}
+
+/* Card lift */
+@keyframes border-glow {
+  0%, 100% { border-color: rgba(255, 255, 255, 0.07); }
+  50%       { border-color: rgba(255, 255, 255, 0.16); }
+}
+
+/* ── 3. Base Styles ───────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html, body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── 4. Animated Mesh Gradient Background ─────────────────── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+}
+
+/* Gradient orbs — layered behind everything */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 20%, rgba(124, 58, 237, 0.09) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 60% at 85% 75%, rgba(52, 211, 153, 0.06) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 40% at 50% 50%, rgba(15, 15, 30, 0.95) 0%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
+  animation: mesh-drift 28s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Secondary ambient orb */
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Noise texture overlay — keep from original */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.45;
+}
+
+/* ── 5. Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(167, 139, 250, 0.2);
+  border-radius: 99px;
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(167, 139, 250, 0.45);
+}
+
+/* ── 6. Selection ─────────────────────────────────────────── */
+::selection {
+  background: rgba(167, 139, 250, 0.28);
+  color: #f0f0f8;
+}
+
+/* ── 7. Premium Glassmorphism ─────────────────────────────── */
+.glass {
+  background: var(--card);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  /* Layered inner glow + subtle depth */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    0 0 0 0.5px rgba(255, 255, 255, 0.03);
+  transition:
+    border-color 0.25s var(--ease-smooth),
+    box-shadow 0.3s var(--ease-smooth),
+    transform 0.25s var(--ease-smooth),
+    background 0.25s var(--ease-smooth);
+}
+
+.glass:hover {
+  background: var(--card-hover);
+  border-color: var(--border-hover);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    0 12px 48px rgba(0, 0, 0, 0.3),
+    0 0 0 0.5px rgba(255, 255, 255, 0.06),
+    0 0 40px rgba(167, 139, 250, 0.06);
+  transform: translateY(-2px);
+}
+
+/* Elevated glass variant */
+.glass-elevated {
+  background: rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(32px) saturate(1.6);
+  -webkit-backdrop-filter: blur(32px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 4px 6px rgba(0, 0, 0, 0.3),
+    0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+/* ── 8. Animated Glow Utilities ───────────────────────────── */
+.glow-violet {
+  box-shadow: 0 0 25px rgba(167, 139, 250, 0.22), 0 0 60px rgba(167, 139, 250, 0.08);
+  animation: glow-pulse-violet 3.5s ease-in-out infinite;
+}
+.glow-emerald {
+  box-shadow: 0 0 25px rgba(52, 211, 153, 0.2), 0 0 60px rgba(52, 211, 153, 0.07);
+  animation: glow-pulse-emerald 3.5s ease-in-out infinite;
+}
+.glow-amber {
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.2), 0 0 60px rgba(245, 158, 11, 0.07);
+  animation: glow-pulse-amber 3.5s ease-in-out infinite;
+}
+.glow-rose {
+  box-shadow: 0 0 25px rgba(244, 63, 94, 0.2), 0 0 60px rgba(244, 63, 94, 0.07);
+  animation: glow-pulse-rose 3.5s ease-in-out infinite;
+}
+.glow-cyan {
+  box-shadow: 0 0 25px rgba(34, 211, 238, 0.2), 0 0 60px rgba(34, 211, 238, 0.07);
+  animation: glow-pulse-cyan 3.5s ease-in-out infinite;
+}
+
+/* Static versions (no animation) */
+.glow-violet-static  { box-shadow: 0 0 25px rgba(167, 139, 250, 0.22), 0 0 60px rgba(167, 139, 250, 0.08); }
+.glow-emerald-static { box-shadow: 0 0 25px rgba(52, 211, 153, 0.2),   0 0 60px rgba(52, 211, 153, 0.07); }
+.glow-amber-static   { box-shadow: 0 0 25px rgba(245, 158, 11, 0.2),   0 0 60px rgba(245, 158, 11, 0.07); }
+.glow-rose-static    { box-shadow: 0 0 25px rgba(244, 63, 94, 0.2),    0 0 60px rgba(244, 63, 94, 0.07); }
+
+/* ── 9. Text Effects ──────────────────────────────────────── */
+
+/* Animated gradient text */
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    #a78bfa 0%,
+    #60a5fa 25%,
+    #34d399 50%,
+    #a78bfa 75%,
+    #f43f5e 100%
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 6s ease infinite;
+}
+
+/* Violet↔emerald two-tone variant */
+.gradient-text-ve {
+  background: linear-gradient(135deg, #a78bfa 0%, #34d399 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* Shimmer scanning highlight */
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    var(--text-secondary) 0%,
+    var(--text-secondary) 30%,
+    rgba(255, 255, 255, 0.95) 48%,
+    rgba(200, 180, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.95) 52%,
+    var(--text-secondary) 70%,
+    var(--text-secondary) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-scan 3s linear infinite;
+}
+
+/* ── 10. Type Scale ───────────────────────────────────────── */
+.heading-xl {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+.heading-lg {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+.heading-md {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+.heading-sm {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  line-height: 1.3;
+}
+.label-xs {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── 11. XP Bar ───────────────────────────────────────────── */
+.xp-bar {
+  position: relative;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.xp-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--accent-violet) 0%, var(--accent-cyan) 100%);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.5), 0 0 4px rgba(167, 139, 250, 0.8);
+  position: relative;
+  overflow: hidden;
+  transition: width 0.6s var(--ease-spring);
+}
+
+/* Shine sweep over fill */
+.xp-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  animation: xp-shine 2.8s ease-in-out infinite;
+  border-radius: 99px;
+}
+
+/* ── 12. Pulse Ring (avatars/status) ─────────────────────── */
+.pulse-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulse-ring::before,
+.pulse-ring::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-violet);
+  animation: pulse-ring 2.4s ease-out infinite;
+}
+
+.pulse-ring::after {
+  animation-delay: 1.2s;
+}
+
+.pulse-ring > * {
+  animation: pulse-ring-inner 2.4s ease-in-out infinite;
+}
+
+/* Stage-tinted pulse ring variants */
+.pulse-ring-emerald::before,
+.pulse-ring-emerald::after {
+  border-color: var(--accent-emerald);
+}
+.pulse-ring-amber::before,
+.pulse-ring-amber::after {
+  border-color: var(--accent-amber);
+}
+.pulse-ring-rose::before,
+.pulse-ring-rose::after {
+  border-color: var(--accent-rose);
+}
+
+/* ── 13. Neon Underline ───────────────────────────────────── */
+.neon-underline {
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+}
+
+.neon-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  border-radius: 99px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent-violet) 20%,
+    var(--accent-cyan) 50%,
+    var(--accent-emerald) 80%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: neon-travel 2.5s linear infinite;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.neon-underline:hover::after {
+  opacity: 1;
+  height: 2px;
+}
+
+/* ── 14. CSS-Only Particle Background ────────────────────── */
+.particles-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.particles-bg::before,
+.particles-bg::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Particle cluster A — violet dots */
+.particles-bg::before {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent-violet);
+  box-shadow:
+    /* scattered dots — (x, y) pairs within a 600px × 400px canvas */
+    80px  120px 0 0   rgba(167, 139, 250, 0.5),
+    200px 40px  0 0   rgba(167, 139, 250, 0.3),
+    340px 180px 0 0   rgba(167, 139, 250, 0.4),
+    460px 90px  0 0   rgba(167, 139, 250, 0.25),
+    560px 260px 0 0   rgba(167, 139, 250, 0.35),
+    120px 300px 0 0   rgba(52,  211, 153, 0.3),
+    290px 340px 0 0   rgba(52,  211, 153, 0.2),
+    430px 380px 0 0   rgba(34,  211, 238, 0.3),
+    50px  380px 0 0   rgba(34,  211, 238, 0.2),
+    510px 150px 0 0   rgba(245, 158, 11,  0.25);
+  top: 10%;
+  left: 5%;
+  opacity: 0;
+  animation: float-up 7s ease-out infinite;
+}
+
+/* Particle cluster B — emerald/cyan */
+.particles-bg::after {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+  box-shadow:
+    160px 60px  0 0   rgba(52,  211, 153, 0.45),
+    320px 20px  0 0   rgba(52,  211, 153, 0.28),
+    480px 140px 0 0   rgba(34,  211, 238, 0.38),
+    100px 220px 0 0   rgba(34,  211, 238, 0.22),
+    240px 300px 0 0   rgba(167, 139, 250, 0.35),
+    390px 260px 0 0   rgba(167, 139, 250, 0.2),
+    540px 60px  0 0   rgba(245, 158, 11,  0.3),
+    70px  340px 0 0   rgba(244, 63,  94,  0.2),
+    420px 10px  0 0   rgba(167, 139, 250, 0.4),
+    580px 310px 0 0   rgba(52,  211, 153, 0.25);
+  top: 20%;
+  left: 10%;
+  opacity: 0;
+  animation: float-up-b 9s ease-out 2s infinite;
+}
+
+/* ── 15. Stage Color Utility Classes ─────────────────────── */
+.stage-0 { color: var(--stage-0-color); }
+.stage-1 { color: var(--stage-1-color); }
+.stage-2 { color: var(--stage-2-color); }
+.stage-3 { color: var(--stage-3-color); }
+.stage-4 { color: var(--stage-4-color); }
+.stage-5 { color: var(--stage-5-color); }
+
+.stage-0-bg { background: var(--stage-0-bg); }
+.stage-1-bg { background: var(--stage-1-bg); }
+.stage-2-bg { background: var(--stage-2-bg); }
+.stage-3-bg { background: var(--stage-3-bg); }
+.stage-4-bg { background: var(--stage-4-bg); }
+.stage-5-bg { background: var(--stage-5-bg); }
+
+.stage-0-glow { box-shadow: 0 0 24px var(--stage-0-glow); }
+.stage-1-glow { box-shadow: 0 0 24px var(--stage-1-glow); }
+.stage-2-glow { box-shadow: 0 0 24px var(--stage-2-glow); }
+.stage-3-glow { box-shadow: 0 0 24px var(--stage-3-glow); }
+.stage-4-glow { box-shadow: 0 0 24px var(--stage-4-glow); }
+.stage-5-glow { box-shadow: 0 0 24px var(--stage-5-glow); }
+
+/* ── 16. Misc Utility Classes ─────────────────────────────── */
+
+/* Inset glow highlight on top edge (like raised glass) */
+.inset-highlight {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Divider with fade */
+.divider-fade {
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.08) 70%,
+    transparent 100%
+  );
+}
+
+/* Subtle text glow for headings */
+.text-glow-violet {
+  text-shadow: 0 0 24px rgba(167, 139, 250, 0.5), 0 0 60px rgba(167, 139, 250, 0.2);
+}
+.text-glow-emerald {
+  text-shadow: 0 0 24px rgba(52, 211, 153, 0.5), 0 0 60px rgba(52, 211, 153, 0.18);
+}
+.text-glow-amber {
+  text-shadow: 0 0 24px rgba(245, 158, 11, 0.5), 0 0 60px rgba(245, 158, 11, 0.18);
+}
+
+/* Interactive press state */
+.press-effect {
+  transition: transform 0.12s var(--ease-smooth);
+}
+.press-effect:active {
+  transform: scale(0.97);
+}
+
+/* Dot grid background for cards */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Frosted border — accent-colored */
+.border-violet { border-color: rgba(167, 139, 250, 0.3); }
+.border-emerald { border-color: rgba(52, 211, 153, 0.28); }
+.border-amber   { border-color: rgba(245, 158, 11, 0.28); }
+.border-rose    { border-color: rgba(244, 63, 94, 0.28); }
+.border-cyan    { border-color: rgba(34, 211, 238, 0.28); }
+
+/* Monospace number display */
+.mono-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.1ms !important;
+  }
 }
