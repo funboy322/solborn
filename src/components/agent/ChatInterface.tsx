@@ -13,6 +13,7 @@ import { applyTraitBoosts } from '@/lib/ai/trait-analyzer'
 import { calculateTeachingXP, isRepetitive } from '@/lib/ai/xp-calculator'
 import { checkNewAchievements, calculateStreak, getStreakBonus } from '@/lib/achievements'
 import { SFX } from '@/lib/sounds'
+import { useDemoMode, DEMO_XP_MULTIPLIER, DEMO_ENERGY_COST } from '@/lib/demo-mode'
 import type { ForgeAgent, Achievement } from '@/lib/types'
 
 interface ChatMessage {
@@ -118,6 +119,7 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
   const registerTraining = useForgeStore((s) => s.registerTraining)
   const { publicKey } = useWallet()
   const trainerWallet = publicKey?.toBase58() ?? null
+  const demo = useDemoMode()
   const stageConfig = STAGE_CONFIG[agent.stage]
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -165,13 +167,16 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isLoading) return
 
-    // Energy gate
-    const hasEnergy = consumeEnergy(agent.id, ENERGY_PER_MESSAGE)
-    if (!hasEnergy) {
-      setSpamWarnings((prev) => [...prev, nanoid()])
-      return
+    // Energy gate (bypassed in demo mode — cost is 0, always passes)
+    const energyCost = demo ? DEMO_ENERGY_COST : ENERGY_PER_MESSAGE
+    if (energyCost > 0) {
+      const hasEnergy = consumeEnergy(agent.id, energyCost)
+      if (!hasEnergy) {
+        setSpamWarnings((prev) => [...prev, nanoid()])
+        return
+      }
+      setDisplayEnergy((e) => Math.max(0, e - energyCost))
     }
-    setDisplayEnergy((e) => Math.max(0, e - ENERGY_PER_MESSAGE))
 
     // Spam / repetition gate
     const recentUserMsgs = messages.filter((m) => m.role === 'user').map((m) => m.content)
@@ -243,7 +248,9 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
         ? { total: 0, quality: 'spam' as const, traitBoosts: {} }
         : calculateTeachingXP(text.trim(), accumulated, agent.stage)
 
-      const totalXP = breakdown.total + streakBonus
+      const baseXP = breakdown.total + streakBonus
+      // Demo mode: multiply XP so judges can hit Adult in 3–4 messages for the 60s video
+      const totalXP = demo ? baseXP * DEMO_XP_MULTIPLIER : baseXP
       if (totalXP > 0) {
         gainXP(agent.id, totalXP)
         SFX.xpGain()
@@ -297,14 +304,14 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
       setIsLoading(false)
       setStreamingId(null)
     }
-  }, [messages, isLoading, agent, gainXP, updateTraits, unlockAchievement, updateStreak, incrementLongResponses, consumeEnergy, regenEnergy, triggerScreenShake, registerTraining, trainerWallet])
+  }, [messages, isLoading, agent, gainXP, updateTraits, unlockAchievement, updateStreak, incrementLongResponses, consumeEnergy, regenEnergy, triggerScreenShake, registerTraining, trainerWallet, demo])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     sendMessage(input)
   }
 
-  const noEnergy = displayEnergy < ENERGY_PER_MESSAGE
+  const noEnergy = !demo && displayEnergy < ENERGY_PER_MESSAGE
   const suggested = SUGGESTED_PROMPTS[agent.stage]
   const hasInput = input.trim().length > 0
 
@@ -315,8 +322,25 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
       transition={{ duration: 0.5, ease: 'easeInOut' }}
     >
       {/* Energy bar at top */}
-      <div className="px-4 pt-3 pb-2 border-b border-white/5">
-        <EnergyBar energy={displayEnergy} maxEnergy={agent.maxEnergy ?? MAX_ENERGY} compact />
+      <div className="px-4 pt-3 pb-2 border-b border-white/5 flex items-center gap-3">
+        <div className="flex-1">
+          <EnergyBar energy={displayEnergy} maxEnergy={agent.maxEnergy ?? MAX_ENERGY} compact />
+        </div>
+        {demo && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="px-2 py-0.5 rounded-md text-[10px] font-black tracking-wider text-amber-300"
+            style={{
+              background: 'linear-gradient(135deg, rgba(245,158,11,0.25), rgba(236,72,153,0.2))',
+              border: '1px solid rgba(245,158,11,0.5)',
+              boxShadow: '0 0 12px rgba(245,158,11,0.3)',
+            }}
+            title="Demo mode: ×50 XP, infinite energy. Remove ?demo=1 to return to normal play."
+          >
+            DEMO ×{DEMO_XP_MULTIPLIER}
+          </motion.div>
+        )}
       </div>
 
       {/* Messages */}
