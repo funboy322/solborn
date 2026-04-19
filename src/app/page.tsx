@@ -423,10 +423,20 @@ function StickyNav({
             variant="ghost"
             size="sm"
             onClick={() => router.push('/rewards')}
-            className="text-zinc-400 hover:text-zinc-100 text-xs"
-            title="Nominate trainers for rewards"
+            className="text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
+            title="Reward program — coming soon"
           >
             🎁 Rewards
+            <span
+              className="px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider"
+              style={{
+                background: 'rgba(245,158,11,0.15)',
+                color: 'rgb(252, 211, 77)',
+                border: '1px solid rgba(245,158,11,0.3)',
+              }}
+            >
+              SOON
+            </span>
           </Button>
           {(agents as unknown[]).length > 0 && (
             <Button

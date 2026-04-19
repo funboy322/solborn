@@ -76,7 +76,7 @@ Ships.<br />Generates a live Blink<br />from its trait vector.
 | 🎓 **Teaching XP engine** | Custom grader + trait analyzer | Word count × quality × novelty — spam = 0 XP |
 | 🪪 **Compressed NFTs** | Metaplex Bubblegum + Umi | Real devnet mints, cost ~0.00001 SOL per evolution |
 | 🪄 **Solana Blinks** | Solana Actions spec 2.4 | GET/POST/OPTIONS endpoint, opens in dial.to + Phantom |
-| 👥 **Trainer royalties** | Per-wallet XP attribution | On-chain memo-indexed, feeds into `$BORN` fee-share pool |
+| 👥 **Trainer royalties** | Per-wallet XP attribution | On-chain memo-indexed, feeds into `$SBORN` fee-share pool |
 | 🔋 **Energy system** | Client-side regen + wallet boost | 2 energy/min, connect wallet for refill |
 | 🏆 **Achievements** | 20+ unlocks, XP bonuses | Real-time toast + screen-shake feedback |
 | 🎬 **Demo mode** | `?demo=1` → ×50 XP, ∞ energy | Lets judges hit Adult in 3–4 messages |
@@ -203,7 +203,7 @@ solborn/
 - **Devnet only** at launch. All cNFTs, Blinks, and Memo txs are devnet. Mainnet is a Phase 8 decision, not a day-1 promise.
 - **Groq free-tier limits** apply. Chat has a Llama 3.1 8B fallback when 70B is throttled.
 - **Minting costs SOL**. Bubblegum mints are ~0.00001 SOL each but require a funded trainer wallet.
-- **Not financial advice.** `$BORN` is a memecoin with a utility wrapper, not a security. If you can't afford to lose what you ape, don't ape.
+- **Not financial advice.** `$SBORN` is a memecoin with a utility wrapper, not a security. If you can't afford to lose what you ape, don't ape.
 
 <br />
 
