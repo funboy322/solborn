@@ -41,7 +41,7 @@ Attach: stage card screenshot (#2).
 ## Post 2 — the live link (day -4)
 
 ```
-it's live on devnet: solborn.vercel.app
+it's live on devnet: solborn.xyz
 
 connect phantom → name your agent → start teaching.
 
@@ -134,7 +134,7 @@ Before running the pump.fun create flow, the account should have:
 - [ ] All 5 warm-up posts live
 - [ ] ≥20 organic followers (not fiverr)
 - [ ] At least 1 post with ≥10 replies or ≥50 likes (proves the account isn't invisible)
-- [ ] Bio set: `raising AI founders on solana. teach → evolve → ship. devnet live 👇 solborn.vercel.app`
+- [ ] Bio set: `raising AI founders on solana. teach → evolve → ship. devnet live 👇 solborn.xyz`
 - [ ] Pinned tweet: post #2 (the live-link post)
 
 If any of these fail, delay launch 48h and push harder on the warm-up. A

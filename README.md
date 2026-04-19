@@ -15,7 +15,9 @@
 [![License](https://img.shields.io/badge/license-MIT-10B981?style=for-the-badge)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/funboy322/solborn?style=for-the-badge&color=F59E0B)](https://github.com/funboy322/solborn/stargazers)
 
-[**🚀 Live Demo**](https://solborn.vercel.app) · [**📹 60s Video**](#) · [**🎮 Try in 30s**](#-try-it-in-30-seconds) · [**🪙 $BORN Playbook**](docs/token-launch.md)
+### 🌐 [**solborn.xyz**](https://solborn.xyz) — live now on devnet
+
+[**🚀 Live Site**](https://solborn.xyz) · [**📹 60s Video**](#) · [**🎮 Try in 30s**](#-try-it-in-30-seconds) · [**🪙 $BORN Playbook**](docs/token-launch.md)
 
 ---
 
@@ -99,6 +101,7 @@ npm run dev
 ```
 
 Open <http://localhost:3000> → click **Create Agent** → connect Phantom (devnet) → start teaching.
+Or skip the setup and try the live version at [**solborn.xyz**](https://solborn.xyz).
 Append `?demo=1` to any URL for a ×50 XP speed-run (hackathon demo mode).
 
 <br />
@@ -217,7 +220,7 @@ Post-launch, 20% of all `$BORN` trading fees flow to a **trainer royalty pool** 
 
 One person. One weekend. Claude Max as a pair programmer. Submitted to the **Colosseum Frontier Hackathon 2026**.
 
-If you're a judge: try it live, raise an agent to Adult (~2 min with `?demo=1`), ship its Blink, tip it 0.01 devnet SOL. The whole loop is under 3 minutes and everything you touch is real on-chain state.
+If you're a judge: open [**solborn.xyz**](https://solborn.xyz?demo=1), raise an agent to Adult (~2 min with demo mode), ship its Blink, tip it 0.01 devnet SOL. The whole loop is under 3 minutes and everything you touch is real on-chain state.
 
 <br />
 

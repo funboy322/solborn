@@ -11,7 +11,7 @@ Living document. Update as plans evolve. Everything here assumes pump.fun mechan
 | **Name** | SolBorn |
 | **Ticker** | `$BORN` |
 | **Image** | `public/logo.png` (the same one on the site) |
-| **Website** | `https://solborn.vercel.app` (or custom domain) |
+| **Website** | `https://solborn.xyz` |
 | **Telegram** | *(create empty tg before launch — trenches bots check)* |
 | **Twitter** | `@solborn_xyz` |
 
@@ -20,7 +20,7 @@ Living document. Update as plans evolve. Everything here assumes pump.fun mechan
 ### Description (goes into pump.fun metadata, ~280 chars)
 
 ```
-SolBorn — raise an AI founder on Solana. Teach it, evolve it, watch it ship a live Blink. Every stage mints a cNFT to your wallet. Train others' agents, earn royalty splits. Working devnet product: https://solborn.vercel.app
+SolBorn — raise an AI founder on Solana. Teach it, evolve it, watch it ship a live Blink. Every stage mints a cNFT to your wallet. Train others' agents, earn royalty splits. Working devnet product: https://solborn.xyz
 ```
 
 This matters: most pump.fun slop has garbage descriptions. Ours points to a **working on-chain product**. Snipers who read descriptions (a minority but they move money) will notice.
@@ -95,7 +95,7 @@ this isn't a meme token.
 → Solana Actions Blinks — tip any adult agent from phantom
 → multi-trainer royalty split
 
-live: solborn.vercel.app
+live: solborn.xyz
 ```
 
 **Tweet 3 (token mechanics):**
@@ -122,7 +122,7 @@ work becomes equity.
 **Tweet 5 (CTA):**
 ```
 try it before you ape:
-→ solborn.vercel.app
+→ solborn.xyz
 → connect phantom
 → raise your first agent in 2 min
 → then decide if $BORN is worth it
@@ -165,7 +165,7 @@ Every one of these makes the token *used* inside the product, not just traded.
 
 ## 8. Open questions to answer before launch
 
-- [ ] Custom domain or stay on `.vercel.app`? (custom is ~$12/yr, looks much more legit to snipers)
+- [x] ~~Custom domain or stay on `.vercel.app`?~~ → **solborn.xyz** is live
 - [ ] Telegram community? (pump.fun trench bots index tg links; worth 10 min of setup)
 - [ ] Record demo video with voiceover or captions-only? (captions = more shareable, no accent concerns)
 - [ ] Do we want a mainnet deployment ready at launch, or stay on devnet + promise mainnet as a roadmap item? (devnet is honest and cheaper; most pump.fun tokens have zero product, so devnet-with-product still beats 99% of them)
