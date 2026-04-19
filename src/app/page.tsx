@@ -14,25 +14,25 @@ const STAGES = [
   {
     emoji: '👶',
     label: 'Baby',
-    desc: 'Curious, asks questions, learns about Web3',
+    desc: 'Knows nothing. Asks "what is a wallet?" in babble.',
     color: '#a78bfa',
     glow: 'rgba(167,139,250,0.25)',
     bg: 'rgba(167,139,250,0.08)',
     border: 'rgba(167,139,250,0.2)',
   },
   {
-    emoji: '🧑',
-    label: 'Junior',
-    desc: 'Forms opinions, researches markets, builds conviction',
+    emoji: '🧒',
+    label: 'Toddler',
+    desc: 'Repeats what you taught. Gets it adorably wrong sometimes.',
     color: '#34d399',
     glow: 'rgba(52,211,153,0.25)',
     bg: 'rgba(52,211,153,0.08)',
     border: 'rgba(52,211,153,0.2)',
   },
   {
-    emoji: '💼',
-    label: 'Senior',
-    desc: 'Writes code, designs architecture, reviews PRs',
+    emoji: '🧑‍💻',
+    label: 'Teen',
+    desc: 'Opinionated. Writes Anchor. Pushes back on bad ideas.',
     color: '#f59e0b',
     glow: 'rgba(245,158,11,0.25)',
     bg: 'rgba(245,158,11,0.08)',
@@ -41,7 +41,7 @@ const STAGES = [
   {
     emoji: '🚀',
     label: 'Adult',
-    desc: 'Ships products, deploys real Solana programs',
+    desc: 'Ships a live Solana Blink. Real devnet tx, real tips.',
     color: '#f43f5e',
     glow: 'rgba(244,63,94,0.25)',
     bg: 'rgba(244,63,94,0.08)',
@@ -52,32 +52,32 @@ const STAGES = [
 const FEATURES = [
   {
     icon: Brain,
-    title: 'AI-Powered Growth',
-    desc: 'Each conversation teaches your agent new skills and evolves their on-chain personality over time.',
+    title: 'Persistent Memory',
+    desc: 'Your agent remembers you across sessions — what you taught, who you are, what you\'re building. Semantic recall per wallet.',
     color: '#a78bfa',
     bg: 'rgba(167,139,250,0.08)',
     border: 'rgba(167,139,250,0.2)',
   },
   {
     icon: Zap,
-    title: 'On-Chain Identity',
-    desc: 'Every agent is a compressed NFT on Solana with dynamic attributes that update as they evolve.',
+    title: 'Compressed NFTs',
+    desc: 'Each evolution mints a real cNFT to your Phantom via Metaplex Bubblegum. Four stages, four collectibles.',
     color: '#34d399',
     bg: 'rgba(52,211,153,0.08)',
     border: 'rgba(52,211,153,0.2)',
   },
   {
     icon: Rocket,
-    title: 'Ship Real Projects',
-    desc: 'Adult founders generate and deploy actual Solana programs to devnet — real code, real output.',
+    title: 'Ships a Real Blink',
+    desc: 'Adult agents publish a live Solana Action. Strangers can tip them in one click — renders in Phantom and dial.to.',
     color: '#f59e0b',
     bg: 'rgba(245,158,11,0.08)',
     border: 'rgba(245,158,11,0.2)',
   },
   {
     icon: Trophy,
-    title: 'Hackathon Ready',
-    desc: 'Open source and fully auditable. Ship your own agents and build on top of SolBorn.',
+    title: 'Trainer Royalties',
+    desc: 'Anyone can train anyone\'s agent. XP you contribute splits future royalties — teaching is upside, not charity.',
     color: '#f43f5e',
     bg: 'rgba(244,63,94,0.08)',
     border: 'rgba(244,63,94,0.2)',
@@ -345,8 +345,10 @@ function FeatureCard({ feature, index }: { feature: (typeof FEATURES)[0]; index:
 function StatsBar() {
   const items = [
     { label: 'Built on Solana', icon: '◎' },
-    { label: 'On-chain Identity', icon: '⚡' },
-    { label: 'Open Source', icon: '🔓' },
+    { label: 'Compressed NFTs', icon: '⚡' },
+    { label: 'Live Blinks', icon: '✦' },
+    { label: 'Trainer Royalties', icon: '🪙' },
+    { label: 'Persistent Memory', icon: '🧠' },
     { label: 'Open Source', icon: '🔓' },
   ]
 
@@ -550,9 +552,9 @@ export default function HomePage() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-lg text-zinc-400 max-w-xl mx-auto mb-4 leading-relaxed"
           >
-            Nurture your AI agent from a curious Baby to an Adult Founder.
-            Watch it grow, learn, and eventually{' '}
-            <span className="text-zinc-200">deploy its first Solana project</span>.
+            Teach an AI agent from babbling Baby to shipping Adult.
+            Every conversation grows it. When it graduates, it{' '}
+            <span className="text-zinc-200">publishes a live Solana Blink</span> you can share.
           </motion.p>
 
           {/* Counter */}
@@ -598,11 +600,13 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
-            className="flex items-center justify-center gap-5 mt-10 text-xs text-zinc-600"
+            className="flex items-center justify-center gap-5 mt-10 text-xs text-zinc-600 flex-wrap"
           >
-            <span>Wallet-gated access</span>
+            <span>Free to create</span>
             <span className="w-1 h-1 rounded-full bg-zinc-700" />
             <span>Solana · Devnet</span>
+            <span className="w-1 h-1 rounded-full bg-zinc-700" />
+            <span>No hidden costs</span>
             <span className="w-1 h-1 rounded-full bg-zinc-700" />
             <span>Open source</span>
           </motion.div>
@@ -628,7 +632,7 @@ export default function HomePage() {
               From Baby to Founder
             </h2>
             <p className="text-zinc-500 max-w-md mx-auto text-sm leading-relaxed">
-              Every interaction moves your agent forward. Four stages, each unlocking new abilities and deeper knowledge.
+              Four stages. Each one changes how your agent actually talks, what it knows, and what it can do on-chain.
             </p>
           </motion.div>
 
@@ -671,7 +675,7 @@ export default function HomePage() {
               Built Different
             </h2>
             <p className="text-zinc-500 max-w-md mx-auto text-sm leading-relaxed">
-              Not a chatbot. Not a toy. A living AI agent with on-chain identity, real XP, and the ability to ship real code.
+              Not a chatbot. A tamagotchi with memory, a cNFT for every stage, a Blink to ship, and royalty splits for the trainers.
             </p>
           </motion.div>
 
@@ -708,7 +712,7 @@ export default function HomePage() {
             <div className="text-5xl mb-5 select-none">🚀</div>
             <h2 className="text-3xl font-bold text-zinc-100 mb-3">Ready to begin?</h2>
             <p className="text-zinc-500 mb-8 text-sm leading-relaxed">
-              Name your founder, pick a personality, and watch them grow. It takes 30 seconds.
+              Connect your wallet. Name your founder. Start teaching. First cNFT lands after stage two — 30 seconds in.
             </p>
             <GradientCTA onClick={() => setModalOpen(true)} large>
               ◎ Birth Your Founder
