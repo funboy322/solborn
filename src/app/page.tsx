@@ -419,6 +419,15 @@ function StickyNav({
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push('/rewards')}
+            className="text-zinc-400 hover:text-zinc-100 text-xs"
+            title="Nominate trainers for rewards"
+          >
+            🎁 Rewards
+          </Button>
           {(agents as unknown[]).length > 0 && (
             <Button
               variant="ghost"
