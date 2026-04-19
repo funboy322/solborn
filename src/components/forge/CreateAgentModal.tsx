@@ -70,6 +70,21 @@ export function CreateAgentModal({ open, onClose, onCreated }: CreateAgentModalP
       personality,
       walletAddress: publicKey.toBase58(),
     })
+    // Fire-and-forget register in the global birth registry so the landing
+    // counter is shared across all visitors, not just the current browser.
+    // We intentionally don't await — a network blip here must not block UX.
+    fetch('/api/stats/birth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: agent.id,
+        name: agent.name,
+        emoji: agent.emoji,
+        wallet: agent.walletAddress ?? null,
+      }),
+    }).catch(() => {
+      /* best-effort; local agent still works */
+    })
     onCreated(agent.id)
     handleClose()
   }

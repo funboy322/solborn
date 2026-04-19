@@ -5,6 +5,8 @@ import { Send, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AchievementToastStack } from '@/components/agent/AchievementToast'
 import { EnergyBar } from '@/components/agent/EnergyBar'
+import { SupportBanner } from '@/components/agent/SupportBanner'
+import { MessageFeedback } from '@/components/agent/MessageFeedback'
 import { useForgeStore } from '@/lib/store'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { STAGE_CONFIG, ENERGY_PER_MESSAGE, MAX_ENERGY, ENERGY_REGEN_PER_MIN } from '@/lib/constants'
@@ -134,6 +136,8 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
   const [screenShake, setScreenShake] = useState(false)
   const [hoveredMsgId, setHoveredMsgId] = useState<string | null>(null)
   const [inputFocused, setInputFocused] = useState(false)
+  // Flips true after the first assistant reply finishes streaming. Drives SupportBanner.
+  const [firstReplyDone, setFirstReplyDone] = useState(false)
 
   // Live energy (regens over time without forcing store updates constantly)
   const [displayEnergy, setDisplayEnergy] = useState(agent.energy ?? MAX_ENERGY)
@@ -236,6 +240,7 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
       }
 
       SFX.message()
+      setFirstReplyDone(true)
 
       if (accumulated.length > 200) incrementLongResponses(agent.id)
 
@@ -379,7 +384,7 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
         )}
 
         <AnimatePresence initial={false}>
-          {messages.map((msg) => (
+          {messages.map((msg, idx) => (
             <motion.div
               key={msg.id}
               initial={{ opacity: 0, y: 10, scale: 0.97 }}
@@ -434,6 +439,18 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
                       />
                     )}
                   </div>
+                )}
+
+                {/* Feedback (only on completed assistant messages) */}
+                {msg.role === 'assistant' && msg.id !== streamingId && msg.content.length > 0 && (
+                  <MessageFeedback
+                    agentId={agent.id}
+                    agentStage={agent.stage}
+                    messageId={msg.id}
+                    userMessage={messages[idx - 1]?.role === 'user' ? messages[idx - 1].content : ''}
+                    assistantMessage={msg.content}
+                    trainerWallet={trainerWallet}
+                  />
                 )}
 
                 <AnimatePresence>
@@ -564,6 +581,8 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
           </motion.div>
         </motion.div>
       </form>
+
+      <SupportBanner trigger={firstReplyDone} />
 
       <AchievementToastStack
         achievements={toastAchievements}

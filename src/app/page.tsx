@@ -493,7 +493,31 @@ export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false)
   const router = useRouter()
   const agents = useForgeStore((s) => s.agents)
-  const totalAgents = agents.length
+  // Global "founders born" count from /api/stats (shared across all visitors).
+  // Falls back to the user's local count if the endpoint is unreachable.
+  const [globalTotal, setGlobalTotal] = useState<number | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      try {
+        const res = await fetch('/api/stats', { cache: 'no-store' })
+        if (!res.ok) return
+        const json = (await res.json()) as { total?: number }
+        if (!cancelled && typeof json.total === 'number') setGlobalTotal(json.total)
+      } catch {
+        /* fall back to local */
+      }
+    }
+    load()
+    // Re-poll every 30s so the number ticks up as other visitors birth agents
+    const id = setInterval(load, 30_000)
+    return () => {
+      cancelled = true
+      clearInterval(id)
+    }
+  }, [])
+  const localTotal = agents.length
+  const totalAgents = globalTotal ?? localTotal
   const displayCount = Math.max(totalAgents, 1)
 
   return (
