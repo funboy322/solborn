@@ -581,18 +581,9 @@ export default function HomePage() {
             <span className="text-zinc-200">publishes a live Solana Blink</span> you can share.
           </motion.p>
 
-          {/* Counter */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-sm text-zinc-600 mb-10 font-mono"
-          >
-            <span className="text-violet-400 font-semibold">
-              <AnimatedCounter target={displayCount} />
-            </span>{' '}
-            {totalAgents === 1 ? 'founder' : 'founders'} born
-          </motion.div>
+          {/* Counter removed — global registry is still warming up.
+              Will re-enable once the number feels trustworthy. */}
+          <div className="mb-10" />
 
           {/* CTAs */}
           <motion.div
