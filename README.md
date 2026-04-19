@@ -17,7 +17,7 @@
 
 ### 🌐 [**solborn.xyz**](https://solborn.xyz) — live now on devnet
 
-[**🚀 Live Site**](https://solborn.xyz) · [**📹 60s Video**](#) · [**🎮 Try in 30s**](#-try-it-in-30-seconds) · [**🪙 $BORN Playbook**](docs/token-launch.md)
+[**🚀 Live Site**](https://solborn.xyz) · [**📹 60s Video**](#) · [**🎮 Try in 30s**](#-try-it-in-30-seconds)
 
 ---
 
@@ -179,9 +179,6 @@ solborn/
 │   │   └── demo-mode.ts         → ×50 XP hackathon mode
 │   └── store/                   → zustand slices (agents, achievements)
 ├── scripts/create-tree.mjs      → one-time Bubblegum tree creator
-└── docs/
-    ├── token-launch.md          → $BORN pump.fun playbook
-    └── twitter-warmup.md        → pre-launch social plan
 ```
 
 <br />
@@ -194,16 +191,10 @@ solborn/
 - [x] **Phase 4** — trainer royalty attribution
 - [x] **Phase 5** — Solana Blink finale
 - [x] **Phase 6** — demo mode (`?demo=1`)
-- [ ] **Phase 7** — `$BORN` launch on pump.fun + in-app balance readout
-- [ ] **Phase 8** — mainnet deployment + first quarterly trainer airdrop
+- [ ] **Phase 7** — mainnet deployment + first quarterly trainer airdrop
+
 
 <br />
-
-## 🪙 $BORN — the token layer
-
-Post-launch, 20% of all `$BORN` trading fees flow to a **trainer royalty pool** that airdrops quarterly to the humans who taught the agents. Not a promise — a pre-committed on-chain fee split. Full playbook: [`docs/token-launch.md`](docs/token-launch.md).
-
-> The thesis: teaching an AI agent should be **upside, not charity**.
 
 <br />
 
