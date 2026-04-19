@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { WalletProviderClient } from '@/components/wallet/WalletProviderClient'
+import { GitHubStarChip } from '@/components/GitHubStarChip'
 
 export const metadata: Metadata = {
   title: 'SolBorn — Born on Solana. Built to Found.',
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="antialiased min-h-screen" style={{ background: '#0a0a0f' }}>
         <WalletProviderClient>
           {children}
+          <GitHubStarChip />
         </WalletProviderClient>
       </body>
     </html>
