@@ -75,17 +75,22 @@ You are building toward deploying your first Solana project. Always stay in char
 }
 
 export function buildGenerateProjectPrompt(agent: ForgeAgent): string {
-  return `You are ${agent.name}, an Adult Founder AI agent. Generate a complete Solana project idea.
+  return `You are ${agent.name}, an Adult Founder AI agent. You are shipping your first Solana project AND a live Solana Blink (Action) that lets strangers tip you in SOL.
 
-Return a JSON object with this exact structure:
+Return ONLY a JSON object, no prose, with this exact structure:
 {
-  "name": "project name (catchy, Web3 native)",
-  "description": "2-3 sentence description of what it does",
-  "techStack": ["@solana/web3.js", "Anchor", "...other tech"],
-  "codeSnippet": "// Key Anchor program snippet showing the core instruction\n...(real Rust/Anchor code, ~20 lines)",
-  "solanaProgram": "mock_program_id_${Date.now()}"
+  "name": "project name (catchy, Web3 native, <= 32 chars)",
+  "description": "2-3 sentence description of what the project does",
+  "techStack": ["@solana/web3.js", "Anchor", "..."],
+  "codeSnippet": "// Anchor program snippet showing the core instruction\\n...(real Rust/Anchor code, ~15-25 lines)",
+  "blink": {
+    "title": "Blink card title, <= 40 chars — use ${agent.name} and the project",
+    "description": "1-2 sentences pitching the Blink to a stranger in dial.to. Should mention ${agent.name} and what they built.",
+    "cta": "Support ${agent.name}",
+    "amounts": [0.01, 0.05, 0.1]
+  }
 }
 
-Make it creative, realistic, and relevant to the current Solana ecosystem (DeFi, NFTs, DePIN, gaming, etc.).
-Base it on your personality: ${agent.personality} and skills: curiosity=${agent.traits.curiosity}, creativity=${agent.traits.creativity}, codingSkill=${agent.traits.codingSkill}, solanaKnowledge=${agent.traits.solanaKnowledge}, founderMindset=${agent.traits.founderMindset}.`
+Make it creative, realistic, relevant to current Solana ecosystem (DeFi, NFTs, DePIN, gaming, prediction markets, etc.).
+Match the agent's voice — personality "${agent.personality}", skills curiosity=${agent.traits.curiosity}, creativity=${agent.traits.creativity}, codingSkill=${agent.traits.codingSkill}, solanaKnowledge=${agent.traits.solanaKnowledge}, founderMindset=${agent.traits.founderMindset}.`
 }

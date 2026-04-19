@@ -1,12 +1,22 @@
 'use client'
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Rocket, Code2, ExternalLink, Loader2, Sparkles, Copy, Check } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
+import {
+  Rocket,
+  Code2,
+  ExternalLink,
+  Loader2,
+  Sparkles,
+  Copy,
+  Check,
+  Zap,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useForgeStore } from '@/lib/store'
-import { deployMockProgram } from '@/lib/solana/mock-nft'
+import { recordEvolution } from '@/lib/solana/payment'
 import { STAGE_CONFIG } from '@/lib/constants'
 import { SFX } from '@/lib/sounds'
+import { useWallet } from '@solana/wallet-adapter-react'
 import type { ForgeAgent, GeneratedProject } from '@/lib/types'
 
 interface ProjectGeneratorProps {
@@ -20,27 +30,57 @@ const LOADING_MESSAGES = [
   'Analyzing Solana ecosystem...',
   'Designing architecture...',
   'Writing Anchor program...',
-  'Optimizing for devnet...',
+  'Packaging Blink payload...',
 ]
+
+function buildBlinkUrl(agent: ForgeAgent, project: GeneratedProject, origin: string): string {
+  const blink = project.blink
+  if (!blink) return ''
+  // Recipient = agent creator wallet (falls back to platform treasury if unbound).
+  const to = agent.walletAddress ?? 'F7QRP4aack2aYgRJa1Khxb7MmMtA1wEHRtP7Wex98BoL'
+  const params = new URLSearchParams({
+    to,
+    name: agent.name,
+    title: blink.title,
+    desc: blink.description,
+    cta: blink.cta,
+    amounts: blink.amounts.join(','),
+  })
+  return `${origin}/api/blinks/${agent.id}?${params.toString()}`
+}
+
+function dialToUrl(blinkUrl: string): string {
+  return `https://dial.to/?action=solana-action:${encodeURIComponent(blinkUrl)}`
+}
 
 export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
   const setGeneratedProject = useForgeStore((s) => s.setGeneratedProject)
-  const [phase, setPhase] = useState<Phase>(agent.generatedProject ? 'generated' : 'idle')
+  const addChainCheckpoint = useForgeStore((s) => s.addChainCheckpoint)
+  const [phase, setPhase] = useState<Phase>(
+    agent.generatedProject?.blinkUrl
+      ? 'deployed'
+      : agent.generatedProject
+      ? 'generated'
+      : 'idle',
+  )
   const [project, setProject] = useState<GeneratedProject | null>(agent.generatedProject ?? null)
   const [loadingMsg, setLoadingMsg] = useState('')
-  const [deployResult, setDeployResult] = useState<{
-    programId: string
-    txSignature: string
-    explorerUrl: string
-  } | null>(null)
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState<'code' | 'url' | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
+  const { publicKey, signTransaction, connected } = useWallet()
   const config = STAGE_CONFIG[agent.stage]
+
+  const origin = typeof window !== 'undefined' ? window.location.origin : ''
+  const blinkUrl = useMemo(
+    () => (project && origin ? buildBlinkUrl(agent, project, origin) : ''),
+    [agent, project, origin],
+  )
 
   async function handleGenerate() {
     setPhase('generating')
+    setError(null)
 
-    // Cycle through loading messages
     let msgIdx = 0
     const interval = setInterval(() => {
       setLoadingMsg(LOADING_MESSAGES[msgIdx % LOADING_MESSAGES.length])
@@ -53,60 +93,76 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ agent }),
       })
-
       clearInterval(interval)
-
-      if (!res.ok) throw new Error('Generation failed')
-
-      const data = await res.json()
+      if (!res.ok) throw new Error(`Generation failed (${res.status})`)
+      const data = (await res.json()) as { project: GeneratedProject }
       setProject(data.project)
       setGeneratedProject(agent.id, data.project)
       setPhase('generated')
-    } catch {
+    } catch (e) {
       clearInterval(interval)
+      setError(e instanceof Error ? e.message : 'Generation failed')
       setPhase('idle')
     }
   }
 
   async function handleDeploy() {
-    if (!project) return
+    if (!project || !blinkUrl) return
     setPhase('deploying')
+    setError(null)
 
-    const result = await deployMockProgram(project.name)
-    setDeployResult(result)
-    SFX.deploy()
+    let txSignature = ''
+    // If wallet connected, write a real devnet memo recording the Blink deploy.
+    if (connected && publicKey && signTransaction) {
+      try {
+        const r = await recordEvolution(publicKey, signTransaction, {
+          agentName: agent.name,
+          fromStage: agent.stage,
+          toStage: agent.stage, // reuse the memo tx helper for now
+          xp: agent.xp,
+        })
+        txSignature = r.txSignature
+        addChainCheckpoint(agent.id, {
+          kind: 'mint',
+          stage: agent.stage,
+          txSignature,
+          timestamp: Date.now(),
+        })
+      } catch (e) {
+        console.warn('[blink deploy] on-chain memo failed:', e)
+        // non-fatal — Blink still works
+      }
+    }
 
-    // Update project with deploy info
     const updated: GeneratedProject = {
       ...project,
-      solanaProgram: result.programId,
       deployedAt: Date.now(),
-      txHash: result.txSignature,
+      txHash: txSignature || project.txHash,
+      blinkUrl,
     }
     setProject(updated)
     setGeneratedProject(agent.id, updated)
+    SFX.deploy()
     setPhase('deployed')
   }
 
-  function handleCopy(text: string) {
+  function handleCopy(text: string, kind: 'code' | 'url') {
     navigator.clipboard.writeText(text)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    setCopied(kind)
+    setTimeout(() => setCopied(null), 2000)
   }
 
   if (agent.stage !== 'adult') return null
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex items-center gap-2">
         <Rocket size={16} style={{ color: config.color }} />
         <h2 className="text-sm font-semibold" style={{ color: config.color }}>
-          Project Generation
+          Ship a Blink
         </h2>
       </div>
 
-      {/* Idle — ready to generate */}
       {phase === 'idle' && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -116,20 +172,20 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
           <div className="text-4xl">🚀</div>
           <div>
             <p className="text-sm text-zinc-200 font-medium">
-              {agent.name} is ready to build
+              {agent.name} is ready to ship
             </p>
             <p className="text-xs text-zinc-500 mt-1">
-              Your agent will generate a complete Solana project idea with code
+              Generate a Solana project + a live Blink that accepts SOL tips on devnet.
             </p>
           </div>
           <Button onClick={handleGenerate} className="w-full" style={{ background: config.color }}>
             <Sparkles size={16} />
-            Generate First Project
+            Generate Project & Blink
           </Button>
+          {error && <p className="text-xs text-rose-400">{error}</p>}
         </motion.div>
       )}
 
-      {/* Generating */}
       {phase === 'generating' && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -143,7 +199,7 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
             <Loader2 size={32} style={{ color: config.color }} />
           </motion.div>
           <div>
-            <p className="text-sm text-zinc-200 font-medium">{agent.name} is creating...</p>
+            <p className="text-sm text-zinc-200 font-medium">{agent.name} is shipping...</p>
             <motion.p
               key={loadingMsg}
               initial={{ opacity: 0, y: 5 }}
@@ -156,7 +212,6 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
         </motion.div>
       )}
 
-      {/* Generated / Deployed — show project */}
       {(phase === 'generated' || phase === 'deploying' || phase === 'deployed') && project && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -165,13 +220,11 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
         >
           {/* Project card */}
           <div className="glass p-5 space-y-4" style={{ boxShadow: `0 0 30px ${config.color}15` }}>
-            {/* Name + description */}
             <div>
               <h3 className="text-lg font-bold text-zinc-100">{project.name}</h3>
               <p className="text-sm text-zinc-400 mt-1 leading-relaxed">{project.description}</p>
             </div>
 
-            {/* Tech stack */}
             <div className="flex flex-wrap gap-1.5">
               {project.techStack.map((tech) => (
                 <span
@@ -183,7 +236,6 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
               ))}
             </div>
 
-            {/* Code snippet */}
             {project.codeSnippet && (
               <div className="relative">
                 <div className="flex items-center justify-between px-3 py-1.5 bg-white/5 rounded-t-lg border border-white/10 border-b-0">
@@ -192,10 +244,10 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
                     <span className="text-xs text-zinc-500">program.rs</span>
                   </div>
                   <button
-                    onClick={() => handleCopy(project.codeSnippet)}
+                    onClick={() => handleCopy(project.codeSnippet, 'code')}
                     className="text-zinc-600 hover:text-zinc-400 transition-colors"
                   >
-                    {copied ? <Check size={12} /> : <Copy size={12} />}
+                    {copied === 'code' ? <Check size={12} /> : <Copy size={12} />}
                   </button>
                 </div>
                 <pre className="p-3 bg-black/40 rounded-b-lg border border-white/10 border-t-0 overflow-x-auto">
@@ -207,7 +259,36 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
             )}
           </div>
 
-          {/* Deploy section */}
+          {/* Blink preview card */}
+          {project.blink && (
+            <div
+              className="glass p-4 space-y-2"
+              style={{ borderColor: `${config.color}30` }}
+            >
+              <div className="flex items-center gap-2">
+                <Zap size={14} style={{ color: config.color }} />
+                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: config.color }}>
+                  Blink preview
+                </span>
+              </div>
+              <p className="text-sm font-medium text-zinc-100">{project.blink.title}</p>
+              <p className="text-xs text-zinc-400 leading-relaxed">{project.blink.description}</p>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {project.blink.amounts.map((a) => (
+                  <span
+                    key={a}
+                    className="text-xs px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-zinc-300 font-mono"
+                  >
+                    {a} SOL
+                  </span>
+                ))}
+                <span className="text-xs px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-zinc-500">
+                  Custom
+                </span>
+              </div>
+            </div>
+          )}
+
           {phase === 'generated' && (
             <Button
               onClick={handleDeploy}
@@ -215,17 +296,17 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
               style={{ background: config.color }}
             >
               <Rocket size={16} />
-              Deploy to Solana Devnet
+              Ship Blink to Devnet
             </Button>
           )}
 
           {phase === 'deploying' && (
             <Button disabled className="w-full" loading>
-              Deploying to Devnet...
+              Deploying Blink...
             </Button>
           )}
 
-          {phase === 'deployed' && deployResult && (
+          {phase === 'deployed' && project.blinkUrl && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -235,35 +316,55 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-sm font-semibold text-emerald-400">
-                  Deployed Successfully!
+                  Blink live on devnet
                 </span>
               </div>
 
-              <div className="space-y-2 text-xs">
-                <div>
-                  <span className="text-zinc-500">Program ID</span>
-                  <p className="font-mono text-zinc-300 break-all mt-0.5">
-                    {deployResult.programId}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-zinc-500">Transaction</span>
-                  <p className="font-mono text-zinc-300 break-all mt-0.5">
-                    {deployResult.txSignature.slice(0, 40)}...
-                  </p>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                Anyone with a Solana wallet can now tip {agent.name} in one click.
+                The Blink renders inside Phantom, X posts, and dial.to.
+              </p>
+
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-wider text-zinc-500">
+                  Blink URL
+                </label>
+                <div className="flex items-center gap-2 rounded-lg bg-black/40 border border-white/10 px-3 py-2">
+                  <code className="flex-1 text-[11px] font-mono text-zinc-300 truncate">
+                    {project.blinkUrl}
+                  </code>
+                  <button
+                    onClick={() => handleCopy(project.blinkUrl!, 'url')}
+                    className="text-zinc-500 hover:text-zinc-300 transition-colors"
+                  >
+                    {copied === 'url' ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
                 </div>
               </div>
 
-              <a
-                href={deployResult.explorerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs font-medium transition-colors"
-                style={{ color: config.color }}
-              >
-                <ExternalLink size={12} />
-                View on Solana Explorer
-              </a>
+              <div className="flex flex-col gap-2">
+                <a
+                  href={dialToUrl(project.blinkUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-opacity hover:opacity-80"
+                  style={{ background: config.color, color: '#0a0a0a' }}
+                >
+                  <ExternalLink size={12} />
+                  Open in dial.to
+                </a>
+                {project.txHash && (
+                  <a
+                    href={`https://explorer.solana.com/tx/${project.txHash}?cluster=devnet`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors"
+                  >
+                    <ExternalLink size={12} />
+                    Deploy tx on Explorer
+                  </a>
+                )}
+              </div>
             </motion.div>
           )}
         </motion.div>

@@ -25,6 +25,17 @@ export interface AgentMessage {
   xpGained?: number
 }
 
+export interface BlinkSpec {
+  /** Short noun phrase, shown as Blink title */
+  title: string
+  /** 1-2 sentence description shown in dial.to card */
+  description: string
+  /** CTA label on the donate button */
+  cta: string
+  /** Suggested tip amounts in SOL, e.g. [0.01, 0.05, 0.1] */
+  amounts: number[]
+}
+
 export interface GeneratedProject {
   id: string
   name: string
@@ -33,7 +44,11 @@ export interface GeneratedProject {
   codeSnippet: string      // key code snippet
   solanaProgram?: string   // mock program ID
   deployedAt?: number
-  txHash?: string          // mock tx hash
+  txHash?: string          // real devnet memo tx from /deploy
+  /** If set, agent has shipped a live Solana Action. */
+  blink?: BlinkSpec
+  /** Absolute Blink URL pointing to /api/blinks/[id]?... */
+  blinkUrl?: string
 }
 
 export interface Achievement {
