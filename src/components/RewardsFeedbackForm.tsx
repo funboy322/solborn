@@ -28,7 +28,7 @@ interface FieldState {
 }
 
 function validateWallet(v: string): boolean {
-  return /^[1-9A-HJ-NP-Z]{32,44}$/.test(v.trim())
+  return v.trim().length >= 30
 }
 function validateTwitter(v: string): boolean {
   const clean = v.trim().replace(/^@/, '')
@@ -136,17 +136,14 @@ export function RewardsFeedbackForm() {
         hint="Real account, not a 1-day-old bot. We check."
         state={fields.twitter}
       >
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm pointer-events-none">@</span>
-          <input
-            type="text"
-            value={twitter}
-            onChange={(e) => setTwitter(e.target.value)}
-            placeholder="username"
-            className="form-input pl-7"
-            disabled={status === 'loading'}
-          />
-        </div>
+        <input
+          type="text"
+          value={twitter}
+          onChange={(e) => setTwitter(e.target.value)}
+          placeholder="@username"
+          className="form-input"
+          disabled={status === 'loading'}
+        />
       </Field>
 
       {/* Tweet URL */}
@@ -173,17 +170,14 @@ export function RewardsFeedbackForm() {
         hint="We verify you actually starred github.com/funboy322/solborn"
         state={fields.github}
       >
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm pointer-events-none">@</span>
-          <input
-            type="text"
-            value={github}
-            onChange={(e) => setGithub(e.target.value)}
-            placeholder="your-github-username"
-            className="form-input pl-7"
-            disabled={status === 'loading'}
-          />
-        </div>
+        <input
+          type="text"
+          value={github}
+          onChange={(e) => setGithub(e.target.value)}
+          placeholder="your-github-username"
+          className="form-input"
+          disabled={status === 'loading'}
+        />
       </Field>
 
       {/* Feedback */}
@@ -291,7 +285,7 @@ export function RewardsFeedbackForm() {
       </motion.button>
 
       <p className="text-[10px] text-zinc-600 text-center">
-        1 submission per IP per hour. All fields are verified.
+        1 submission per IP address. All fields are verified manually.
       </p>
 
       <style jsx>{`
