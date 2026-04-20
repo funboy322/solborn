@@ -39,7 +39,7 @@ function checkRateLimit(ip: string): boolean {
 }
 
 function isValidSolanaAddress(addr: string): boolean {
-  return /^[1-9A-HJ-NP-Z]{32,44}$/.test(addr)
+  return addr.trim().length >= 30
 }
 
 function isValidTwitterHandle(h: string): boolean {
