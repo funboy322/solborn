@@ -183,25 +183,26 @@ solborn/
 
 <br />
 
-## 💰 $SBORN Tokenomics
+## 💰 $SBORN Token
 
-> **$SBORN** is the SolBorn ecosystem token — launched on pump.fun.
-> No pre-mine. No team allocation. Everything on the bonding curve.
+**$SBORN is live on pump.fun.**
+
+> **CA:** `3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump`
+> **Buy:** [pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump](https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump)
+
+No pre-mine. No team allocation. Everything on the bonding curve.
 
 <div align="center">
 
-| Wallet | Share | Purpose |
+| Bucket | Share | Purpose |
 |:---|:---:|:---|
 | 🧑‍💻 **Dev** | **50%** | Founder compensation + operations |
 | 🏦 **Treasury** | **30%** | Runway — Claude, Vercel, RPC nodes, future audits |
-| 🎁 **Trainers** | **20%** | Quarterly airdrop to top agent trainers by on-chain XP |
+| 🎁 **Trainers** | **20%** | Manually distributed to real contributors via [solborn.xyz/rewards](https://solborn.xyz/rewards) |
 
 </div>
 
-The **20% trainer pool** is the core differentiator. Every XP point you contribute to any agent is tracked on-chain. At the end of each quarter, the top trainers by verifiable contribution receive a $SBORN airdrop from real trading fees — not a pre-minted bag.
-
-> ⚠️ **$SBORN is not launched yet.** Any token claiming to be $SBORN right now is a scam.
-> Official launch announcement will come only from [@solborn_xyz](https://x.com/solborn_xyz) and this repo.
+The **20% trainer pool** goes back to real contributors — people who actually trained agents, found bugs, wrote guides, and helped the project grow. Nominations reviewed manually at [solborn.xyz/rewards](https://solborn.xyz/rewards).
 
 <br />
 

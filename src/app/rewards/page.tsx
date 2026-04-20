@@ -127,8 +127,31 @@ export default function RewardsPage() {
           <RewardsFeedbackForm />
         </motion.div>
 
+        {/* Token link */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-10 flex justify-center"
+        >
+          <a
+            href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(245,158,11,0.15))',
+              border: '1px solid rgba(245,158,11,0.35)',
+              color: 'rgb(252,211,77)',
+            }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            $SBORN is live — buy on pump.fun
+          </a>
+        </motion.div>
+
         {/* Back link */}
-        <div className="mt-16 text-center">
+        <div className="mt-8 text-center">
           <Link
             href="/"
             className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"

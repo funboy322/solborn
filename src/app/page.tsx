@@ -419,24 +419,26 @@ function StickyNav({
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <a
+            href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(245,158,11,0.2))',
+              border: '1px solid rgba(245,158,11,0.4)',
+              color: 'rgb(252,211,77)',
+            }}
+          >
+            ◎ Buy $SBORN
+          </a>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => router.push('/rewards')}
             className="text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
-            title="Reward program — coming soon"
           >
             🎁 Rewards
-            <span
-              className="px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider"
-              style={{
-                background: 'rgba(245,158,11,0.15)',
-                color: 'rgb(252, 211, 77)',
-                border: '1px solid rgba(245,158,11,0.3)',
-              }}
-            >
-              SOON
-            </span>
           </Button>
           {(agents as unknown[]).length > 0 && (
             <Button
@@ -643,6 +645,30 @@ export default function HomePage() {
             <span>No hidden costs</span>
             <span className="w-1 h-1 rounded-full bg-zinc-700" />
             <span>Open source</span>
+          </motion.div>
+
+          {/* Token live banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            className="mt-6 flex items-center justify-center"
+          >
+            <a
+              href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(245,158,11,0.15))',
+                border: '1px solid rgba(245,158,11,0.35)',
+                color: 'rgb(252,211,77)',
+              }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              $SBORN is live on pump.fun
+              <ExternalLink size={11} />
+            </a>
           </motion.div>
         </div>
       </section>
