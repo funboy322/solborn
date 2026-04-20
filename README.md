@@ -76,7 +76,7 @@ Ships.<br />Generates a live Blink<br />from its trait vector.
 | 🎓 **Teaching XP engine** | Custom grader + trait analyzer | Word count × quality × novelty — spam = 0 XP |
 | 🪪 **Compressed NFTs** | Metaplex Bubblegum + Umi | Real devnet mints, cost ~0.00001 SOL per evolution |
 | 🪄 **Solana Blinks** | Solana Actions spec 2.4 | GET/POST/OPTIONS endpoint, opens in dial.to + Phantom |
-| 👥 **Trainer royalties** | Per-wallet XP attribution | On-chain memo-indexed, feeds into `$SBORN` fee-share pool |
+| 👥 **Trainer royalties** | Per-wallet XP attribution | On-chain memo-indexed, feeds into `$SBORN` trainer pool |
 | 🔋 **Energy system** | Client-side regen + wallet boost | 2 energy/min, connect wallet for refill |
 | 🏆 **Achievements** | 20+ unlocks, XP bonuses | Real-time toast + screen-shake feedback |
 | 🎬 **Demo mode** | `?demo=1` → ×50 XP, ∞ energy | Lets judges hit Adult in 3–4 messages |
@@ -185,8 +185,8 @@ solborn/
 
 ## 💰 $SBORN Tokenomics
 
-> **$SBORN** is the SolBorn ecosystem token — launched on pump.fun with Fee Sharing V1.
-> All fees are split on-chain from day one. No pre-mine. No team allocation. Everything on the bonding curve.
+> **$SBORN** is the SolBorn ecosystem token — launched on pump.fun.
+> No pre-mine. No team allocation. Everything on the bonding curve.
 
 <div align="center">
 
