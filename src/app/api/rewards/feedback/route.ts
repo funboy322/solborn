@@ -1,24 +1,10 @@
 /**
- * Reward nomination endpoint with anti-abuse verification.
- *
- * Required checks BEFORE Telegram notify:
- *   ✓ Wallet = valid base58 Solana address
- *   ✓ Twitter handle format is real (3-15 chars, alnum/underscore)
- *   ✓ Tweet URL is on x.com / twitter.com and mentions solborn OR $SBORN
- *   ✓ GitHub user exists (via GitHub API)
- *   ✓ GitHub user starred funboy322/solborn (via GitHub API)
- *
- * Rate-limited: 1 submission per IP per hour.
- *
- * All failed checks surface back to the user with specific error so they can
- * fix — we don't want to be opaque for real users, just for bots.
+ * Reward nomination endpoint — simplified.
+ * No external API checks. Just validates fields are filled, sends to Telegram.
  */
 import { NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
-
-const REPO_OWNER = 'funboy322'
-const REPO_NAME = 'solborn'
 
 interface Body {
   wallet?: string
@@ -28,71 +14,6 @@ interface Body {
   feedback?: string
 }
 
-// In-memory permanent block per IP — one submission per IP, ever.
-// Serverless caveat: each cold-start resets the map, but for anti-abuse
-// this is fine. Real abusers would need a new IP anyway.
-const submittedIPs = new Set<string>()
-function checkRateLimit(ip: string): boolean {
-  if (submittedIPs.has(ip)) return false
-  submittedIPs.add(ip)
-  return true
-}
-
-function isValidSolanaAddress(addr: string): boolean {
-  return addr.trim().length >= 30
-}
-
-function isValidTwitterHandle(h: string): boolean {
-  return /^[A-Za-z0-9_]{3,15}$/.test(h)
-}
-
-function isValidTweetUrl(url: string): boolean {
-  return /^https?:\/\/(x\.com|twitter\.com)\/[A-Za-z0-9_]+\/status\/\d+/i.test(url)
-}
-
-function isValidGithubUsername(u: string): boolean {
-  return /^[A-Za-z0-9-]{1,39}$/.test(u)
-}
-
-/**
- * Check if a GitHub user has starred our repo.
- * GitHub has a public endpoint: /users/{username}/starred/{owner}/{repo}
- * Returns 204 if starred, 404 if not.
- */
-async function hasStarredRepo(username: string): Promise<{ ok: boolean; reason?: string }> {
-  try {
-    const url = `https://api.github.com/users/${encodeURIComponent(username)}/starred/${REPO_OWNER}/${REPO_NAME}`
-    const res = await fetch(url, {
-      headers: {
-        Accept: 'application/vnd.github+json',
-        'User-Agent': 'solborn-rewards-bot',
-      },
-      // Short timeout; GitHub API is usually fast
-      signal: AbortSignal.timeout(5000),
-    })
-    if (res.status === 204) return { ok: true }
-    if (res.status === 404) {
-      // Could be user doesn't exist OR hasn't starred. Check user separately.
-      const userRes = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
-        headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'solborn-rewards-bot' },
-        signal: AbortSignal.timeout(5000),
-      })
-      if (userRes.status === 404) return { ok: false, reason: `github user @${username} does not exist` }
-      return { ok: false, reason: `@${username} has not starred the repo yet — please star https://github.com/${REPO_OWNER}/${REPO_NAME} first` }
-    }
-    if (res.status === 403) {
-      // Rate-limited by GitHub. Don't block user — accept submission, flag for manual review.
-      return { ok: true, reason: 'github rate-limit hit, accepted pending manual review' }
-    }
-    return { ok: false, reason: `github check failed (status ${res.status})` }
-  } catch (err) {
-    // Network error — don't block real users. Accept but log.
-    const msg = err instanceof Error ? err.message : 'unknown'
-    console.warn('[rewards/feedback] github check error:', msg)
-    return { ok: true, reason: 'github unreachable, accepted pending manual review' }
-  }
-}
-
 async function sendToTelegram(payload: {
   wallet: string
   twitter: string
@@ -100,7 +21,6 @@ async function sendToTelegram(payload: {
   github: string
   feedback: string
   ip: string
-  githubNote?: string
 }): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN
   const chatId = process.env.TELEGRAM_CHAT_ID
@@ -115,7 +35,7 @@ async function sendToTelegram(payload: {
     `💰 *Wallet:* \`${payload.wallet}\``,
     `🐦 *Twitter:* [@${payload.twitter}](https://x.com/${payload.twitter})`,
     `📝 *Tweet:* ${payload.tweetUrl}`,
-    `⭐ *GitHub:* [@${payload.github}](https://github.com/${payload.github})${payload.githubNote ? ` _(${payload.githubNote})_` : ''}`,
+    `⭐ *GitHub:* [@${payload.github}](https://github.com/${payload.github})`,
     '',
     `💬 *Feedback:*`,
     payload.feedback,
@@ -132,7 +52,7 @@ async function sendToTelegram(payload: {
         chat_id: chatId,
         text,
         parse_mode: 'Markdown',
-        disable_web_page_preview: false,
+        disable_web_page_preview: true,
       }),
     })
     if (!res.ok) {
@@ -150,13 +70,6 @@ export async function POST(req: Request) {
     req.headers.get('x-real-ip') ||
     'unknown'
 
-  if (!checkRateLimit(ip)) {
-    return NextResponse.json(
-      { ok: false, error: 'One nomination per IP address. You have already submitted.' },
-      { status: 429 },
-    )
-  }
-
   let body: Body
   try {
     body = (await req.json()) as Body
@@ -170,47 +83,22 @@ export async function POST(req: Request) {
   const github = body.github?.trim().replace(/^@/, '') ?? ''
   const feedback = body.feedback?.trim() ?? ''
 
-  // Field-by-field validation with specific error messages
-  if (!isValidSolanaAddress(wallet)) {
-    return NextResponse.json({ ok: false, error: 'Invalid Solana wallet address format.' }, { status: 400 })
-  }
-  if (!isValidTwitterHandle(twitter)) {
-    return NextResponse.json({ ok: false, error: 'Invalid Twitter handle (3-15 chars, letters/numbers/underscore).' }, { status: 400 })
-  }
-  if (!isValidTweetUrl(tweetUrl)) {
-    return NextResponse.json({ ok: false, error: 'Tweet URL must be a valid x.com or twitter.com status link.' }, { status: 400 })
-  }
-  if (!isValidGithubUsername(github)) {
-    return NextResponse.json({ ok: false, error: 'Invalid GitHub username format.' }, { status: 400 })
-  }
-  if (feedback.length < 30 || feedback.length > 500) {
-    return NextResponse.json({ ok: false, error: 'Feedback must be 30–500 characters.' }, { status: 400 })
+  if (!wallet || !twitter || !tweetUrl || !github || !feedback) {
+    return NextResponse.json({ ok: false, error: 'All fields are required.' }, { status: 400 })
   }
 
-  // GitHub star check
-  const starCheck = await hasStarredRepo(github)
-  if (!starCheck.ok) {
-    return NextResponse.json({ ok: false, error: starCheck.reason ?? 'GitHub verification failed' }, { status: 400 })
+  if (feedback.length < 30) {
+    return NextResponse.json({ ok: false, error: 'Feedback must be at least 30 characters.' }, { status: 400 })
   }
 
-  // Log structured record
-  const record = {
+  console.log(JSON.stringify({
     type: 'solborn.nomination.v1',
     ts: new Date().toISOString(),
-    wallet,
-    twitter,
-    tweetUrl,
-    github,
-    feedback,
+    wallet, twitter, tweetUrl, github, feedback,
     ip: ip.slice(0, 64),
-    githubNote: starCheck.reason,
-  }
-  console.log(JSON.stringify(record))
+  }))
 
-  // Fire-and-forget Telegram
-  sendToTelegram({ wallet, twitter, tweetUrl, github, feedback, ip, githubNote: starCheck.reason }).catch(() => {
-    /* best-effort */
-  })
+  sendToTelegram({ wallet, twitter, tweetUrl, github, feedback, ip }).catch(() => {})
 
-  return NextResponse.json({ ok: true, message: 'Nomination received. We review each one manually within 48h.' })
+  return NextResponse.json({ ok: true, message: 'Nomination received! We review each one manually within 48h.' })
 }

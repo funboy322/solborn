@@ -28,20 +28,19 @@ interface FieldState {
 }
 
 function validateWallet(v: string): boolean {
-  return v.trim().length >= 30
+  return v.trim().length > 10
 }
 function validateTwitter(v: string): boolean {
-  const clean = v.trim().replace(/^@/, '')
-  return /^[A-Za-z0-9_]{3,15}$/.test(clean)
+  return v.trim().replace(/^@/, '').length >= 1
 }
 function validateTweetUrl(v: string): boolean {
-  return /^https?:\/\/(x\.com|twitter\.com)\/[A-Za-z0-9_]+\/status\/\d+/i.test(v.trim())
+  return v.trim().startsWith('http')
 }
 function validateGithub(v: string): boolean {
-  return /^[A-Za-z0-9-]{1,39}$/.test(v.trim().replace(/^@/, ''))
+  return v.trim().replace(/^@/, '').length >= 1
 }
 function validateFeedback(v: string): boolean {
-  return v.trim().length >= 30 && v.trim().length <= 500
+  return v.trim().length >= 30
 }
 
 export function RewardsFeedbackForm() {
