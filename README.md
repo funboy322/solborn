@@ -183,6 +183,28 @@ solborn/
 
 <br />
 
+## 💰 $SBORN Tokenomics
+
+> **$SBORN** is the SolBorn ecosystem token — launched on pump.fun with Fee Sharing V1.
+> All fees are split on-chain from day one. No pre-mine. No team allocation. Everything on the bonding curve.
+
+<div align="center">
+
+| Wallet | Share | Purpose |
+|:---|:---:|:---|
+| 🧑‍💻 **Dev** | **50%** | Founder compensation + operations |
+| 🏦 **Treasury** | **30%** | Runway — Claude, Vercel, RPC nodes, future audits |
+| 🎁 **Trainers** | **20%** | Quarterly airdrop to top agent trainers by on-chain XP |
+
+</div>
+
+The **20% trainer pool** is the core differentiator. Every XP point you contribute to any agent is tracked on-chain. At the end of each quarter, the top trainers by verifiable contribution receive a $SBORN airdrop from real trading fees — not a pre-minted bag.
+
+> ⚠️ **$SBORN is not launched yet.** Any token claiming to be $SBORN right now is a scam.
+> Official launch announcement will come only from [@solborn_xyz](https://x.com/solborn_xyz) and this repo.
+
+<br />
+
 ## 🎯 Roadmap
 
 - [x] **Phase 1** — baseline chat + XP + stages

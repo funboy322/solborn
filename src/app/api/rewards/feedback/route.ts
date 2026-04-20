@@ -28,14 +28,13 @@ interface Body {
   feedback?: string
 }
 
-// In-memory rate-limit (1/hr per IP). Serverless caveat: each region has own
-// map, but for 1/hr this is fine — real abusers would hit the same region repeatedly.
-const rateLimitStore: Record<string, number> = {}
+// In-memory permanent block per IP — one submission per IP, ever.
+// Serverless caveat: each cold-start resets the map, but for anti-abuse
+// this is fine. Real abusers would need a new IP anyway.
+const submittedIPs = new Set<string>()
 function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const last = rateLimitStore[ip] ?? 0
-  if (now - last < 3600_000) return false
-  rateLimitStore[ip] = now
+  if (submittedIPs.has(ip)) return false
+  submittedIPs.add(ip)
   return true
 }
 
@@ -153,7 +152,7 @@ export async function POST(req: Request) {
 
   if (!checkRateLimit(ip)) {
     return NextResponse.json(
-      { ok: false, error: 'Rate limited — max 1 nomination per IP per hour.' },
+      { ok: false, error: 'One nomination per IP address. You have already submitted.' },
       { status: 429 },
     )
   }
