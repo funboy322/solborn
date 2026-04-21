@@ -14,7 +14,6 @@ import { EnergyBar } from '@/components/agent/EnergyBar'
 import { useForgeStore } from '@/lib/store'
 import { STAGE_CONFIG, STAGE_ORDER, MAX_ENERGY, ENERGY_REFILL_AMOUNT } from '@/lib/constants'
 import { mintAgentOnChain } from '@/lib/solana/on-chain'
-import { mintAgentCNFT, isBubblegumEnabled } from '@/lib/solana/bubblegum'
 import { recordEvolution } from '@/lib/solana/payment'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { useWallet } from '@solana/wallet-adapter-react'
@@ -61,42 +60,21 @@ export default function AgentPage({ params }: PageProps) {
         SFX.evolve()
         // Record evolution on-chain (silent, optional)
         if (connected && publicKey && signTransaction) {
-          // If Bubblegum is configured, mint a fresh cNFT snapshot to the
-          // trainer's wallet (each stage is its own collectible). Otherwise
-          // fall back to a Memo-program evolution record.
-          if (isBubblegumEnabled()) {
-            mintAgentCNFT(agent, {
-              publicKey,
-              signTransaction,
-              signAllTransactions: wallet.signAllTransactions,
-              signMessage: wallet.signMessage,
-            })
-              .then((r) => {
-                addChainCheckpoint(agent.id, {
-                  kind: 'evolve',
-                  stage: agent.stage,
-                  txSignature: r.txSignature,
-                  timestamp: Date.now(),
-                })
+          recordEvolution(publicKey, signTransaction, {
+            agentName: agent.name,
+            fromStage: prev,
+            toStage: agent.stage,
+            xp: agent.xp,
+          })
+            .then((r) => {
+              addChainCheckpoint(agent.id, {
+                kind: 'evolve',
+                stage: agent.stage,
+                txSignature: r.txSignature,
+                timestamp: Date.now(),
               })
-              .catch(() => {/* silent — optional */})
-          } else {
-            recordEvolution(publicKey, signTransaction, {
-              agentName: agent.name,
-              fromStage: prev,
-              toStage: agent.stage,
-              xp: agent.xp,
             })
-              .then((r) => {
-                addChainCheckpoint(agent.id, {
-                  kind: 'evolve',
-                  stage: agent.stage,
-                  txSignature: r.txSignature,
-                  timestamp: Date.now(),
-                })
-              })
-              .catch(() => {/* silent — optional */})
-          }
+            .catch(() => {/* silent — optional */})
         }
       }
     }
@@ -130,27 +108,10 @@ export default function AgentPage({ params }: PageProps) {
     setMinting(true)
     setMintError(null)
     try {
-      // Prefer real compressed NFT via Bubblegum if tree is configured.
-      // Falls back to Memo-program mint so the demo always works.
-      let mintAddress: string
-      let txSignature: string
-      let explorerUrl: string
-      if (isBubblegumEnabled()) {
-        const cnft = await mintAgentCNFT(agent, {
-          publicKey,
-          signTransaction,
-          signAllTransactions: wallet.signAllTransactions,
-          signMessage: wallet.signMessage,
-        })
-        mintAddress = cnft.treeAddress
-        txSignature = cnft.txSignature
-        explorerUrl = cnft.explorerUrl
-      } else {
-        const memo = await mintAgentOnChain(agent, publicKey, signTransaction)
-        mintAddress = memo.mintAddress
-        txSignature = memo.txSignature
-        explorerUrl = memo.explorerUrl
-      }
+      const memo = await mintAgentOnChain(agent, publicKey, signTransaction)
+      const mintAddress = memo.mintAddress
+      const txSignature = memo.txSignature
+      const explorerUrl = memo.explorerUrl
       updateAgentNFT(agent.id, mintAddress)
       addChainCheckpoint(agent.id, {
         kind: 'mint',
@@ -162,7 +123,7 @@ export default function AgentPage({ params }: PageProps) {
       SFX.mint()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Transaction failed'
-      setMintError(msg.includes('insufficient') ? 'Need SOL — use airdrop from wallet menu' : 'Mint failed. Try again.')
+      setMintError(msg.includes('insufficient') ? 'Need SOL - use airdrop from wallet menu' : msg)
     } finally {
       setMinting(false)
     }
@@ -307,14 +268,14 @@ export default function AgentPage({ params }: PageProps) {
 
               {!connected ? (
                 <div className="space-y-2">
-                  <p className="text-xs text-zinc-500 mb-2">Connect wallet to mint NFT</p>
+                  <p className="text-xs text-zinc-500 mb-2">Connect wallet to mint passport</p>
                   <WalletButton />
                 </div>
               ) : mintResult ? (
                 <div className="space-y-2">
                   <div className="text-xs text-emerald-400 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    Agent NFT minted
+                    Agent Passport minted
                   </div>
                   <p className="text-xs text-zinc-600 font-mono break-all">{mintResult.mintAddress.slice(0, 24)}...</p>
                   {mintResult.txSignature && (
@@ -332,9 +293,9 @@ export default function AgentPage({ params }: PageProps) {
                   {mintError && <p className="text-xs text-rose-400">{mintError}</p>}
                   <Button variant="secondary" size="sm" className="w-full" loading={minting} onClick={handleMintNFT} disabled={!isOwner || minting}>
                     <Zap size={14} />
-                    {minting ? 'Signing tx...' : '◎ Mint Agent NFT'}
+                    {minting ? 'Signing tx...' : 'Mint Agent Passport'}
                   </Button>
-                  <p className="text-[10px] text-zinc-600 text-center">~0.000005 SOL fee</p>
+                  <p className="text-[10px] text-zinc-600 text-center">Writes agent proof to Solana devnet</p>
                 </div>
               )}
 

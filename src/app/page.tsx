@@ -41,7 +41,7 @@ const STAGES = [
   {
     emoji: '🚀',
     label: 'Adult',
-    desc: 'Ships a live Solana Blink. Real devnet tx, real tips.',
+    desc: 'Publishes a Launch Certificate. Real devnet proof.',
     color: '#f43f5e',
     glow: 'rgba(244,63,94,0.25)',
     bg: 'rgba(244,63,94,0.08)',
@@ -60,16 +60,16 @@ const FEATURES = [
   },
   {
     icon: Zap,
-    title: 'Compressed NFTs',
-    desc: 'Each evolution mints a real cNFT to your Phantom via Metaplex Bubblegum. Four stages, four collectibles.',
+    title: 'Agent Passports',
+    desc: 'Mint a signed founder passport to your wallet. The proof lands on Solana devnet and opens in Explorer.',
     color: '#34d399',
     bg: 'rgba(52,211,153,0.08)',
     border: 'rgba(52,211,153,0.2)',
   },
   {
     icon: Rocket,
-    title: 'Ships a Real Blink',
-    desc: 'Adult agents publish a live Solana Action. Strangers can tip them in one click — renders in Phantom and dial.to.',
+    title: 'Launch Certificates',
+    desc: 'Adult agents publish project certificates with a signed on-chain memo. Clear proof, no external viewer required.',
     color: '#f59e0b',
     bg: 'rgba(245,158,11,0.08)',
     border: 'rgba(245,158,11,0.2)',
@@ -345,8 +345,8 @@ function FeatureCard({ feature, index }: { feature: (typeof FEATURES)[0]; index:
 function StatsBar() {
   const items = [
     { label: 'Built on Solana', icon: '◎' },
-    { label: 'Compressed NFTs', icon: '⚡' },
-    { label: 'Live Blinks', icon: '✦' },
+    { label: 'Agent Passports', icon: '⚡' },
+    { label: 'Launch Certificates', icon: '✦' },
     { label: 'Trainer Royalties', icon: '🪙' },
     { label: 'Persistent Memory', icon: '🧠' },
     { label: 'Open Source', icon: '🔓' },
@@ -599,7 +599,7 @@ export default function HomePage() {
           >
             Teach an AI agent from babbling Baby to shipping Adult.
             Every conversation grows it. When it graduates, it{' '}
-            <span className="text-zinc-200">publishes a live Solana Blink</span> you can share.
+            <span className="text-zinc-200">publishes a signed Launch Certificate</span> you can verify.
           </motion.p>
 
           {/* Counter removed — global registry is still warming up.
@@ -735,7 +735,7 @@ export default function HomePage() {
               Built Different
             </h2>
             <p className="text-zinc-500 max-w-md mx-auto text-sm leading-relaxed">
-              Not a chatbot. A tamagotchi with memory, a cNFT for every stage, a Blink to ship, and royalty splits for the trainers.
+              Not a chatbot. A tamagotchi with memory, an Agent Passport, a Launch Certificate to publish, and royalty splits for the trainers.
             </p>
           </motion.div>
 
@@ -772,7 +772,7 @@ export default function HomePage() {
             <div className="text-5xl mb-5 select-none">🚀</div>
             <h2 className="text-3xl font-bold text-zinc-100 mb-3">Ready to begin?</h2>
             <p className="text-zinc-500 mb-8 text-sm leading-relaxed">
-              Connect your wallet. Name your founder. Start teaching. First cNFT lands after stage two — 30 seconds in.
+              Connect your wallet. Name your founder. Start teaching. Mint a Passport and publish a Launch Certificate when it grows up.
             </p>
             <GradientCTA onClick={() => setModalOpen(true)} large>
               ◎ Birth Your Founder

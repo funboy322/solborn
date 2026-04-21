@@ -18,7 +18,7 @@ import { STAGE_CONFIG } from '../constants'
 export const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr')
 
 export const DEVNET_CONNECTION = new Connection(
-  'https://api.devnet.solana.com',
+  process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://api.devnet.solana.com',
   { commitment: 'confirmed', confirmTransactionInitialTimeout: 60000 }
 )
 
@@ -26,6 +26,13 @@ export interface OnChainMintResult {
   txSignature: string
   explorerUrl: string
   mintAddress: string // walletAddress used as identity
+}
+
+export interface LaunchCertificateInput {
+  projectId: string
+  projectName: string
+  projectDescription: string
+  techStack: string[]
 }
 
 /**
@@ -84,6 +91,55 @@ export async function mintAgentOnChain(
     txSignature,
     explorerUrl: `https://explorer.solana.com/tx/${txSignature}?cluster=devnet`,
     mintAddress: publicKey.toBase58(),
+  }
+}
+
+export async function publishLaunchCertificate(
+  agent: ForgeAgent,
+  publicKey: PublicKey,
+  signTransaction: (tx: Transaction) => Promise<Transaction>,
+  project: LaunchCertificateInput,
+): Promise<{ txSignature: string; explorerUrl: string }> {
+  const payload = {
+    protocol: 'SolBorn v1',
+    action: 'launch_certificate',
+    agentId: agent.id,
+    agent: agent.name,
+    projectId: project.projectId,
+    project: project.projectName,
+    description: project.projectDescription.slice(0, 160),
+    stack: project.techStack.slice(0, 5),
+    xp: agent.xp,
+    stage: agent.stage,
+    issuer: publicKey.toBase58(),
+    timestamp: Date.now(),
+    network: 'devnet',
+  }
+
+  const instruction = new TransactionInstruction({
+    keys: [{ pubkey: publicKey, isSigner: true, isWritable: false }],
+    programId: MEMO_PROGRAM_ID,
+    data: Buffer.from(JSON.stringify(payload), 'utf-8'),
+  })
+
+  const { blockhash, lastValidBlockHeight } = await DEVNET_CONNECTION.getLatestBlockhash()
+  const transaction = new Transaction({ recentBlockhash: blockhash, feePayer: publicKey })
+  transaction.add(instruction)
+
+  const signed = await signTransaction(transaction)
+  const txSignature = await DEVNET_CONNECTION.sendRawTransaction(signed.serialize(), {
+    skipPreflight: false,
+    preflightCommitment: 'confirmed',
+  })
+
+  await DEVNET_CONNECTION.confirmTransaction(
+    { signature: txSignature, blockhash, lastValidBlockHeight },
+    'confirmed',
+  )
+
+  return {
+    txSignature,
+    explorerUrl: `https://explorer.solana.com/tx/${txSignature}?cluster=devnet`,
   }
 }
 

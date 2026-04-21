@@ -9,11 +9,11 @@ import {
   Sparkles,
   Copy,
   Check,
-  Zap,
+  ShieldCheck,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useForgeStore } from '@/lib/store'
-import { recordEvolution } from '@/lib/solana/payment'
+import { publishLaunchCertificate } from '@/lib/solana/on-chain'
 import { STAGE_CONFIG } from '@/lib/constants'
 import { SFX } from '@/lib/sounds'
 import { useWallet } from '@solana/wallet-adapter-react'
@@ -30,7 +30,7 @@ const LOADING_MESSAGES = [
   'Analyzing Solana ecosystem...',
   'Designing architecture...',
   'Writing Anchor program...',
-  'Packaging Blink payload...',
+  'Preparing launch certificate...',
 ]
 
 function buildBlinkUrl(agent: ForgeAgent, project: GeneratedProject, origin: string): string {
@@ -66,7 +66,7 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
   )
   const [project, setProject] = useState<GeneratedProject | null>(agent.generatedProject ?? null)
   const [loadingMsg, setLoadingMsg] = useState('')
-  const [copied, setCopied] = useState<'code' | 'url' | null>(null)
+  const [copied, setCopied] = useState<'code' | 'url' | 'summary' | null>(null)
   const [codeOpen, setCodeOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -109,19 +109,18 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
   }
 
   async function handleDeploy() {
-    if (!project || !blinkUrl) return
+    if (!project) return
     setPhase('deploying')
     setError(null)
 
     let txSignature = ''
-    // If wallet connected, write a real devnet memo recording the Blink deploy.
     if (connected && publicKey && signTransaction) {
       try {
-        const r = await recordEvolution(publicKey, signTransaction, {
-          agentName: agent.name,
-          fromStage: agent.stage,
-          toStage: agent.stage, // reuse the memo tx helper for now
-          xp: agent.xp,
+        const r = await publishLaunchCertificate(agent, publicKey, signTransaction, {
+          projectId: project.id,
+          projectName: project.name,
+          projectDescription: project.description,
+          techStack: project.techStack,
         })
         txSignature = r.txSignature
         addChainCheckpoint(agent.id, {
@@ -131,9 +130,14 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
           timestamp: Date.now(),
         })
       } catch (e) {
-        console.warn('[blink deploy] on-chain memo failed:', e)
-        // non-fatal — Blink still works
+        setError(e instanceof Error ? e.message : 'Launch certificate failed')
+        setPhase('generated')
+        return
       }
+    } else {
+      setError('Connect wallet to publish launch certificate')
+      setPhase('generated')
+      return
     }
 
     const updated: GeneratedProject = {
@@ -154,6 +158,19 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
     setTimeout(() => setCopied(null), 2000)
   }
 
+  function handleCopySummary() {
+    if (!project) return
+    const summary = [
+      `${agent.name} shipped ${project.name} on SolBorn.`,
+      project.description,
+      `Stack: ${project.techStack.join(', ')}`,
+      project.txHash ? `Proof: https://explorer.solana.com/tx/${project.txHash}?cluster=devnet` : '',
+    ].filter(Boolean).join('\n\n')
+    navigator.clipboard.writeText(summary)
+    setCopied('summary')
+    setTimeout(() => setCopied(null), 2000)
+  }
+
   if (agent.stage !== 'adult') return null
 
   return (
@@ -161,7 +178,7 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
       <div className="flex items-center gap-2">
         <Rocket size={16} style={{ color: config.color }} />
         <h2 className="text-sm font-semibold" style={{ color: config.color }}>
-          Ship a Blink
+          Launch Certificate
         </h2>
       </div>
 
@@ -177,12 +194,12 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
               {agent.name} is ready to ship
             </p>
             <p className="text-xs text-zinc-500 mt-1">
-              Generate a Solana project + a live Blink that accepts SOL tips on devnet.
+              Generate a project and publish a signed launch proof on Solana devnet.
             </p>
           </div>
           <Button onClick={handleGenerate} className="w-full" style={{ background: config.color }}>
             <Sparkles size={16} />
-            Generate Project & Blink
+            Generate Project
           </Button>
           {error && <p className="text-xs text-rose-400">{error}</p>}
         </motion.div>
@@ -272,35 +289,35 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
             )}
           </div>
 
-          {/* Blink preview card */}
-          {project.blink && (
-            <div
-              className="glass p-4 space-y-2"
-              style={{ borderColor: `${config.color}30` }}
-            >
-              <div className="flex items-center gap-2">
-                <Zap size={14} style={{ color: config.color }} />
-                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: config.color }}>
-                  Blink preview
-                </span>
+          <div
+            className="glass p-4 space-y-3"
+            style={{ borderColor: `${config.color}30` }}
+          >
+            <div className="flex items-center gap-2">
+              <ShieldCheck size={14} style={{ color: config.color }} />
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: config.color }}>
+                Certificate payload
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="rounded-md bg-white/5 border border-white/10 px-2 py-1.5">
+                <p className="text-zinc-600">Agent</p>
+                <p className="text-zinc-200 truncate">{agent.name}</p>
               </div>
-              <p className="text-sm font-medium text-zinc-100">{project.blink.title}</p>
-              <p className="text-xs text-zinc-400 leading-relaxed">{project.blink.description}</p>
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {project.blink.amounts.map((a) => (
-                  <span
-                    key={a}
-                    className="text-xs px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-zinc-300 font-mono"
-                  >
-                    {a} SOL
-                  </span>
-                ))}
-                <span className="text-xs px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-zinc-500">
-                  Custom
-                </span>
+              <div className="rounded-md bg-white/5 border border-white/10 px-2 py-1.5">
+                <p className="text-zinc-600">Stage</p>
+                <p className="text-zinc-200 capitalize">{agent.stage}</p>
+              </div>
+              <div className="rounded-md bg-white/5 border border-white/10 px-2 py-1.5">
+                <p className="text-zinc-600">XP</p>
+                <p className="text-zinc-200 font-mono">{agent.xp}</p>
+              </div>
+              <div className="rounded-md bg-white/5 border border-white/10 px-2 py-1.5">
+                <p className="text-zinc-600">Network</p>
+                <p className="text-zinc-200">devnet</p>
               </div>
             </div>
-          )}
+          </div>
 
           {phase === 'generated' && (
             <Button
@@ -309,13 +326,13 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
               style={{ background: config.color }}
             >
               <Rocket size={16} />
-              Ship Blink to Devnet
+              Publish Launch Certificate
             </Button>
           )}
 
           {phase === 'deploying' && (
             <Button disabled className="w-full" loading>
-              Deploying Blink...
+              Publishing Certificate...
             </Button>
           )}
 
@@ -329,18 +346,18 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-sm font-semibold text-emerald-400">
-                  Blink live on devnet
+                  Launch Certificate live
                 </span>
               </div>
 
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Anyone with a Solana wallet can now tip {agent.name} in one click.
-                The Blink renders inside Phantom, X posts, and dial.to.
+                {agent.name} published a project proof to Solana devnet.
+                The certificate is backed by a signed memo transaction.
               </p>
 
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-wider text-zinc-500">
-                  Blink URL
+                  Optional Blink URL
                 </label>
                 <div className="flex items-center gap-2 rounded-lg bg-black/40 border border-white/10 px-3 py-2">
                   <code className="flex-1 text-[11px] font-mono text-zinc-300 truncate">
@@ -364,8 +381,15 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
                   style={{ background: config.color, color: '#0a0a0a' }}
                 >
                   <ExternalLink size={12} />
-                  Open in dial.to
+                  Optional external preview
                 </a>
+                <button
+                  onClick={handleCopySummary}
+                  className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium bg-white/5 border border-white/10 text-zinc-300 hover:bg-white/10 transition-colors"
+                >
+                  {copied === 'summary' ? <Check size={12} /> : <Copy size={12} />}
+                  {copied === 'summary' ? 'Copied summary' : 'Copy launch summary'}
+                </button>
                 {project.txHash && (
                   <a
                     href={`https://explorer.solana.com/tx/${project.txHash}?cluster=devnet`}
@@ -374,7 +398,7 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
                     className="flex items-center justify-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors"
                   >
                     <ExternalLink size={12} />
-                    Deploy tx on Explorer
+                    Certificate tx on Explorer
                   </a>
                 )}
               </div>

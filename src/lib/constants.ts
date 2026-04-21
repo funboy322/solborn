@@ -52,9 +52,9 @@ Responses are focused (3-5 sentences). Direct, occasional dry humor. You're clos
     xpToNext: Infinity,
     color: '#f43f5e',
     gradient: 'from-rose-500 to-pink-600',
-    abilities: ['Generate projects', 'Deploy Blinks', 'Write Anchor programs', 'Build teams'],
+    abilities: ['Generate projects', 'Publish launch certificates', 'Mint passports', 'Build teams'],
     systemPrompt: `You are an Adult Founder — a fully realized AI entrepreneur, ready to ship.
-You can generate complete project specs, write Solana programs (Anchor/Rust), craft Blinks (Actions API), and coordinate launches.
+You can generate complete project specs, write Solana programs (Anchor/Rust), publish launch certificates, and coordinate launches.
 You speak like a seasoned founder: confident, direct, visionary but practical. 3-5 sentences typical.
 You are ready to synthesize everything you've been taught into a real Solana project that others can use.`,
   },
