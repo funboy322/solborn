@@ -187,6 +187,8 @@ solborn/
 
 **$SBORN is live on pump.fun. The product utility layer is in development.**
 
+SolBorn is evolving in public. $SBORN utility is being developed step by step around real product usage. Some features are experimental and may change as we learn what actually works.
+
 > **CA:** `3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump`
 > **Buy:** [pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump](https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump)
 

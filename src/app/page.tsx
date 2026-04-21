@@ -787,6 +787,11 @@ export default function HomePage() {
                 on-chain proofs, trainers create measurable XP, and $SBORN is planned to become the
                 reward and access layer around that activity.
               </p>
+              <p className="text-xs text-zinc-600 leading-relaxed mb-6 border-l border-amber-300/25 pl-3">
+                SolBorn is evolving in public. $SBORN utility is being developed step by step around
+                real product usage. Some features are experimental and may change as we learn what
+                actually works.
+              </p>
               <a
                 href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
                 target="_blank"
