@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
     techStack: Array.isArray(raw.techStack)
       ? raw.techStack.map(String).slice(0, 10)
       : ['@solana/web3.js', 'Anchor'],
-    codeSnippet: String(raw.codeSnippet ?? '').slice(0, 4000),
+    codeSnippet: '',
     solanaProgram: typeof raw.solanaProgram === 'string' ? raw.solanaProgram : undefined,
     blink: safeBlink(raw.blink, agent.name),
   }
