@@ -42,6 +42,9 @@ const CORS_HEADERS = {
   'Access-Control-Expose-Headers': 'X-Action-Version, X-Blockchain-Ids',
   'X-Action-Version': '2.4',
   'X-Blockchain-Ids': SOLANA_DEVNET_CAIP2,
+  'Cache-Control': 'no-store, max-age=0',
+  'CDN-Cache-Control': 'no-store',
+  'Vercel-CDN-Cache-Control': 'no-store',
   'Content-Type': 'application/json',
 }
 
