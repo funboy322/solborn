@@ -28,6 +28,7 @@ export const dynamic = 'force-dynamic'
 
 const RPC = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://api.devnet.solana.com'
 const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr')
+const SOLANA_DEVNET_CAIP2 = 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
 
 // Default fallback recipient if `to` is missing — SolBorn treasury (devnet).
 // In practice the creator wallet is always passed in the URL.
@@ -35,12 +36,12 @@ const FALLBACK_RECIPIENT = 'F7QRP4aack2aYgRJa1Khxb7MmMtA1wEHRtP7Wex98BoL'
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
   'Access-Control-Allow-Headers':
     'Content-Type, Authorization, Content-Encoding, Accept-Encoding',
   'Access-Control-Expose-Headers': 'X-Action-Version, X-Blockchain-Ids',
   'X-Action-Version': '2.4',
-  'X-Blockchain-Ids': 'solana:devnet',
+  'X-Blockchain-Ids': SOLANA_DEVNET_CAIP2,
   'Content-Type': 'application/json',
 }
 
@@ -133,7 +134,7 @@ export async function POST(req: NextRequest, ctx: RouteCtx) {
   const amountStr = req.nextUrl.searchParams.get('amount') ?? '0.01'
   const amount = Number(amountStr)
   if (!Number.isFinite(amount) || amount <= 0 || amount > 100) {
-    return NextResponse.json({ error: 'Invalid amount' }, { status: 400, headers: CORS_HEADERS })
+    return NextResponse.json({ message: 'Invalid amount' }, { status: 400, headers: CORS_HEADERS })
   }
 
   let payer: PublicKey
@@ -143,7 +144,7 @@ export async function POST(req: NextRequest, ctx: RouteCtx) {
     payer = new PublicKey(body.account)
   } catch {
     return NextResponse.json(
-      { error: 'Invalid or missing account' },
+      { message: 'Invalid or missing account' },
       { status: 400, headers: CORS_HEADERS },
     )
   }
@@ -153,7 +154,7 @@ export async function POST(req: NextRequest, ctx: RouteCtx) {
     recipient = new PublicKey(p.to)
   } catch {
     return NextResponse.json(
-      { error: 'Invalid recipient wallet' },
+      { message: 'Invalid recipient wallet' },
       { status: 400, headers: CORS_HEADERS },
     )
   }
