@@ -130,7 +130,11 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
           timestamp: Date.now(),
         })
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Launch certificate failed')
+        const msg = e instanceof Error ? e.message : 'Launch certificate failed'
+        const needsDevnetSol =
+          msg.toLowerCase().includes('insufficient') ||
+          msg.includes('Attempt to debit an account but found no record of a prior credit')
+        setError(needsDevnetSol ? 'Need devnet SOL - open wallet menu and request 0.5 SOL' : msg)
         setPhase('generated')
         return
       }

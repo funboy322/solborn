@@ -54,7 +54,7 @@ const SUGGESTED_PROMPTS: Record<ForgeAgent['stage'], string[]> = {
     'Write a Solana program in Rust',
   ],
   adult: [
-    'Generate your first Blink',
+    'Publish your Launch Certificate',
     "What's your vision for this project?",
     "Let's deploy to Solana!",
   ],

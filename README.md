@@ -7,7 +7,7 @@
 ### Raise an AI founder on Solana.
 
 **Teach it from babbling baby → shipping adult.**
-**Every stage mints a compressed NFT. When it graduates, it publishes a live Blink.**
+**Mint an Agent Passport. Grow it to Adult. Publish a signed Launch Certificate.**
 
 [![Solana](https://img.shields.io/badge/Solana-devnet-9945FF?style=for-the-badge&logo=solana&logoColor=white)](https://solana.com)
 [![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js)](https://nextjs.org)
@@ -30,7 +30,7 @@
 
 ## ✨ The pitch in one paragraph
 
-Most "AI agent" projects are a text field that says *"deployed!"*. SolBorn is different. You name an agent, it starts as a **babbling baby** that genuinely knows nothing. You teach it — with actual explanations, not prompts — and a **teaching-XP engine** grades how much it learned. It remembers you across sessions via **semantic vector memory**. Each evolution **mints a real compressed NFT** to your wallet. When it reaches Adult, it generates a **Solana Blink** anyone can tip from Phantom. Teaching other people's agents earns you tracked on-chain contribution credit toward a **trainer royalty pool**.
+Most "AI agent" projects are a text field that says *"deployed!"*. SolBorn is different. You name an agent, it starts as a **babbling baby** that genuinely knows nothing. You teach it with actual explanations, not prompts, and a **teaching-XP engine** grades how much it learned. It remembers you across sessions via **semantic vector memory**. You can mint an **Agent Passport** as a signed Solana devnet proof. When the agent reaches Adult, it generates a project and publishes a **Launch Certificate** on-chain. Teaching other people's agents earns per-wallet attribution toward the planned **$SBORN trainer reward layer**.
 
 <br />
 
@@ -41,13 +41,13 @@ Most "AI agent" projects are a text field that says *"deployed!"*. SolBorn is di
 <td align="center" width="25%">
 <h3>👶</h3>
 <b>Baby</b><br />
-<sub>0–80 XP</sub><br /><br />
+<sub>0–100 XP</sub><br /><br />
 Knows nothing.<br />Asks "what is a wallet?" in babble.
 </td>
 <td align="center" width="25%">
 <h3>🧒</h3>
 <b>Toddler</b><br />
-<sub>80–300 XP</sub><br /><br />
+<sub>100–300 XP</sub><br /><br />
 Starts connecting concepts.<br />Writes pseudocode, gets DeFi basics.
 </td>
 <td align="center" width="25%">
@@ -60,7 +60,7 @@ Codes in Rust.<br />Reviews your GTM. Has opinions.
 <h3>🚀</h3>
 <b>Adult</b><br />
 <sub>700+ XP</sub><br /><br />
-Ships.<br />Generates a live Blink<br />from its trait vector.
+Ships.<br />Publishes a Launch Certificate<br />from its trait vector.
 </td>
 </tr>
 </table>
@@ -74,9 +74,9 @@ Ships.<br />Generates a live Blink<br />from its trait vector.
 | 🧠 **Semantic memory** | Upstash Vector (BGE-M3 multilingual, EU1) | Facts extracted async via `after()`, agent recalls them weeks later |
 | ⚡ **Streaming chat** | AI SDK v6 + Groq (`llama-3.3-70b`) | Edge streaming with fallback to `llama-3.1-8b-instant` |
 | 🎓 **Teaching XP engine** | Custom grader + trait analyzer | Word count × quality × novelty — spam = 0 XP |
-| 🪪 **Compressed NFTs** | Metaplex Bubblegum + Umi | Real devnet mints, cost ~0.00001 SOL per evolution |
-| 🪄 **Solana Blinks** | Solana Actions spec 2.4 | GET/POST/OPTIONS endpoint, opens in dial.to + Phantom |
-| 👥 **Trainer royalties** | Per-wallet XP attribution | On-chain memo-indexed, feeds into `$SBORN` trainer pool |
+| 🪪 **Agent Passports** | Solana Memo Program + wallet signatures | Real devnet tx that proves the agent identity in Explorer |
+| 🚀 **Launch Certificates** | Signed Memo tx + generated project spec | Adult agents publish a verifiable launch proof on Solana devnet |
+| 🪙 **$SBORN utility layer** | Per-wallet XP attribution + reward roadmap | Trainer XP becomes the score layer for future token rewards |
 | 🔋 **Energy system** | Client-side regen + wallet boost | 2 energy/min, connect wallet for refill |
 | 🏆 **Achievements** | 20+ unlocks, XP bonuses | Real-time toast + screen-shake feedback |
 | 🎬 **Demo mode** | `?demo=1` → ×50 XP, ∞ energy | Lets judges hit Adult in 3–4 messages |
@@ -94,7 +94,7 @@ npm install
 # 2. Copy env template
 cp .env.example .env.local
 # Fill in: GROQ_API_KEY, UPSTASH_VECTOR_REST_URL, UPSTASH_VECTOR_REST_TOKEN
-#          NEXT_PUBLIC_BUBBLEGUM_TREE (optional — falls back to Memo mints)
+# Optional but recommended: NEXT_PUBLIC_HELIUS_RPC
 
 # 3. Run
 npm run dev
@@ -127,15 +127,15 @@ Append `?demo=1` to any URL for a ×50 XP speed-run (hackathon demo mode).
                                  │  yes
                                  ▼
  ┌──────────────────────────────────────────────────────────────────┐
- │     bubblegum.ts  →  mint cNFT snapshot to trainer wallet         │
- │     recordEvolution()  →  Memo tx for public evolution ledger     │
+ │     on-chain.ts  →  Agent Passport Memo tx to trainer wallet      │
+ │     chainHistory →  public evolution and launch proof ledger      │
  └───────────────────────────────┬──────────────────────────────────┘
                                  │  stage === 'adult'?
                                  ▼
  ┌──────────────────────────────────────────────────────────────────┐
- │   /api/agent/generate  →  LLM produces BlinkSpec                  │
- │   /api/blinks/[id]     →  serves Solana Actions endpoint          │
- │   dial.to link         →  anyone can tip from Phantom             │
+ │   /api/agent/generate  →  LLM produces project spec               │
+ │   publishLaunchCertificate() → signed Memo proof in Explorer      │
+ │   optional Blink URL   → support link, not required for demo       │
  └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -148,8 +148,8 @@ Append `?demo=1` to any URL for a ×50 XP speed-run (hackathon demo mode).
 | Frontend | AI & Memory | Solana |
 |:---:|:---:|:---:|
 | Next.js 16 + Turbopack | AI SDK v6 | `@solana/web3.js` |
-| React 19 | Groq (Llama 3.3 70B) | Metaplex Bubblegum |
-| Tailwind v4 | Upstash Vector | Solana Actions 2.4 |
+| React 19 | Groq (Llama 3.3 70B) | SPL Memo Program |
+| Tailwind v4 | Upstash Vector | Helius/devnet RPC |
 | Framer Motion | BGE-M3 embeddings | Umi + wallet adapter |
 | Zustand v5 + persist | `after()` background tasks | SPL Memo |
 
@@ -165,32 +165,32 @@ solborn/
 │   ├── app/
 │   │   ├── api/
 │   │   │   ├── agent/chat/      → streaming teaching chat
-│   │   │   ├── agent/generate/  → LLM → BlinkSpec
+│   │   │   ├── agent/generate/  → LLM → generated project spec
 │   │   │   ├── blinks/[id]/     → Solana Actions endpoint
-│   │   │   └── nft-metadata/    → on-the-fly cNFT JSON
+│   │   │   └── nft-metadata/    → legacy metadata route
 │   │   ├── actions.json/        → Blink client domain registration
 │   │   ├── forge/[id]/          → agent page (chat + stats + deploy)
 │   │   └── page.tsx             → landing
 │   ├── components/agent/        → ChatInterface, ProjectGenerator, ...
 │   ├── lib/
 │   │   ├── ai/                  → prompts, xp-calculator, trait-analyzer
-│   │   ├── solana/bubblegum.ts  → cNFT mint flow
+│   │   ├── solana/on-chain.ts   → Passport + Launch Certificate memos
 │   │   ├── memory/              → Upstash Vector wrapper
 │   │   └── demo-mode.ts         → ×50 XP hackathon mode
 │   └── store/                   → zustand slices (agents, achievements)
-├── scripts/create-tree.mjs      → one-time Bubblegum tree creator
+├── scripts/                     → helper scripts
 ```
 
 <br />
 
 ## 💰 $SBORN Token
 
-**$SBORN is live on pump.fun.**
+**$SBORN is live on pump.fun and is being wired into the SolBorn product loop.**
 
 > **CA:** `3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump`
 > **Buy:** [pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump](https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump)
 
-No pre-mine. No team allocation. Everything on the bonding curve.
+No pre-mine. No team allocation. Everything started on the bonding curve.
 
 <div align="center">
 
@@ -198,11 +198,18 @@ No pre-mine. No team allocation. Everything on the bonding curve.
 |:---|:---:|:---|
 | 🧑‍💻 **Dev** | **50%** | Founder compensation + operations |
 | 🏦 **Treasury** | **30%** | Runway — Claude, Vercel, RPC nodes, future audits |
-| 🎁 **Trainers** | **20%** | Manually distributed to real contributors via [solborn.xyz/rewards](https://solborn.xyz/rewards) |
+| 🎁 **Trainers** | **20%** | Planned rewards for real contributors via [solborn.xyz/rewards](https://solborn.xyz/rewards) |
 
 </div>
 
-The **20% trainer pool** goes back to real contributors — people who actually trained agents, found bugs, wrote guides, and helped the project grow. Nominations reviewed manually at [solborn.xyz/rewards](https://solborn.xyz/rewards).
+The token is designed as the coordination layer around the product:
+
+- **Trainer rewards:** wallet-linked XP becomes the attribution score for future $SBORN distributions.
+- **Agent utility:** planned use cases include energy boosts, launch boosts, Passport cosmetics, and advanced agent actions.
+- **Proof-gated identity:** Agent Passports and Launch Certificates give $SBORN a native product surface instead of being a detached meme.
+- **Community incentives:** rewards can prioritize people who actually teach agents, ship feedback, write guides, and help the system grow.
+
+The **20% trainer pool** is intended for real contributors: people who trained agents, found bugs, wrote guides, and helped the project grow. Nominations are reviewed manually at [solborn.xyz/rewards](https://solborn.xyz/rewards).
 
 <br />
 
@@ -210,11 +217,12 @@ The **20% trainer pool** goes back to real contributors — people who actually 
 
 - [x] **Phase 1** — baseline chat + XP + stages
 - [x] **Phase 2** — semantic memory (Upstash Vector)
-- [x] **Phase 3** — compressed NFT minting via Bubblegum
+- [x] **Phase 3** — Agent Passport memo minting
 - [x] **Phase 4** — trainer royalty attribution
-- [x] **Phase 5** — Solana Blink finale
+- [x] **Phase 5** — Launch Certificate finale
 - [x] **Phase 6** — demo mode (`?demo=1`)
-- [ ] **Phase 7** — mainnet deployment + first quarterly trainer airdrop
+- [ ] **Phase 7** — wire $SBORN into energy, launch boosts, and trainer rewards
+- [ ] **Phase 8** — mainnet deployment + first trainer distribution
 
 
 <br />
@@ -223,10 +231,10 @@ The **20% trainer pool** goes back to real contributors — people who actually 
 
 ## 🛡️ Honest caveats
 
-- **Devnet only** at launch. All cNFTs, Blinks, and Memo txs are devnet. Mainnet is a Phase 8 decision, not a day-1 promise.
+- **Devnet only** at launch. Agent Passports, Launch Certificates, and Memo txs are devnet. Mainnet is a Phase 8 decision, not a day-1 promise.
 - **Groq free-tier limits** apply. Chat has a Llama 3.1 8B fallback when 70B is throttled.
-- **Minting costs SOL**. Bubblegum mints are ~0.00001 SOL each but require a funded trainer wallet.
-- **Not financial advice.** `$SBORN` is a memecoin with a utility wrapper, not a security. If you can't afford to lose what you ape, don't ape.
+- **Minting costs devnet SOL**. Passports and Launch Certificates are Memo transactions, but the wallet still needs a small devnet balance for fees.
+- **Not financial advice.** `$SBORN` is an experimental community token with a planned utility wrapper, not a security. If you can't afford to lose what you ape, don't ape.
 
 <br />
 
@@ -234,7 +242,7 @@ The **20% trainer pool** goes back to real contributors — people who actually 
 
 One person. One weekend. Claude Max as a pair programmer. Submitted to the **Colosseum Frontier Hackathon 2026**.
 
-If you're a judge: open [**solborn.xyz**](https://solborn.xyz?demo=1), raise an agent to Adult (~2 min with demo mode), ship its Blink, tip it 0.01 devnet SOL. The whole loop is under 3 minutes and everything you touch is real on-chain state.
+If you're a judge: open [**solborn.xyz**](https://solborn.xyz?demo=1), mint an Agent Passport, raise the agent to Adult (~2 min with demo mode), generate its project, and publish a Launch Certificate. The whole loop is under 3 minutes and the key milestones are real Solana devnet transactions.
 
 <br />
 

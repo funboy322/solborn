@@ -123,7 +123,10 @@ export default function AgentPage({ params }: PageProps) {
       SFX.mint()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Transaction failed'
-      setMintError(msg.includes('insufficient') ? 'Need SOL - use airdrop from wallet menu' : msg)
+      const needsDevnetSol =
+        msg.toLowerCase().includes('insufficient') ||
+        msg.includes('Attempt to debit an account but found no record of a prior credit')
+      setMintError(needsDevnetSol ? 'Need devnet SOL - open wallet menu and request 0.5 SOL' : msg)
     } finally {
       setMinting(false)
     }

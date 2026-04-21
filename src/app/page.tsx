@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, useScroll, useTransform, useSpring, useMotionValue, useAnimationFrame } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { Zap, Brain, Rocket, Trophy, ArrowRight, ExternalLink } from 'lucide-react'
+import { Zap, Brain, Rocket, Trophy, ArrowRight, ExternalLink, Coins } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CreateAgentModal } from '@/components/forge/CreateAgentModal'
 import { WalletButton } from '@/components/wallet/WalletButton'
@@ -77,10 +77,25 @@ const FEATURES = [
   {
     icon: Trophy,
     title: 'Trainer Royalties',
-    desc: 'Anyone can train anyone\'s agent. XP you contribute splits future royalties — teaching is upside, not charity.',
+    desc: 'Anyone can train anyone\'s agent. XP you contribute becomes attribution for future $SBORN rewards.',
     color: '#f43f5e',
     bg: 'rgba(244,63,94,0.08)',
     border: 'rgba(244,63,94,0.2)',
+  },
+]
+
+const TOKEN_UTILITIES = [
+  {
+    label: 'Train-to-earn attribution',
+    desc: 'Teaching XP is tracked per wallet, creating the score layer for future $SBORN trainer rewards.',
+  },
+  {
+    label: 'Agent economy sink',
+    desc: '$SBORN is planned for energy boosts, launch boosts, Passport cosmetics, and advanced agent actions.',
+  },
+  {
+    label: 'Proof-gated community',
+    desc: 'Agent Passports and Launch Certificates give the token a native identity layer instead of a detached meme.',
   },
 ]
 
@@ -347,7 +362,7 @@ function StatsBar() {
     { label: 'Built on Solana', icon: '◎' },
     { label: 'Agent Passports', icon: '⚡' },
     { label: 'Launch Certificates', icon: '✦' },
-    { label: 'Trainer Royalties', icon: '🪙' },
+    { label: '$SBORN Utility Layer', icon: '🪙' },
     { label: 'Persistent Memory', icon: '🧠' },
     { label: 'Open Source', icon: '🔓' },
   ]
@@ -666,7 +681,7 @@ export default function HomePage() {
               }}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              $SBORN is live on pump.fun
+              $SBORN is live · utility layer in progress
               <ExternalLink size={11} />
             </a>
           </motion.div>
@@ -735,7 +750,7 @@ export default function HomePage() {
               Built Different
             </h2>
             <p className="text-zinc-500 max-w-md mx-auto text-sm leading-relaxed">
-              Not a chatbot. A tamagotchi with memory, an Agent Passport, a Launch Certificate to publish, and royalty splits for the trainers.
+              Not a chatbot. A trainable founder with memory, an Agent Passport, a Launch Certificate to publish, and a token reward layer for real trainers.
             </p>
           </motion.div>
 
@@ -744,6 +759,62 @@ export default function HomePage() {
               <FeatureCard key={feature.title} feature={feature} index={i} />
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Token Utility ── */}
+      <section className="py-24 px-6">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center"
+          >
+            <div>
+              <p className="text-xs font-mono text-amber-300 tracking-widest uppercase mb-3">
+                $SBORN
+              </p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-zinc-100 mb-4">
+                The token is the coordination layer
+              </h2>
+              <p className="text-zinc-500 text-sm leading-relaxed mb-6">
+                SolBorn is designed so the token is not just a logo on a chart. Agents create
+                on-chain proofs, trainers create measurable XP, and $SBORN becomes the reward
+                and access layer around that activity.
+              </p>
+              <a
+                href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-amber-200 border border-amber-300/25 bg-amber-300/10 hover:bg-amber-300/15 transition-colors"
+              >
+                <Coins size={15} />
+                View $SBORN
+                <ExternalLink size={13} />
+              </a>
+            </div>
+            <div className="grid gap-3">
+              {TOKEN_UTILITIES.map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                  className="glass p-5 border border-white/10"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="mt-1 w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
+                    <div>
+                      <h3 className="text-sm font-semibold text-zinc-100 mb-1">{item.label}</h3>
+                      <p className="text-sm text-zinc-500 leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
