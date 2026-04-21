@@ -185,7 +185,7 @@ solborn/
 
 ## 💰 $SBORN Token
 
-**$SBORN is live on pump.fun and is being wired into the SolBorn product loop.**
+**$SBORN is live on pump.fun. The product utility layer is in development.**
 
 > **CA:** `3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump`
 > **Buy:** [pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump](https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump)

@@ -681,7 +681,7 @@ export default function HomePage() {
               }}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              $SBORN is live · utility layer in progress
+              $SBORN is live · utility layer soon
               <ExternalLink size={11} />
             </a>
           </motion.div>
@@ -775,13 +775,17 @@ export default function HomePage() {
               <p className="text-xs font-mono text-amber-300 tracking-widest uppercase mb-3">
                 $SBORN
               </p>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-300/25 bg-amber-300/10 text-[11px] font-semibold text-amber-200 mb-4">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
+                Utility layer in development
+              </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-zinc-100 mb-4">
-                The token is the coordination layer
+                The token is becoming the coordination layer
               </h2>
               <p className="text-zinc-500 text-sm leading-relaxed mb-6">
-                SolBorn is designed so the token is not just a logo on a chart. Agents create
-                on-chain proofs, trainers create measurable XP, and $SBORN becomes the reward
-                and access layer around that activity.
+                SolBorn is being designed so the token is not just a logo on a chart. Agents create
+                on-chain proofs, trainers create measurable XP, and $SBORN is planned to become the
+                reward and access layer around that activity.
               </p>
               <a
                 href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
