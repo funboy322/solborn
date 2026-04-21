@@ -66,6 +66,7 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
   const [project, setProject] = useState<GeneratedProject | null>(agent.generatedProject ?? null)
   const [loadingMsg, setLoadingMsg] = useState('')
   const [copied, setCopied] = useState<'code' | 'url' | null>(null)
+  const [codeOpen, setCodeOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const { publicKey, signTransaction, connected } = useWallet()
@@ -238,23 +239,34 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
 
             {project.codeSnippet && (
               <div className="relative">
-                <div className="flex items-center justify-between px-3 py-1.5 bg-white/5 rounded-t-lg border border-white/10 border-b-0">
+                <button
+                  onClick={() => setCodeOpen((v) => !v)}
+                  className="w-full flex items-center justify-between px-3 py-1.5 bg-white/5 rounded-lg border border-white/10 hover:bg-white/8 transition-colors"
+                >
                   <div className="flex items-center gap-1.5">
                     <Code2 size={12} className="text-zinc-500" />
-                    <span className="text-xs text-zinc-500">program.rs</span>
+                    <span className="text-xs text-zinc-500">View generated code</span>
                   </div>
-                  <button
-                    onClick={() => handleCopy(project.codeSnippet, 'code')}
-                    className="text-zinc-600 hover:text-zinc-400 transition-colors"
-                  >
-                    {copied === 'code' ? <Check size={12} /> : <Copy size={12} />}
-                  </button>
-                </div>
-                <pre className="p-3 bg-black/40 rounded-b-lg border border-white/10 border-t-0 overflow-x-auto">
-                  <code className="text-xs text-zinc-300 leading-relaxed">
-                    {project.codeSnippet}
-                  </code>
-                </pre>
+                  <span className="text-[10px] text-zinc-600">{codeOpen ? '▲ hide' : '▼ show'}</span>
+                </button>
+                {codeOpen && (
+                  <div className="mt-1">
+                    <div className="flex items-center justify-end px-3 py-1 bg-white/5 rounded-t-lg border border-white/10 border-b-0">
+                      <button
+                        onClick={() => handleCopy(project.codeSnippet, 'code')}
+                        className="text-zinc-600 hover:text-zinc-400 transition-colors flex items-center gap-1"
+                      >
+                        {copied === 'code' ? <Check size={12} /> : <Copy size={12} />}
+                        <span className="text-[10px]">{copied === 'code' ? 'copied' : 'copy'}</span>
+                      </button>
+                    </div>
+                    <pre className="p-3 bg-black/40 rounded-b-lg border border-white/10 border-t-0 overflow-x-auto max-h-64">
+                      <code className="text-xs text-zinc-300 leading-relaxed">
+                        {project.codeSnippet}
+                      </code>
+                    </pre>
+                  </div>
+                )}
               </div>
             )}
           </div>
