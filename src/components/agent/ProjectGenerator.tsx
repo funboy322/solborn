@@ -45,6 +45,7 @@ function buildBlinkUrl(agent: ForgeAgent, project: GeneratedProject, origin: str
     desc: blink.description,
     cta: blink.cta,
     amounts: blink.amounts.join(','),
+    pid: project.id,
   })
   return `${origin}/api/blinks/${agent.id}?${params.toString()}`
 }
