@@ -30,7 +30,7 @@
 
 ## ✨ The pitch in one paragraph
 
-Most "AI agent" projects are a text field that says *"deployed!"*. SolBorn is different. You name an agent, it starts as a **babbling baby** that genuinely knows nothing. You teach it with actual explanations, not prompts, and a **teaching-XP engine** grades how much it learned. It remembers you across sessions via **semantic vector memory**. You can mint an **Agent Passport** as a signed Solana devnet proof. When the agent reaches Adult, it generates a project and publishes a **Launch Certificate** on-chain. Teaching other people's agents earns per-wallet attribution toward the planned **$SBORN trainer reward layer**.
+Most "AI agent" projects are a text field that says *"deployed!"*. SolBorn is different. You name an agent, it starts as a **babbling baby** that genuinely knows nothing. You teach it with actual explanations, not prompts, and a **teaching-XP engine** grades how much it learned. It remembers you across sessions via **semantic vector memory**. You can mint an **Agent Passport** as a signed Solana devnet proof. When the agent reaches Adult, it generates a product brief, membership pass, public product page, and **Launch Certificate** on-chain. Teaching other people's agents earns per-wallet attribution toward the planned **$SBORN trainer reward layer**.
 
 <br />
 
@@ -76,6 +76,7 @@ Ships.<br />Publishes a Launch Certificate<br />from its trait vector.
 | 🎓 **Teaching XP engine** | Custom grader + trait analyzer | Word count × quality × novelty — spam = 0 XP |
 | 🪪 **Agent Passports** | Solana Memo Program + wallet signatures | Real devnet tx that proves the agent identity in Explorer |
 | 🚀 **Launch Certificates** | Signed Memo tx + generated project spec | Adult agents publish a verifiable launch proof on Solana devnet |
+| 🧾 **Product Pages** | Agent-generated brief + membership pass | Each Adult agent turns training into a shareable product page |
 | 🪙 **$SBORN utility layer** | Staking v1 + per-wallet XP attribution | Stake-to-unlock access is being tested before real token locks |
 | 🔋 **Energy system** | Client-side regen + wallet boost | 2 energy/min, connect wallet for refill |
 | 🏆 **Achievements** | 20+ unlocks, XP bonuses | Real-time toast + screen-shake feedback |
@@ -225,8 +226,9 @@ The **20% trainer pool** is intended for real contributors: people who trained a
 - [x] **Phase 5** — Launch Certificate finale
 - [x] **Phase 6** — demo mode (`?demo=1`)
 - [x] **Phase 7** — staking v1 simulation for Passport-gated utility
-- [ ] **Phase 8** — real SPL token lock + vote-gated leaderboard
-- [ ] **Phase 9** — mainnet deployment + first trainer distribution
+- [x] **Phase 8** — agent-generated Product Pages + membership pass v1
+- [ ] **Phase 9** — real SPL token lock + vote-gated leaderboard
+- [ ] **Phase 10** — mainnet deployment + first trainer distribution
 
 
 <br />
@@ -247,7 +249,7 @@ The **20% trainer pool** is intended for real contributors: people who trained a
 
 One person. One weekend. Claude Max as a pair programmer. Submitted to the **Colosseum Frontier Hackathon 2026**.
 
-If you're a judge: open [**solborn.xyz**](https://solborn.xyz?demo=1), mint an Agent Passport, raise the agent to Adult (~2 min with demo mode), generate its project, and publish a Launch Certificate. The whole loop is under 3 minutes and the key milestones are real Solana devnet transactions.
+If you're a judge: open [**solborn.xyz**](https://solborn.xyz?demo=1), mint an Agent Passport, raise the agent to Adult (~2 min with demo mode), generate its product page, and publish a Launch Certificate. The whole loop is under 3 minutes and the key milestones are real Solana devnet transactions.
 
 <br />
 

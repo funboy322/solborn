@@ -36,6 +36,23 @@ export interface BlinkSpec {
   amounts: number[]
 }
 
+export interface ProductBrief {
+  targetUser: string
+  problem: string
+  solution: string
+  mvp: string
+  solanaAngle: string
+  pricing: string
+  launchPlan: string[]
+}
+
+export interface MembershipOffer {
+  title: string
+  priceUsd: number
+  durationDays: number
+  benefits: string[]
+}
+
 export interface GeneratedProject {
   id: string
   name: string
@@ -43,6 +60,8 @@ export interface GeneratedProject {
   techStack: string[]
   codeSnippet: string      // key code snippet
   solanaProgram?: string   // mock program ID
+  brief?: ProductBrief
+  membership?: MembershipOffer
   deployedAt?: number
   txHash?: string          // real devnet memo tx from /deploy
   /** If set, agent has shipped a live Solana Action. */

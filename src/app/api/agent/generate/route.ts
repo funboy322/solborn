@@ -2,7 +2,7 @@ import { createGroq } from '@ai-sdk/groq'
 import { generateText } from 'ai'
 import { NextRequest, NextResponse } from 'next/server'
 import { buildGenerateProjectPrompt } from '@/lib/ai/prompts'
-import type { ForgeAgent, GeneratedProject, BlinkSpec } from '@/lib/types'
+import type { ForgeAgent, GeneratedProject, BlinkSpec, ProductBrief, MembershipOffer } from '@/lib/types'
 import { nanoid } from '@/lib/utils'
 
 export const maxDuration = 60
@@ -29,6 +29,51 @@ function safeBlink(raw: unknown, agentName: string): BlinkSpec {
     ).slice(0, 280),
     cta: String(r.cta ?? `Tip ${agentName}`).slice(0, 40),
     amounts: amounts.length ? amounts : [0.01, 0.05, 0.1],
+  }
+}
+
+function cleanText(value: unknown, fallback: string, max = 220): string {
+  const text = typeof value === 'string' && value.trim() ? value.trim() : fallback
+  return text.replace(/\s+/g, ' ').slice(0, max)
+}
+
+function cleanList(value: unknown, fallback: string[], max = 4): string[] {
+  const items = Array.isArray(value)
+    ? value.map((item) => cleanText(item, '', 120)).filter(Boolean)
+    : []
+  return (items.length ? items : fallback).slice(0, max)
+}
+
+function safeBrief(raw: unknown, projectName: string): ProductBrief {
+  const r = (raw ?? {}) as Partial<ProductBrief>
+  return {
+    targetUser: cleanText(r.targetUser, 'Solana builders who need a faster way to turn rough ideas into launchable product pages.'),
+    problem: cleanText(r.problem, 'Most early projects cannot explain who they serve, what they build first, or why the wallet layer matters.'),
+    solution: cleanText(r.solution, `${projectName} turns an agent-trained idea into a focused product brief and launch page.`),
+    mvp: cleanText(r.mvp, 'A public product page, access pass, and launch proof that can be shown to early users.'),
+    solanaAngle: cleanText(r.solanaAngle, 'Wallet identity, token access, and signed launch proofs make each project verifiable from day one.'),
+    pricing: cleanText(r.pricing, 'A simple monthly access pass for early supporters and beta users.'),
+    launchPlan: cleanList(r.launchPlan, [
+      'Create the product page from the trained agent context',
+      'Publish a signed launch certificate',
+      'Invite early users to request access',
+    ]),
+  }
+}
+
+function safeMembership(raw: unknown, projectName: string): MembershipOffer {
+  const r = (raw ?? {}) as Partial<MembershipOffer>
+  const priceUsd = Number(r.priceUsd)
+  const durationDays = Number(r.durationDays)
+  return {
+    title: cleanText(r.title, `${projectName} Access Pass`, 60),
+    priceUsd: Number.isFinite(priceUsd) && priceUsd > 0 && priceUsd < 1000 ? Math.round(priceUsd) : 9,
+    durationDays: Number.isFinite(durationDays) && durationDays > 0 && durationDays <= 365 ? Math.round(durationDays) : 30,
+    benefits: cleanList(r.benefits, [
+      'Early product access',
+      'Founder updates',
+      'Priority feedback loop',
+    ]),
   }
 }
 
@@ -95,6 +140,8 @@ export async function POST(req: NextRequest) {
       : ['@solana/web3.js', 'Anchor'],
     codeSnippet: '',
     solanaProgram: typeof raw.solanaProgram === 'string' ? raw.solanaProgram : undefined,
+    brief: safeBrief(raw.brief, String(raw.name ?? `${agent.name}'s Project`).slice(0, 60)),
+    membership: safeMembership(raw.membership, String(raw.name ?? `${agent.name}'s Project`).slice(0, 60)),
     blink: safeBlink(raw.blink, agent.name),
   }
 

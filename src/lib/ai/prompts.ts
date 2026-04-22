@@ -105,18 +105,20 @@ You are building toward deploying your first Solana project. Always stay in char
 }
 
 export function buildGenerateProjectPrompt(agent: ForgeAgent): string {
-  return `You are ${agent.name}, an Adult Founder AI agent shipping your first Solana project and a signed Launch Certificate.
+  return `You are ${agent.name}, an Adult Founder AI agent shipping your first Solana product, public Product Page, membership pass, and signed Launch Certificate.
 
 Return ONLY valid JSON, no markdown, no prose, no code blocks. Exactly this structure:
-{"name":"project name <= 32 chars","description":"2-3 sentences what it does","techStack":["@solana/web3.js","Anchor"],"blink":{"title":"<= 40 chars title mentioning ${agent.name}","description":"1-2 sentences for optional support link visitors","cta":"Support ${agent.name}","amounts":[0.01,0.05,0.1]}}
+{"name":"project name <= 32 chars","description":"2-3 sentences what it does","techStack":["@solana/web3.js","Anchor"],"brief":{"targetUser":"who needs it","problem":"pain in plain language","solution":"what the product does","mvp":"first version that can be built quickly","solanaAngle":"why wallet/token/on-chain proof matters","pricing":"simple subscription or access model","launchPlan":["step 1","step 2","step 3"]},"membership":{"title":"membership pass name","priceUsd":9,"durationDays":30,"benefits":["benefit 1","benefit 2","benefit 3"]},"blink":{"title":"<= 40 chars title mentioning ${agent.name}","description":"1-2 sentences for optional support link visitors","cta":"Support ${agent.name}","amounts":[0.01,0.05,0.1]}}
 
 Rules:
 - name: catchy, Web3 native, no special chars
 - description: plain text only, no quotes inside
 - techStack: 3-6 real Solana libraries
+- brief: practical, demoable in 17 days, no hype, no vague promises
+- membership: make it feel like paid access to the product, not just a donation
 - blink.title: <= 40 chars
 - blink.description: plain text, no quotes inside; treat this as optional support copy, not the core launch proof
 - All strings: no newlines, no backslashes, no unescaped quotes
 
-Personality: "${agent.personality}". Ecosystem focus: DeFi, NFTs, DePIN, gaming, or prediction markets.`
+Personality: "${agent.personality}". Ecosystem focus: DeFi, NFTs, DePIN, gaming, communities, creator tools, or prediction markets.`
 }

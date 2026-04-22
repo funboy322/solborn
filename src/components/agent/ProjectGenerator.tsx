@@ -66,7 +66,7 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
   )
   const [project, setProject] = useState<GeneratedProject | null>(agent.generatedProject ?? null)
   const [loadingMsg, setLoadingMsg] = useState('')
-  const [copied, setCopied] = useState<'code' | 'url' | 'summary' | null>(null)
+  const [copied, setCopied] = useState<'code' | 'url' | 'product' | 'summary' | null>(null)
   const [codeOpen, setCodeOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -78,6 +78,7 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
     () => (project && origin ? buildBlinkUrl(agent, project, origin) : ''),
     [agent, project, origin],
   )
+  const productUrl = project && origin ? `${origin}/products/${project.id}` : ''
 
   async function handleGenerate() {
     setPhase('generating')
@@ -156,7 +157,7 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
     setPhase('deployed')
   }
 
-  function handleCopy(text: string, kind: 'code' | 'url') {
+  function handleCopy(text: string, kind: 'code' | 'url' | 'product') {
     navigator.clipboard.writeText(text)
     setCopied(kind)
     setTimeout(() => setCopied(null), 2000)
@@ -168,6 +169,7 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
       `${agent.name} shipped ${project.name} on SolBorn.`,
       project.description,
       `Stack: ${project.techStack.join(', ')}`,
+      productUrl ? `Product page: ${productUrl}` : '',
       project.txHash ? `Proof: https://explorer.solana.com/tx/${project.txHash}?cluster=devnet` : '',
     ].filter(Boolean).join('\n\n')
     navigator.clipboard.writeText(summary)
@@ -259,6 +261,15 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
               ))}
             </div>
 
+            {project.brief && (
+              <div className="grid gap-2 text-xs">
+                <BriefRow label="User" value={project.brief.targetUser} />
+                <BriefRow label="Problem" value={project.brief.problem} />
+                <BriefRow label="MVP" value={project.brief.mvp} />
+                <BriefRow label="Solana" value={project.brief.solanaAngle} />
+              </div>
+            )}
+
             {project.codeSnippet && (
               <div className="relative">
                 <button
@@ -292,6 +303,37 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
               </div>
             )}
           </div>
+
+          {productUrl && (
+            <div className="glass p-4 space-y-3 border border-white/10">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                  Product Page
+                </p>
+                <p className="text-sm text-zinc-300 mt-1">
+                  Share the generated product brief, access pass, and launch proof.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 rounded-lg bg-black/40 border border-white/10 px-3 py-2">
+                <code className="flex-1 text-[11px] font-mono text-zinc-300 truncate">
+                  {productUrl}
+                </code>
+                <button
+                  onClick={() => handleCopy(productUrl, 'product')}
+                  className="text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                  {copied === 'product' ? <Check size={14} /> : <Copy size={14} />}
+                </button>
+              </div>
+              <a
+                href={productUrl}
+                className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium bg-white/5 border border-white/10 text-zinc-300 hover:bg-white/10 transition-colors"
+              >
+                <ExternalLink size={12} />
+                Open Product Page
+              </a>
+            </div>
+          )}
 
           <div
             className="glass p-4 space-y-3"
@@ -407,6 +449,15 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
           )}
         </motion.div>
       )}
+    </div>
+  )
+}
+
+function BriefRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-md bg-white/5 border border-white/10 px-3 py-2">
+      <p className="text-[10px] uppercase tracking-wider text-zinc-600">{label}</p>
+      <p className="text-zinc-300 leading-relaxed mt-1">{value}</p>
     </div>
   )
 }
