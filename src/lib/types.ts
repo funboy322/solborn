@@ -79,6 +79,16 @@ export interface Trainer {
   displayName?: string       // future: X handle / ENS / shortened addr
 }
 
+export interface StakePosition {
+  id: string
+  walletAddress: string
+  amount: number
+  createdAt: number
+  unlockAt?: number
+  status: 'active' | 'unstaked'
+  mode: 'simulation' | 'on-chain'
+}
+
 export interface ForgeAgent {
   id: string
   name: string

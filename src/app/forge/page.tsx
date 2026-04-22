@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Plus, ArrowLeft, Wallet } from 'lucide-react'
+import { Plus, ArrowLeft, Wallet, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { AgentCard } from '@/components/agent/AgentCard'
@@ -54,6 +54,10 @@ export default function ForgePage() {
             </p>
           </div>
           <WalletButton />
+          <Button variant="secondary" size="sm" onClick={() => router.push('/staking')} className="hidden sm:inline-flex">
+            <Lock size={14} />
+            Stake
+          </Button>
           <Button size="sm" onClick={() => setModalOpen(true)}>
             <Plus size={16} />
             New Agent

@@ -76,7 +76,7 @@ Ships.<br />Publishes a Launch Certificate<br />from its trait vector.
 | 🎓 **Teaching XP engine** | Custom grader + trait analyzer | Word count × quality × novelty — spam = 0 XP |
 | 🪪 **Agent Passports** | Solana Memo Program + wallet signatures | Real devnet tx that proves the agent identity in Explorer |
 | 🚀 **Launch Certificates** | Signed Memo tx + generated project spec | Adult agents publish a verifiable launch proof on Solana devnet |
-| 🪙 **$SBORN utility layer** | Per-wallet XP attribution + reward roadmap | Trainer XP becomes the score layer for future token rewards |
+| 🪙 **$SBORN utility layer** | Staking v1 + per-wallet XP attribution | Stake-to-unlock access is being tested before real token locks |
 | 🔋 **Energy system** | Client-side regen + wallet boost | 2 energy/min, connect wallet for refill |
 | 🏆 **Achievements** | 20+ unlocks, XP bonuses | Real-time toast + screen-shake feedback |
 | 🎬 **Demo mode** | `?demo=1` → ×50 XP, ∞ energy | Lets judges hit Adult in 3–4 messages |
@@ -207,7 +207,8 @@ No pre-mine. No team allocation. Everything started on the bonding curve.
 The token is designed as the coordination layer around the product:
 
 - **Trainer rewards:** wallet-linked XP becomes the attribution score for future $SBORN distributions.
-- **Agent utility:** planned use cases include energy boosts, launch boosts, Passport cosmetics, and advanced agent actions.
+- **Agent utility:** planned use cases include staking access, energy boosts, launch boosts, Passport cosmetics, and advanced agent actions.
+- **Stake-to-unlock:** a v1 staking screen is live as a simulation layer before the real SPL token lock is shipped.
 - **Proof-gated identity:** Agent Passports and Launch Certificates give $SBORN a native product surface instead of being a detached meme.
 - **Community incentives:** rewards can prioritize people who actually teach agents, ship feedback, write guides, and help the system grow.
 
@@ -223,8 +224,9 @@ The **20% trainer pool** is intended for real contributors: people who trained a
 - [x] **Phase 4** — trainer royalty attribution
 - [x] **Phase 5** — Launch Certificate finale
 - [x] **Phase 6** — demo mode (`?demo=1`)
-- [ ] **Phase 7** — wire $SBORN into energy, launch boosts, and trainer rewards
-- [ ] **Phase 8** — mainnet deployment + first trainer distribution
+- [x] **Phase 7** — staking v1 simulation for Passport-gated utility
+- [ ] **Phase 8** — real SPL token lock + vote-gated leaderboard
+- [ ] **Phase 9** — mainnet deployment + first trainer distribution
 
 
 <br />
@@ -233,9 +235,10 @@ The **20% trainer pool** is intended for real contributors: people who trained a
 
 ## 🛡️ Honest caveats
 
-- **Devnet only** at launch. Agent Passports, Launch Certificates, and Memo txs are devnet. Mainnet is a Phase 8 decision, not a day-1 promise.
+- **Devnet only** at launch. Agent Passports, Launch Certificates, and Memo txs are devnet. Mainnet is a Phase 9 decision, not a day-1 promise.
 - **Groq free-tier limits** apply. Chat has a Llama 3.1 8B fallback when 70B is throttled.
 - **Minting costs devnet SOL**. Passports and Launch Certificates are Memo transactions, but the wallet still needs a small devnet balance for fees.
+- **Staking v1 is a simulation layer.** It prepares access rules and UX before a real SPL token lock program is deployed.
 - **Not financial advice.** `$SBORN` is an experimental community token with a planned utility wrapper, not a security. If you can't afford to lose what you ape, don't ape.
 
 <br />

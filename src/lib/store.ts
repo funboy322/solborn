@@ -1,12 +1,13 @@
 'use client'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { ForgeAgent, CreateAgentInput, AgentMessage, AgentSkills, AgentStage, ChainCheckpoint, Trainer } from './types'
+import type { ForgeAgent, CreateAgentInput, AgentMessage, AgentSkills, AgentStage, ChainCheckpoint, Trainer, StakePosition } from './types'
 import { DEFAULT_SKILLS, STAGE_CONFIG, STAGE_ORDER, MAX_ENERGY, ENERGY_REGEN_PER_MIN } from './constants'
 import { nanoid } from './utils'
 
 interface ForgeStore {
   agents: ForgeAgent[]
+  stakePositions: StakePosition[]
   activeAgentId: string | null
 
   createAgent: (input: CreateAgentInput) => ForgeAgent
@@ -29,6 +30,9 @@ interface ForgeStore {
   bindWallet: (agentId: string, walletAddress: string) => void
   // Multi-trainer
   registerTraining: (agentId: string, walletAddress: string, xpGained: number) => void
+  // $SBORN utility staking v1
+  createStakePosition: (input: { walletAddress: string; amount: number; unlockAt?: number }) => StakePosition
+  closeStakePosition: (positionId: string) => void
   getActiveAgent: () => ForgeAgent | undefined
 }
 
@@ -60,6 +64,7 @@ export const useForgeStore = create<ForgeStore>()(
   persist(
     (set, get) => ({
       agents: [],
+      stakePositions: [],
       activeAgentId: null,
 
       createAgent: (input) => {
@@ -330,6 +335,28 @@ export const useForgeStore = create<ForgeStore>()(
         }))
       },
 
+      createStakePosition: ({ walletAddress, amount, unlockAt }) => {
+        const position: StakePosition = {
+          id: nanoid(),
+          walletAddress,
+          amount,
+          createdAt: Date.now(),
+          unlockAt,
+          status: 'active',
+          mode: 'simulation',
+        }
+        set((state) => ({ stakePositions: [...state.stakePositions, position] }))
+        return position
+      },
+
+      closeStakePosition: (positionId) => {
+        set((state) => ({
+          stakePositions: state.stakePositions.map((position) =>
+            position.id === positionId ? { ...position, status: 'unstaked' } : position,
+          ),
+        }))
+      },
+
       getActiveAgent: () => {
         const { agents, activeAgentId } = get()
         return agents.find((a) => a.id === activeAgentId)
@@ -337,10 +364,11 @@ export const useForgeStore = create<ForgeStore>()(
     }),
     {
       name: 'solborn-store',
-      version: 4,
+      version: 5,
       migrate: (persisted: unknown, version: number) => {
-        const state = persisted as { agents?: ForgeAgent[] }
+        const state = persisted as { agents?: ForgeAgent[]; stakePositions?: StakePosition[] }
         if (!state?.agents) return state
+        state.stakePositions = state.stakePositions ?? []
 
         // v1 → v2: energy fields
         if (version < 2) {
@@ -415,6 +443,10 @@ export const useForgeStore = create<ForgeStore>()(
               ],
             }
           })
+        }
+
+        if (version < 5) {
+          state.stakePositions = state.stakePositions ?? []
         }
 
         return state

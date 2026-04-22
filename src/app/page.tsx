@@ -450,6 +450,14 @@ function StickyNav({
           <Button
             variant="ghost"
             size="sm"
+            onClick={() => router.push('/staking')}
+            className="hidden sm:flex text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
+          >
+            Stake
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => router.push('/rewards')}
             className="text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
           >
@@ -792,16 +800,24 @@ export default function HomePage() {
                 real product usage. Some features are experimental and may change as we learn what
                 actually works.
               </p>
-              <a
-                href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-amber-200 border border-amber-300/25 bg-amber-300/10 hover:bg-amber-300/15 transition-colors"
-              >
-                <Coins size={15} />
-                View $SBORN
-                <ExternalLink size={13} />
-              </a>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => router.push('/staking')}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-zinc-950 bg-amber-300 hover:bg-amber-200 transition-colors"
+                >
+                  <Coins size={15} />
+                  Open staking
+                </button>
+                <a
+                  href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-amber-200 border border-amber-300/25 bg-amber-300/10 hover:bg-amber-300/15 transition-colors"
+                >
+                  View $SBORN
+                  <ExternalLink size={13} />
+                </a>
+              </div>
             </div>
             <div className="grid gap-3">
               {TOKEN_UTILITIES.map((item, i) => (
