@@ -39,25 +39,32 @@ interface ChatInterfaceProps {
 
 const SUGGESTED_PROMPTS: Record<ForgeAgent['stage'], string[]> = {
   baby: [
-    'What is Solana? Let me teach you!',
-    "I'll explain what a startup is",
-    'Do you know what blockchain means?',
+    'Ask me what I want to build',
+    "Help me find a product idea",
+    "I'll explain who this should help",
   ],
   toddler: [
-    'Let me explain how DeFi works',
-    'What do you think about product-market fit?',
-    'Here is how Solana programs work...',
+    'Help me shape an MVP',
+    'Ask who the users are',
+    'Turn this idea into a tiny product',
   ],
   teen: [
-    'Design a token staking program',
-    'Review my go-to-market strategy',
-    'Write a Solana program in Rust',
+    'Interview me about the product',
+    'Find the Solana angle',
+    'Challenge my go-to-market',
   ],
   adult: [
-    'Publish your Launch Certificate',
-    "What's your vision for this project?",
-    "Let's deploy to Solana!",
+    'Create a product brief with me',
+    'Prepare the Launch Certificate',
+    'Turn our idea into a build plan',
   ],
+}
+
+const INPUT_PLACEHOLDERS: Record<ForgeAgent['stage'], string> = {
+  baby: 'Tell me what you want to create...',
+  toddler: 'Describe the user or problem...',
+  teen: 'Pitch the product idea...',
+  adult: 'Refine the launch plan...',
 }
 
 function formatRelativeTime(timestamp: number): string {
@@ -373,12 +380,12 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
             </motion.div>
             <p className="text-zinc-300 text-sm font-medium">
               {agent.stage === 'baby'
-                ? `${agent.name} knows nothing yet — start teaching!`
-                : `Say something to ${agent.name}`}
+                ? `${agent.name} is curious what you want to build`
+                : `Shape a product with ${agent.name}`}
             </p>
             <p className="text-zinc-600 text-xs mt-1">{stageConfig.description}</p>
             <p className="text-zinc-700 text-xs mt-2">
-              💡 Better explanations = more XP
+              Better context = sharper product ideas and more XP
             </p>
           </motion.div>
         )}
@@ -567,7 +574,7 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
             onChange={(e) => setInput(e.target.value)}
             onFocus={() => setInputFocused(true)}
             onBlur={() => setInputFocused(false)}
-            placeholder={noEnergy ? 'Recharging energy...' : `Teach ${agent.name}...`}
+            placeholder={noEnergy ? 'Recharging energy...' : INPUT_PLACEHOLDERS[agent.stage]}
             disabled={isLoading || noEnergy}
             className="flex-1 bg-transparent text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none disabled:opacity-50 py-0.5"
           />

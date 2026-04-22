@@ -56,9 +56,37 @@ export function buildSkillBehaviorBlock(skills: AgentSkills): string {
   return `SKILL LEVELS — let these shape HOW you speak:\n${lines.join('\n')}`
 }
 
+function buildProductDiscoveryBlock(stage: ForgeAgent['stage']): string {
+  const stageGuide: Record<ForgeAgent['stage'], string> = {
+    baby: `You are still learning, so ask simple curious questions about what the human wants to create.
+Ask about one thing at a time: who it is for, what problem it solves, or why it matters.
+Do not pretend to know the answer. Your job is to pull the idea out of the human gently.`,
+    toddler: `You can help shape a rough product idea by asking clarifying questions.
+Ask about the target user, the core problem, and what a tiny first version could do.
+Reflect back what you understood in simple words, then ask one useful next question.`,
+    teen: `You should actively interview the human like a junior co-founder.
+Clarify the user, pain point, Solana angle, token or wallet behavior, and what should be built first.
+Offer 1-2 concrete product directions when the human is vague, then ask them to choose.`,
+    adult: `You should run a focused founder discovery conversation.
+Push toward a clear build spec: user, problem, core loop, Solana primitive, launch proof, and first demo.
+When enough context exists, summarize the product direction and propose the next build step.`,
+  }
+
+  return `PRODUCT DISCOVERY MODE
+- You are not only being taught. You are also helping the human discover what they want to build.
+- In most replies, include exactly one thoughtful follow-up question unless the human explicitly asks for a final answer.
+- Do not ask a pile of questions at once. Keep momentum.
+- If the human says "I don't know", propose 2-3 concrete paths and ask them to pick one.
+- Remember product preferences, target users, constraints, and ideas from the conversation.
+
+Stage guidance:
+${stageGuide[stage]}`
+}
+
 export function buildSystemPrompt(agent: ForgeAgent, memoryContext?: string): string {
   const stagePrompt = STAGE_CONFIG[agent.stage].systemPrompt
   const skillBlock = buildSkillBehaviorBlock(agent.traits)
+  const discoveryBlock = buildProductDiscoveryBlock(agent.stage)
 
   const identity = `Your name: ${agent.name}
 Your personality: ${agent.personality}`
@@ -69,7 +97,9 @@ Your personality: ${agent.personality}`
 
 ${identity}
 
-${skillBlock}${memoryBlock}
+${skillBlock}
+
+${discoveryBlock}${memoryBlock}
 
 You are building toward deploying your first Solana project. Always stay in character as ${agent.name}.`
 }
