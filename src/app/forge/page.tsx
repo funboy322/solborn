@@ -124,7 +124,6 @@ export default function ForgePage() {
         {trainingAgents.length > 0 && (
           <div className="mt-10">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               <h2 className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
                 Training · {trainingAgents.length}
               </h2>

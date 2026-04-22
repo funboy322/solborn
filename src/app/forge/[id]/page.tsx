@@ -160,7 +160,6 @@ export default function AgentPage({ params }: PageProps) {
         {isTrainingOther && (
           <div className="mb-4 px-4 py-2.5 rounded-xl text-xs text-emerald-300 flex items-center gap-2"
             style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>
               You&apos;re <strong className="font-semibold">training</strong> this agent. Your XP contribution is tracked and splits future royalties.
             </span>
@@ -248,8 +247,7 @@ export default function AgentPage({ params }: PageProps) {
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-xs font-medium text-zinc-500 uppercase tracking-wider">On-chain</h2>
                 {connected && (
-                  <span className="text-[10px] text-emerald-400 flex items-center gap-1">
-                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[10px] text-emerald-400">
                     Connected
                   </span>
                 )}
@@ -276,8 +274,7 @@ export default function AgentPage({ params }: PageProps) {
                 </div>
               ) : mintResult ? (
                 <div className="space-y-2">
-                  <div className="text-xs text-emerald-400 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <div className="text-xs text-emerald-400">
                     Agent Passport minted
                   </div>
                   <p className="text-xs text-zinc-600 font-mono break-all">{mintResult.mintAddress.slice(0, 24)}...</p>

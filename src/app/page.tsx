@@ -662,11 +662,11 @@ export default function HomePage() {
             className="flex items-center justify-center gap-5 mt-10 text-xs text-zinc-600 flex-wrap"
           >
             <span>Free to create</span>
-            <span className="w-1 h-1 rounded-full bg-zinc-700" />
+            <span className="text-zinc-800">/</span>
             <span>Solana · Devnet</span>
-            <span className="w-1 h-1 rounded-full bg-zinc-700" />
+            <span className="text-zinc-800">/</span>
             <span>No hidden costs</span>
-            <span className="w-1 h-1 rounded-full bg-zinc-700" />
+            <span className="text-zinc-800">/</span>
             <span>Open source</span>
           </motion.div>
 
@@ -688,7 +688,6 @@ export default function HomePage() {
                 color: 'rgb(252,211,77)',
               }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               $SBORN is live · utility layer soon
               <ExternalLink size={11} />
             </a>
@@ -783,8 +782,7 @@ export default function HomePage() {
               <p className="text-xs font-mono text-amber-300 tracking-widest uppercase mb-3">
                 $SBORN
               </p>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-300/25 bg-amber-300/10 text-[11px] font-semibold text-amber-200 mb-4">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
+              <div className="inline-flex items-center px-3 py-1 rounded-full border border-amber-300/25 bg-amber-300/10 text-[11px] font-semibold text-amber-200 mb-4">
                 Utility layer in development
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-zinc-100 mb-4">
@@ -830,7 +828,9 @@ export default function HomePage() {
                   className="glass p-5 border border-white/10"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="mt-1 w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
+                    <span className="mt-0.5 text-[10px] font-mono text-emerald-300/70">
+                      0{i + 1}
+                    </span>
                     <div>
                       <h3 className="text-sm font-semibold text-zinc-100 mb-1">{item.label}</h3>
                       <p className="text-sm text-zinc-500 leading-relaxed">{item.desc}</p>

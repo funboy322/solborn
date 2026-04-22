@@ -96,12 +96,6 @@ export function WalletButton() {
           boxShadow: '0 0 12px rgba(20,241,149,0.15)',
         }}
       >
-        {/* Live dot */}
-        <motion.span
-          className="w-1.5 h-1.5 rounded-full bg-[#14F195]"
-          animate={{ opacity: [1, 0.4, 1] }}
-          transition={{ duration: 1.8, repeat: Infinity }}
-        />
         <span className="font-mono">{truncateAddress(publicKey!.toBase58())}</span>
         {balance !== null && (
           <span className="text-xs text-zinc-400 hidden sm:inline">

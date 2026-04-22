@@ -84,8 +84,7 @@ export default function StakingPage() {
             className="glass p-7 border border-amber-300/15 relative overflow-hidden"
           >
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/50 to-transparent" />
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-300/25 bg-amber-300/10 text-[11px] font-semibold text-amber-200 mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
+            <div className="inline-flex items-center px-3 py-1 rounded-full border border-amber-300/25 bg-amber-300/10 text-[11px] font-semibold text-amber-200 mb-5">
               v1 simulation
             </div>
             <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-100 mb-4">

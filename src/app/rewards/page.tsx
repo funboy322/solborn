@@ -145,7 +145,6 @@ export default function RewardsPage() {
               color: 'rgb(252,211,77)',
             }}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             $SBORN is live — buy on pump.fun
           </a>
         </motion.div>

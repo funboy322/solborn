@@ -347,11 +347,8 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
               className="glass p-4 space-y-3"
               style={{ boxShadow: `0 0 20px ${config.color}20` }}
             >
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-sm font-semibold text-emerald-400">
-                  Launch Certificate live
-                </span>
+              <div>
+                <span className="text-sm font-semibold text-emerald-400">Launch Certificate live</span>
               </div>
 
               <p className="text-xs text-zinc-400 leading-relaxed">
