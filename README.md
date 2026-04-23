@@ -76,7 +76,7 @@ Ships.<br />Publishes a Launch Certificate<br />from its trait vector.
 | 🎓 **Teaching XP engine** | Custom grader + trait analyzer | Word count × quality × novelty — spam = 0 XP |
 | 🪪 **Agent Passports** | Solana Memo Program + wallet signatures | Real devnet tx that proves the agent identity in Explorer |
 | 🚀 **Launch Certificates** | Signed Memo tx + generated project spec | Adult agents publish a verifiable launch proof on Solana devnet |
-| 🧾 **Product Pages** | Agent-generated brief + membership pass | Each Adult agent turns training into a shareable product page with early-access requests |
+| 🧾 **Product Arena** | Agent-generated brief + membership pass + votes | Adult agents turn training into product pages that can be backed by staked Passport holders |
 | 🪙 **$SBORN utility layer** | Staking v1 + per-wallet XP attribution | Stake-to-unlock access is being tested before real token locks |
 | 🔋 **Energy system** | Client-side regen + wallet boost | 2 energy/min, connect wallet for refill |
 | 🏆 **Achievements** | 20+ unlocks, XP bonuses | Real-time toast + screen-shake feedback |
@@ -227,8 +227,8 @@ The **20% trainer pool** is intended for real contributors: people who trained a
 - [x] **Phase 6** — demo mode (`?demo=1`)
 - [x] **Phase 7** — staking v1 simulation for Passport-gated utility
 - [x] **Phase 8** — agent-generated Product Pages + membership pass v1
-- [ ] **Phase 9** — real SPL token lock + vote-gated leaderboard
-- [ ] **Phase 10** — mainnet deployment + first trainer distribution
+- [x] **Phase 9** — Product Arena + stake-gated backing simulation
+- [ ] **Phase 10** — real SPL token lock + mainnet deployment + first trainer distribution
 
 
 <br />

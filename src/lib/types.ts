@@ -108,6 +108,16 @@ export interface StakePosition {
   mode: 'simulation' | 'on-chain'
 }
 
+export interface ProductVote {
+  id: string
+  productId: string
+  walletAddress: string
+  weight: number
+  createdAt: number
+  updatedAt: number
+  mode: 'simulation' | 'on-chain'
+}
+
 export interface ForgeAgent {
   id: string
   name: string

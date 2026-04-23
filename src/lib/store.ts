@@ -1,13 +1,14 @@
 'use client'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { ForgeAgent, CreateAgentInput, AgentMessage, AgentSkills, AgentStage, ChainCheckpoint, Trainer, StakePosition } from './types'
+import type { ForgeAgent, CreateAgentInput, AgentMessage, AgentSkills, AgentStage, ChainCheckpoint, Trainer, StakePosition, ProductVote } from './types'
 import { DEFAULT_SKILLS, STAGE_CONFIG, STAGE_ORDER, MAX_ENERGY, ENERGY_REGEN_PER_MIN } from './constants'
 import { nanoid } from './utils'
 
 interface ForgeStore {
   agents: ForgeAgent[]
   stakePositions: StakePosition[]
+  productVotes: ProductVote[]
   activeAgentId: string | null
 
   createAgent: (input: CreateAgentInput) => ForgeAgent
@@ -33,6 +34,7 @@ interface ForgeStore {
   // $SBORN utility staking v1
   createStakePosition: (input: { walletAddress: string; amount: number; unlockAt?: number }) => StakePosition
   closeStakePosition: (positionId: string) => void
+  voteForProduct: (input: { productId: string; walletAddress: string; weight: number }) => ProductVote
   getActiveAgent: () => ForgeAgent | undefined
 }
 
@@ -65,6 +67,7 @@ export const useForgeStore = create<ForgeStore>()(
     (set, get) => ({
       agents: [],
       stakePositions: [],
+      productVotes: [],
       activeAgentId: null,
 
       createAgent: (input) => {
@@ -355,6 +358,30 @@ export const useForgeStore = create<ForgeStore>()(
             position.id === positionId ? { ...position, status: 'unstaked' } : position,
           ),
         }))
+      },
+
+      voteForProduct: ({ productId, walletAddress, weight }) => {
+        const now = Date.now()
+        const existing = (get().productVotes ?? []).find(
+          (vote) => vote.productId === productId && vote.walletAddress === walletAddress,
+        )
+        const vote: ProductVote = existing
+          ? { ...existing, weight, updatedAt: now }
+          : {
+              id: nanoid(),
+              productId,
+              walletAddress,
+              weight,
+              createdAt: now,
+              updatedAt: now,
+              mode: 'simulation',
+            }
+        set((state) => ({
+          productVotes: existing
+            ? (state.productVotes ?? []).map((item) => (item.id === existing.id ? vote : item))
+            : [...(state.productVotes ?? []), vote],
+        }))
+        return vote
       },
 
       getActiveAgent: () => {

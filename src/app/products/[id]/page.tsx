@@ -51,6 +51,9 @@ export default function ProductPage() {
           <Button variant="secondary" size="sm" onClick={() => router.push('/staking')}>
             $SBORN access
           </Button>
+          <Button variant="secondary" size="sm" onClick={() => router.push('/products')}>
+            Arena
+          </Button>
         </header>
 
         {!mounted ? (
