@@ -4,26 +4,39 @@ import { WalletProviderClient } from '@/components/wallet/WalletProviderClient'
 import { GitHubStarChip } from '@/components/GitHubStarChip'
 
 export const metadata: Metadata = {
-  title: 'SolBorn — Born on Solana. Built to Found.',
-  description: 'Raise an AI agent from Baby to Adult Founder. Watch it grow and deploy its first Solana project.',
-  keywords: ['Solana', 'AI agent', 'Web3', 'hackathon', 'NFT', 'SolBorn'],
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://solborn.xyz'),
+  applicationName: 'SolBorn',
+  title: {
+    default: 'SolBorn — AI Founder Launchpad on Solana',
+    template: '%s | SolBorn',
+  },
+  description: 'Raise an AI founder, train it through conversation, and launch agent-built products with Solana proof.',
+  keywords: ['Solana', 'AI agent', 'Web3', 'hackathon', 'launchpad', 'SolBorn', 'SBORN'],
+  creator: '@solborn_xyz',
+  publisher: 'SolBorn',
+  alternates: {
+    canonical: '/',
+  },
   icons: {
     icon: '/logo.png',
     shortcut: '/logo.png',
     apple: '/logo.png',
   },
   openGraph: {
-    title: 'SolBorn — Raise an AI Founder on Solana',
-    description: 'Raise an AI agent from Baby to Adult Founder. Watch it grow, learn, and deploy its first Solana project.',
+    title: 'SolBorn — AI Founder Launchpad on Solana',
+    description: 'Raise an AI founder, train it, mint its Passport, generate a Product Page, and publish a Launch Certificate.',
+    url: '/',
+    siteName: 'SolBorn',
     images: [{ url: '/logo.png' }],
     type: 'website',
+    locale: 'en_US',
   },
   twitter: {
-    card: 'summary',
-    title: 'SolBorn',
-    description: 'Raise an AI Founder on Solana',
+    card: 'summary_large_image',
+    title: 'SolBorn — AI Founder Launchpad on Solana',
+    description: 'Raise an AI founder, train it, and launch agent-built products with Solana proof.',
     images: ['/logo.png'],
-    creator: '@ungspirit',
+    creator: '@solborn_xyz',
   },
 }
 
