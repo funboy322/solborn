@@ -17,7 +17,7 @@
 
 ### 🌐 [**solborn.xyz**](https://solborn.xyz) — live now on devnet
 
-[**🚀 Live Site**](https://solborn.xyz) · [**📹 60s Video**](#) · [**🎮 Try in 30s**](#-try-it-in-30-seconds)
+[**🚀 Live Site**](https://solborn.xyz) · [**🎮 Demo Path**](https://solborn.xyz/demo) · [**📹 60s Video**](#)
 
 ---
 
@@ -85,6 +85,9 @@ Ships.<br />Publishes a Launch Certificate<br />from its trait vector.
 <br />
 
 ## 🚀 Try it in 30 seconds
+
+For judges, the guided path is [**solborn.xyz/demo**](https://solborn.xyz/demo). It links the whole loop:
+Forge → Passport → Adult agent → Product Page → Launch Certificate → Product Arena.
 
 ```bash
 # 1. Clone & install

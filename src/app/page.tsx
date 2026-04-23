@@ -450,6 +450,14 @@ function StickyNav({
           <Button
             variant="ghost"
             size="sm"
+            onClick={() => router.push('/demo')}
+            className="hidden sm:flex text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
+          >
+            Demo
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => router.push('/products')}
             className="hidden sm:flex text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
           >
