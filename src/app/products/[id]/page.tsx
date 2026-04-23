@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, ExternalLink, Lock, Rocket, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, Check, ExternalLink, Loader2, Lock, Rocket, Send, ShieldCheck } from 'lucide-react'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { Button } from '@/components/ui/button'
+import { WalletButton } from '@/components/wallet/WalletButton'
 import { useForgeStore } from '@/lib/store'
 import type { GeneratedProject } from '@/lib/types'
 
@@ -75,8 +77,48 @@ function ProductContent({
   agentName: string
   agentStage: string
 }) {
+  const { publicKey } = useWallet()
   const brief = project.brief
   const membership = project.membership
+  const [contact, setContact] = useState('')
+  const [note, setNote] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null)
+
+  async function submitInterest(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!contact.trim() || submitting) return
+    setSubmitting(true)
+    setResult(null)
+    try {
+      const res = await fetch('/api/products/interest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: project.id,
+          productName: project.name,
+          agentName,
+          contact: contact.trim(),
+          note: note.trim(),
+          wallet: publicKey?.toBase58() ?? null,
+        }),
+      })
+      const data = (await res.json()) as { ok?: boolean; message?: string; error?: string }
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error ?? 'Request failed')
+      }
+      setResult({ ok: true, message: data.message ?? 'Request received.' })
+      setContact('')
+      setNote('')
+    } catch (error) {
+      setResult({
+        ok: false,
+        message: error instanceof Error ? error.message : 'Request failed',
+      })
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <div className="space-y-5">
@@ -159,6 +201,45 @@ function ProductContent({
           <Button disabled className="w-full mt-5 bg-violet-400 text-zinc-950 opacity-70">
             Pass checkout soon
           </Button>
+
+          <form onSubmit={submitInterest} className="mt-5 space-y-3 border-t border-white/10 pt-5">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                  Request access
+                </p>
+                <p className="text-xs text-zinc-600 mt-1">Capture early users before checkout is live.</p>
+              </div>
+              <WalletButton />
+            </div>
+            <input
+              value={contact}
+              onChange={(event) => setContact(event.target.value)}
+              placeholder="X / Telegram / email"
+              className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:outline-none focus:border-violet-300/60"
+              maxLength={120}
+            />
+            <textarea
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+              placeholder="What do you want access for?"
+              className="min-h-20 w-full resize-none rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:outline-none focus:border-violet-300/60"
+              maxLength={500}
+            />
+            <Button
+              type="submit"
+              disabled={!contact.trim() || submitting}
+              className="w-full bg-white text-zinc-950 hover:bg-zinc-200"
+            >
+              {submitting ? <Loader2 size={15} className="animate-spin" /> : result?.ok ? <Check size={15} /> : <Send size={15} />}
+              {submitting ? 'Sending...' : result?.ok ? 'Request sent' : 'Request early access'}
+            </Button>
+            {result && (
+              <p className={`text-xs leading-relaxed ${result.ok ? 'text-emerald-300' : 'text-rose-300'}`}>
+                {result.message}
+              </p>
+            )}
+          </form>
         </div>
 
         <div className="glass p-6 border border-white/10">

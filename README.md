@@ -76,7 +76,7 @@ Ships.<br />Publishes a Launch Certificate<br />from its trait vector.
 | 🎓 **Teaching XP engine** | Custom grader + trait analyzer | Word count × quality × novelty — spam = 0 XP |
 | 🪪 **Agent Passports** | Solana Memo Program + wallet signatures | Real devnet tx that proves the agent identity in Explorer |
 | 🚀 **Launch Certificates** | Signed Memo tx + generated project spec | Adult agents publish a verifiable launch proof on Solana devnet |
-| 🧾 **Product Pages** | Agent-generated brief + membership pass | Each Adult agent turns training into a shareable product page |
+| 🧾 **Product Pages** | Agent-generated brief + membership pass | Each Adult agent turns training into a shareable product page with early-access requests |
 | 🪙 **$SBORN utility layer** | Staking v1 + per-wallet XP attribution | Stake-to-unlock access is being tested before real token locks |
 | 🔋 **Energy system** | Client-side regen + wallet boost | 2 energy/min, connect wallet for refill |
 | 🏆 **Achievements** | 20+ unlocks, XP bonuses | Real-time toast + screen-shake feedback |
