@@ -1,6 +1,6 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
-import { motion, useScroll, useTransform, useSpring, useMotionValue, useAnimationFrame } from 'framer-motion'
+import { useState, useRef } from 'react'
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { Zap, Brain, Rocket, Trophy, ArrowRight, ExternalLink, Coins } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,37 +15,37 @@ const STAGES = [
     emoji: '👶',
     label: 'Baby',
     desc: 'Knows nothing. Asks "what is a wallet?" in babble.',
+    color: '#8b5cf6',
+    glow: 'rgba(139,92,246,0.28)',
+    bg: 'rgba(139,92,246,0.09)',
+    border: 'rgba(139,92,246,0.22)',
+  },
+  {
+    emoji: '🧒',
+    label: 'Toddler',
+    desc: 'Repeats what you taught. Gets it adorably wrong sometimes.',
     color: '#a78bfa',
     glow: 'rgba(167,139,250,0.25)',
     bg: 'rgba(167,139,250,0.08)',
     border: 'rgba(167,139,250,0.2)',
   },
   {
-    emoji: '🧒',
-    label: 'Toddler',
-    desc: 'Repeats what you taught. Gets it adorably wrong sometimes.',
-    color: '#34d399',
-    glow: 'rgba(52,211,153,0.25)',
-    bg: 'rgba(52,211,153,0.08)',
-    border: 'rgba(52,211,153,0.2)',
-  },
-  {
     emoji: '🧑‍💻',
     label: 'Teen',
     desc: 'Opinionated. Writes Anchor. Pushes back on bad ideas.',
-    color: '#f59e0b',
-    glow: 'rgba(245,158,11,0.25)',
-    bg: 'rgba(245,158,11,0.08)',
-    border: 'rgba(245,158,11,0.2)',
+    color: '#c084fc',
+    glow: 'rgba(192,132,252,0.25)',
+    bg: 'rgba(192,132,252,0.08)',
+    border: 'rgba(192,132,252,0.2)',
   },
   {
     emoji: '🚀',
     label: 'Adult',
     desc: 'Publishes a Launch Certificate. Real devnet proof.',
-    color: '#f43f5e',
-    glow: 'rgba(244,63,94,0.25)',
-    bg: 'rgba(244,63,94,0.08)',
-    border: 'rgba(244,63,94,0.2)',
+    color: '#e879f9',
+    glow: 'rgba(232,121,249,0.24)',
+    bg: 'rgba(232,121,249,0.075)',
+    border: 'rgba(232,121,249,0.19)',
   },
 ]
 
@@ -62,25 +62,25 @@ const FEATURES = [
     icon: Zap,
     title: 'Agent Passports',
     desc: 'Mint a signed founder passport to your wallet. The proof lands on Solana devnet and opens in Explorer.',
-    color: '#34d399',
-    bg: 'rgba(52,211,153,0.08)',
-    border: 'rgba(52,211,153,0.2)',
+    color: '#8b5cf6',
+    bg: 'rgba(139,92,246,0.08)',
+    border: 'rgba(139,92,246,0.22)',
   },
   {
     icon: Rocket,
     title: 'Launch Certificates',
     desc: 'Adult agents publish project certificates with a signed on-chain memo. Clear proof, no external viewer required.',
-    color: '#f59e0b',
-    bg: 'rgba(245,158,11,0.08)',
-    border: 'rgba(245,158,11,0.2)',
+    color: '#c084fc',
+    bg: 'rgba(192,132,252,0.08)',
+    border: 'rgba(192,132,252,0.2)',
   },
   {
     icon: Trophy,
     title: 'Trainer Royalties',
     desc: 'Anyone can train anyone\'s agent. XP you contribute becomes attribution for future $SBORN rewards.',
-    color: '#f43f5e',
-    bg: 'rgba(244,63,94,0.08)',
-    border: 'rgba(244,63,94,0.2)',
+    color: '#e879f9',
+    bg: 'rgba(232,121,249,0.075)',
+    border: 'rgba(232,121,249,0.18)',
   },
 ]
 
@@ -99,132 +99,24 @@ const TOKEN_UTILITIES = [
   },
 ]
 
-const FLOATING_ITEMS = [
-  { emoji: '⚡', x: '10%', y: '20%', delay: 0, duration: 5.5 },
-  { emoji: '◎', x: '85%', y: '15%', delay: 1.2, duration: 6 },
-  { emoji: '🔮', x: '75%', y: '65%', delay: 0.6, duration: 7 },
-  { emoji: '💎', x: '15%', y: '70%', delay: 1.8, duration: 5 },
-  { emoji: '🌱', x: '50%', y: '85%', delay: 2.4, duration: 6.5 },
-  { emoji: '⚙️', x: '90%', y: '45%', delay: 0.3, duration: 4.8 },
+const FLOW_STEPS = [
+  {
+    label: 'Train',
+    desc: 'Teach the agent your product context.',
+  },
+  {
+    label: 'Passport',
+    desc: 'Mint a wallet-signed agent identity.',
+  },
+  {
+    label: 'Product Page',
+    desc: 'Turn training into a public product brief.',
+  },
+  {
+    label: 'Arena',
+    desc: 'Let staked Passport holders back ideas.',
+  },
 ]
-
-// ─── Animated Orb ────────────────────────────────────────────────────────────
-
-function AnimatedOrb() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-      {/* Primary orb */}
-      <motion.div
-        className="absolute"
-        style={{
-          left: '50%',
-          top: '40%',
-          translateX: '-50%',
-          translateY: '-50%',
-          width: 700,
-          height: 700,
-          borderRadius: '60% 40% 70% 30% / 50% 60% 40% 70%',
-          background: 'radial-gradient(ellipse at 40% 40%, rgba(167,139,250,0.18) 0%, rgba(52,211,153,0.10) 50%, transparent 75%)',
-          filter: 'blur(60px)',
-        }}
-        animate={{
-          borderRadius: [
-            '60% 40% 70% 30% / 50% 60% 40% 70%',
-            '40% 60% 30% 70% / 70% 40% 60% 30%',
-            '70% 30% 50% 50% / 40% 70% 30% 60%',
-            '60% 40% 70% 30% / 50% 60% 40% 70%',
-          ],
-          scale: [1, 1.08, 0.96, 1],
-        }}
-        transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      {/* Secondary orb — offset */}
-      <motion.div
-        className="absolute"
-        style={{
-          left: '35%',
-          top: '55%',
-          translateX: '-50%',
-          translateY: '-50%',
-          width: 500,
-          height: 500,
-          borderRadius: '40% 60% 50% 50% / 60% 40% 60% 40%',
-          background: 'radial-gradient(ellipse at 60% 60%, rgba(52,211,153,0.12) 0%, rgba(167,139,250,0.06) 60%, transparent 80%)',
-          filter: 'blur(80px)',
-        }}
-        animate={{
-          borderRadius: [
-            '40% 60% 50% 50% / 60% 40% 60% 40%',
-            '60% 40% 30% 70% / 40% 60% 40% 60%',
-            '50% 50% 60% 40% / 50% 50% 50% 50%',
-            '40% 60% 50% 50% / 60% 40% 60% 40%',
-          ],
-          x: [-20, 20, -10, -20],
-          y: [10, -20, 15, 10],
-        }}
-        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      {/* Accent ring */}
-      <motion.div
-        className="absolute"
-        style={{
-          left: '50%',
-          top: '40%',
-          translateX: '-50%',
-          translateY: '-50%',
-          width: 400,
-          height: 400,
-          borderRadius: '50%',
-          border: '1px solid rgba(167,139,250,0.08)',
-        }}
-        animate={{ scale: [1, 1.15, 1], opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      <motion.div
-        className="absolute"
-        style={{
-          left: '50%',
-          top: '40%',
-          translateX: '-50%',
-          translateY: '-50%',
-          width: 550,
-          height: 550,
-          borderRadius: '50%',
-          border: '1px solid rgba(52,211,153,0.05)',
-        }}
-        animate={{ scale: [1.1, 1, 1.1], opacity: [0.3, 0.7, 0.3] }}
-        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-      />
-    </div>
-  )
-}
-
-// ─── Animated Counter ────────────────────────────────────────────────────────
-
-function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
-  const [display, setDisplay] = useState(0)
-
-  useEffect(() => {
-    if (target === 0) return
-    const duration = 1200
-    const start = performance.now()
-    const raf = (now: number) => {
-      const elapsed = now - start
-      const progress = Math.min(elapsed / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      setDisplay(Math.round(eased * target))
-      if (progress < 1) requestAnimationFrame(raf)
-    }
-    requestAnimationFrame(raf)
-  }, [target])
-
-  return (
-    <span>
-      {display.toLocaleString()}
-      {suffix}
-    </span>
-  )
-}
 
 // ─── Stage Card (3D tilt) ────────────────────────────────────────────────────
 
@@ -359,12 +251,12 @@ function FeatureCard({ feature, index }: { feature: (typeof FEATURES)[0]; index:
 
 function StatsBar() {
   const items = [
-    { label: 'Built on Solana', icon: '◎' },
-    { label: 'Agent Passports', icon: '⚡' },
-    { label: 'Launch Certificates', icon: '✦' },
-    { label: '$SBORN Utility Layer', icon: '🪙' },
-    { label: 'Persistent Memory', icon: '🧠' },
-    { label: 'Open Source', icon: '🔓' },
+    { label: 'Solana devnet proof', code: '01' },
+    { label: 'Agent Passports', code: '02' },
+    { label: 'Launch Certificates', code: '03' },
+    { label: 'Product Arena', code: '04' },
+    { label: 'Persistent memory', code: '05' },
+    { label: 'Open source', code: '06' },
   ]
 
   return (
@@ -377,9 +269,9 @@ function StatsBar() {
         >
           {[...items, ...items, ...items, ...items].map((item, i) => (
             <div key={i} className="flex items-center gap-2 text-zinc-500 text-sm">
-              <span className="text-zinc-400">{item.icon}</span>
+              <span className="text-[10px] font-mono text-zinc-700">{item.code}</span>
               <span>{item.label}</span>
-              <span className="text-zinc-700 mx-3">·</span>
+              <span className="text-zinc-800 mx-3">/</span>
             </div>
           ))}
         </motion.div>
@@ -405,11 +297,11 @@ function StickyNav({
 
   return (
     <motion.nav
-      className="fixed top-0 inset-x-0 z-50 border-b border-white/5"
+      className="fixed top-0 inset-x-0 z-50 border-b border-violet-300/10"
       style={{ backdropFilter: useSpring(useTransform(blur, (v) => `blur(${v}px)`), { stiffness: 200, damping: 30 }) as never }}
     >
       <motion.div
-        className="absolute inset-0 bg-[#0a0a0f]"
+        className="absolute inset-0 bg-[#08040f]"
         style={{ opacity: bgOpacity }}
       />
       <div className="relative max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
@@ -426,7 +318,7 @@ function StickyNav({
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <span className="font-bold text-zinc-100 tracking-tight">SolBorn</span>
+          <span className="font-bold text-zinc-100 tracking-normal">SolBorn</span>
           <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/25 font-mono">
             Beta
           </span>
@@ -434,19 +326,6 @@ function StickyNav({
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <a
-            href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all hover:scale-105"
-            style={{
-              background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(245,158,11,0.2))',
-              border: '1px solid rgba(245,158,11,0.4)',
-              color: 'rgb(252,211,77)',
-            }}
-          >
-            ◎ Buy $SBORN
-          </a>
           <Button
             variant="ghost"
             size="sm"
@@ -477,7 +356,7 @@ function StickyNav({
             onClick={() => router.push('/rewards')}
             className="text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
           >
-            🎁 Rewards
+            Rewards
           </Button>
           {(agents as unknown[]).length > 0 && (
             <Button
@@ -493,7 +372,7 @@ function StickyNav({
             href="https://x.com/solborn_xyz"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex items-center justify-center w-8 h-8 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-white/5 transition-all"
+            className="hidden sm:flex items-center justify-center w-8 h-8 rounded-lg text-zinc-500 hover:text-violet-100 hover:bg-violet-400/[0.08] transition-all"
             title="Follow on X"
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
@@ -505,9 +384,9 @@ function StickyNav({
             <Button
               size="sm"
               onClick={onBirth}
-              className="relative overflow-hidden bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-emerald-500 border-0 text-white transition-all duration-500"
+              className="relative overflow-hidden bg-violet-600 hover:bg-violet-500 border border-violet-300/20 text-white shadow-lg shadow-violet-950/30 transition-all duration-300"
             >
-              <span className="relative z-10">◎ Birth Agent</span>
+              <span className="relative z-10">Create Agent</span>
             </Button>
           </motion.div>
         </div>
@@ -522,28 +401,46 @@ function GradientCTA({ onClick, children, large }: { onClick: () => void; childr
   return (
     <motion.button
       onClick={onClick}
-      whileHover={{ scale: 1.04 }}
+      whileHover={{ y: -1 }}
       whileTap={{ scale: 0.97 }}
-      className={`relative overflow-hidden rounded-xl font-semibold text-white cursor-pointer ${large ? 'px-8 py-3.5 text-base' : 'px-5 py-2.5 text-sm'}`}
+      className={`relative overflow-hidden rounded-xl border border-violet-300/25 font-semibold text-white cursor-pointer transition-colors ${large ? 'px-8 py-3.5 text-base' : 'px-5 py-2.5 text-sm'}`}
       style={{
-        background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-        boxShadow: '0 0 30px rgba(124,58,237,0.35), inset 0 1px 0 rgba(255,255,255,0.1)',
+        background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 48%, #3b0764 100%)',
+        boxShadow: '0 18px 50px rgba(88,28,135,0.38), inset 0 1px 0 rgba(255,255,255,0.16)',
       }}
     >
-      {/* Animated shimmer */}
-      <motion.div
-        className="absolute inset-0 opacity-50"
-        style={{
-          background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)',
-          backgroundSize: '200% 100%',
-        }}
-        animate={{ backgroundPosition: ['-100% 0', '200% 0'] }}
-        transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 1 }}
-      />
+      <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
       <span className="relative z-10 flex items-center gap-2">
         {children}
       </span>
     </motion.button>
+  )
+}
+
+function ProductFlow() {
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="relative z-10 px-6 pb-14 sm:-mt-6 sm:pb-16"
+    >
+      <div className="mx-auto max-w-6xl border border-violet-300/12 bg-violet-400/[0.035] p-3 sm:p-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {FLOW_STEPS.map((step, index) => (
+            <div
+              key={step.label}
+              className="relative min-h-[138px] overflow-hidden border border-violet-300/12 bg-violet-950/[0.16] p-5"
+            >
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-300/35 to-transparent" />
+              <p className="text-[10px] font-mono text-violet-300/45">0{index + 1}</p>
+              <h3 className="mt-5 text-base font-semibold text-zinc-100">{step.label}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-500">{step.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.section>
   )
 }
 
@@ -553,32 +450,6 @@ export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false)
   const router = useRouter()
   const agents = useForgeStore((s) => s.agents)
-  // Global "founders born" count from /api/stats (shared across all visitors).
-  // Falls back to the user's local count if the endpoint is unreachable.
-  const [globalTotal, setGlobalTotal] = useState<number | null>(null)
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      try {
-        const res = await fetch('/api/stats', { cache: 'no-store' })
-        if (!res.ok) return
-        const json = (await res.json()) as { total?: number }
-        if (!cancelled && typeof json.total === 'number') setGlobalTotal(json.total)
-      } catch {
-        /* fall back to local */
-      }
-    }
-    load()
-    // Re-poll every 30s so the number ticks up as other visitors birth agents
-    const id = setInterval(load, 30_000)
-    return () => {
-      cancelled = true
-      clearInterval(id)
-    }
-  }, [])
-  const localTotal = agents.length
-  const totalAgents = globalTotal ?? localTotal
-  const displayCount = Math.max(totalAgents, 1)
 
   return (
     <main className="min-h-screen overflow-x-hidden">
@@ -586,108 +457,99 @@ export default function HomePage() {
       <StickyNav agents={agents} onBirth={() => setModalOpen(true)} router={router} />
 
       {/* ── Hero ── */}
-      <section className="relative min-h-[90vh] flex items-center justify-center pt-14 pb-20 px-6 overflow-hidden">
-        {/* Orb */}
-        <AnimatedOrb />
-
-        {/* Floating emojis */}
-        {FLOATING_ITEMS.map((item, i) => (
-          <motion.div
-            key={i}
-            className="absolute select-none text-2xl pointer-events-none"
-            style={{ left: item.x, top: item.y }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{
-              opacity: [0, 0.5, 0.5, 0],
-              y: [20, -10, -30, -50],
+      <section className="relative flex min-h-[72vh] items-center overflow-hidden px-6 pb-10 pt-28 sm:min-h-[78vh] sm:pb-12">
+        <div className="absolute inset-0 pointer-events-none" aria-hidden>
+          <div className="absolute inset-x-6 top-24 h-px bg-gradient-to-r from-transparent via-violet-300/16 to-transparent" />
+          <div
+            className="absolute inset-0 opacity-[0.045]"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(167,139,250,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(167,139,250,0.16) 1px, transparent 1px)',
+              backgroundSize: '64px 64px',
+              maskImage: 'linear-gradient(to bottom, black, transparent 75%)',
             }}
-            transition={{
-              delay: item.delay + 1,
-              duration: item.duration,
-              repeat: Infinity,
-              repeatDelay: 2,
-            }}
-          >
-            {item.emoji}
-          </motion.div>
-        ))}
+          />
+        </div>
 
-        {/* Hero content */}
-        <div className="relative max-w-3xl mx-auto text-center z-10">
+        <div className="relative max-w-4xl mx-auto z-10 text-center">
+          <div>
+            <motion.p
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.12 }}
+              className="text-xs font-mono text-zinc-500 tracking-[0.22em] uppercase mb-5"
+            >
+              Solana founder agents
+            </motion.p>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mb-6 text-4xl font-bold leading-[1.06] tracking-normal text-zinc-100 sm:text-6xl lg:text-7xl"
+            >
+              Train a founder.
+              <br />
+              Launch the proof.
+            </motion.h1>
 
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-5xl sm:text-7xl font-bold tracking-tight mb-6 leading-[1.05]"
-          >
-            <span className="text-zinc-100">Raise an </span>
-            <span className="gradient-text">AI Founder</span>
-            <br />
-            <span className="text-zinc-100">on </span>
-            <span className="gradient-text">Solana</span>
-          </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-lg text-zinc-400 max-w-xl mx-auto mb-9 leading-relaxed"
+            >
+              SolBorn turns product training into a Passport, a public Product Page,
+              and a signed Launch Certificate on Solana devnet.
+            </motion.p>
 
-          {/* Sub */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg text-zinc-400 max-w-xl mx-auto mb-4 leading-relaxed"
-          >
-            Teach an AI agent from babbling Baby to shipping Adult.
-            Every conversation grows it. When it graduates, it{' '}
-            <span className="text-zinc-200">publishes a signed Launch Certificate</span> you can verify.
-          </motion.p>
-
-          {/* Counter removed — global registry is still warming up.
-              Will re-enable once the number feels trustworthy. */}
-          <div className="mb-10" />
-
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.45 }}
-            className="flex items-center justify-center gap-3 flex-wrap"
-          >
-            <GradientCTA onClick={() => setModalOpen(true)} large>
-              ◎ Birth Your Founder
-              <ArrowRight size={16} />
-            </GradientCTA>
-            {agents.length > 0 && (
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.45 }}
+              className="flex items-center justify-center gap-3 flex-wrap"
+            >
+              <GradientCTA onClick={() => setModalOpen(true)} large>
+                Create Agent
+                <ArrowRight size={16} />
+              </GradientCTA>
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={() => router.push('/demo')}
+                className="border border-violet-300/15 bg-violet-400/[0.045] hover:bg-violet-400/[0.09] text-violet-50"
+              >
+                View Demo
+              </Button>
+              {agents.length > 0 && (
                 <Button
                   size="lg"
                   variant="secondary"
                   onClick={() => router.push('/forge')}
-                  className="border border-white/10 bg-white/5 hover:bg-white/10 text-zinc-200"
+                  className="border border-violet-300/15 bg-violet-400/[0.045] hover:bg-violet-400/[0.09] text-violet-50"
                 >
-                  View My Agents
+                  My Agents
                 </Button>
-              </motion.div>
-            )}
-          </motion.div>
+              )}
+            </motion.div>
 
-          {/* Trust row */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="flex items-center justify-center gap-5 mt-10 text-xs text-zinc-600 flex-wrap"
-          >
-            <span>Free to create</span>
-            <span className="text-zinc-800">/</span>
-            <span>Solana · Devnet</span>
-            <span className="text-zinc-800">/</span>
-            <span>No hidden costs</span>
-            <span className="text-zinc-800">/</span>
-            <span>Open source</span>
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="flex items-center justify-center gap-5 mt-10 text-xs text-zinc-600 flex-wrap"
+            >
+              <span>Devnet proof</span>
+              <span className="text-zinc-800">/</span>
+              <span>Open source</span>
+              <span className="text-zinc-800">/</span>
+              <span>Product Arena</span>
+            </motion.div>
+          </div>
 
         </div>
       </section>
+
+      <ProductFlow />
 
       {/* Scrolling stats bar */}
       <StatsBar />
@@ -714,7 +576,7 @@ export default function HomePage() {
 
           {/* Stage cards with connecting line */}
           <div className="relative">
-            <div className="absolute top-1/2 left-8 right-8 h-px bg-gradient-to-r from-violet-500/0 via-violet-500/20 to-emerald-500/0 hidden sm:block" />
+            <div className="absolute top-1/2 left-8 right-8 h-px bg-gradient-to-r from-violet-500/0 via-violet-400/24 to-fuchsia-400/0 hidden sm:block" />
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {STAGES.map((stage, i) => (
                 <StageCard key={stage.label} stage={stage} index={i} />
@@ -731,7 +593,7 @@ export default function HomePage() {
           <div
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full"
             style={{
-              background: 'radial-gradient(ellipse, rgba(52,211,153,0.04) 0%, transparent 70%)',
+              background: 'radial-gradient(ellipse, rgba(124,58,237,0.075) 0%, transparent 70%)',
               filter: 'blur(40px)',
             }}
           />
@@ -744,7 +606,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <p className="text-xs font-mono text-emerald-400 tracking-widest uppercase mb-3">
+            <p className="text-xs font-mono text-violet-300 tracking-widest uppercase mb-3">
               Features
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-zinc-100 mb-4">
@@ -773,10 +635,10 @@ export default function HomePage() {
             className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center"
           >
             <div>
-              <p className="text-xs font-mono text-amber-300 tracking-widest uppercase mb-3">
+              <p className="text-xs font-mono text-violet-300 tracking-widest uppercase mb-3">
                 $SBORN
               </p>
-              <div className="inline-flex items-center px-3 py-1 rounded-full border border-amber-300/25 bg-amber-300/10 text-[11px] font-semibold text-amber-200 mb-4">
+              <div className="inline-flex items-center px-3 py-1 rounded-full border border-violet-300/25 bg-violet-400/10 text-[11px] font-semibold text-violet-100 mb-4">
                 Utility layer in development
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-zinc-100 mb-4">
@@ -787,7 +649,7 @@ export default function HomePage() {
                 on-chain proofs, trainers create measurable XP, and $SBORN is planned to become the
                 reward and access layer around that activity.
               </p>
-              <p className="text-xs text-zinc-600 leading-relaxed mb-6 border-l border-amber-300/25 pl-3">
+              <p className="text-xs text-zinc-600 leading-relaxed mb-6 border-l border-violet-300/25 pl-3">
                 SolBorn is evolving in public. $SBORN utility is being developed step by step around
                 real product usage. Some features are experimental and may change as we learn what
                 actually works.
@@ -795,7 +657,7 @@ export default function HomePage() {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => router.push('/staking')}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-zinc-950 bg-amber-300 hover:bg-amber-200 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-violet-300/25 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 shadow-lg shadow-violet-950/30 transition-colors"
                 >
                   <Coins size={15} />
                   Open staking
@@ -804,7 +666,7 @@ export default function HomePage() {
                   href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-amber-200 border border-amber-300/25 bg-amber-300/10 hover:bg-amber-300/15 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-violet-100 border border-violet-300/20 bg-violet-400/[0.06] hover:bg-violet-400/[0.1] transition-colors"
                 >
                   View $SBORN
                   <ExternalLink size={13} />
@@ -819,10 +681,10 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
-                  className="glass p-5 border border-white/10"
+                  className="glass p-5 border border-violet-300/12 bg-violet-400/[0.025]"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="mt-0.5 text-[10px] font-mono text-emerald-300/70">
+                    <span className="mt-0.5 text-[10px] font-mono text-violet-300/70">
                       0{i + 1}
                     </span>
                     <div>
@@ -847,25 +709,21 @@ export default function HomePage() {
         >
           <div
             className="glass relative overflow-hidden p-12 rounded-3xl"
-            style={{ border: '1px solid rgba(167,139,250,0.15)' }}
+            style={{
+              border: '1px solid rgba(167,139,250,0.18)',
+              background: 'linear-gradient(180deg, rgba(124,58,237,0.06), rgba(255,255,255,0.025))',
+            }}
           >
-            {/* Corner glow */}
-            <div
-              className="absolute -top-20 -right-20 w-60 h-60 rounded-full pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(167,139,250,0.12) 0%, transparent 70%)' }}
-            />
-            <div
-              className="absolute -bottom-20 -left-20 w-60 h-60 rounded-full pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(52,211,153,0.08) 0%, transparent 70%)' }}
-            />
-
-            <div className="text-5xl mb-5 select-none">🚀</div>
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-300/35 to-transparent" />
+            <p className="text-xs font-mono uppercase tracking-[0.22em] text-violet-300/70 mb-5">
+              Start the loop
+            </p>
             <h2 className="text-3xl font-bold text-zinc-100 mb-3">Ready to begin?</h2>
             <p className="text-zinc-500 mb-8 text-sm leading-relaxed">
               Connect your wallet. Name your founder. Start teaching. Mint a Passport and publish a Launch Certificate when it grows up.
             </p>
             <GradientCTA onClick={() => setModalOpen(true)} large>
-              ◎ Birth Your Founder
+              Create Agent
               <ArrowRight size={16} />
             </GradientCTA>
           </div>
@@ -873,7 +731,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="py-10 px-6 border-t border-white/5">
+      <footer className="py-10 px-6 border-t border-violet-300/10">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <img src="/logo.png" alt="SolBorn" className="w-6 h-6 rounded-lg" />

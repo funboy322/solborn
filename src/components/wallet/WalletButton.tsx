@@ -62,10 +62,10 @@ export function WalletButton() {
           else select(wallets[0]?.adapter.name)
         }}
         disabled={connecting}
-        className="relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white overflow-hidden"
+        className="relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white overflow-hidden border border-violet-300/20"
         style={{
-          background: 'linear-gradient(135deg, #9945FF, #14F195)',
-          boxShadow: '0 0 20px rgba(153,69,255,0.35)',
+          background: 'linear-gradient(135deg, #8b5cf6, #6d28d9 55%, #3b0764)',
+          boxShadow: '0 16px 38px rgba(88,28,135,0.35), inset 0 1px 0 rgba(255,255,255,0.16)',
         }}
       >
         {/* Shine sweep */}
@@ -90,10 +90,10 @@ export function WalletButton() {
         onClick={() => setOpen((o) => !o)}
         className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium border"
         style={{
-          background: 'rgba(20,241,149,0.08)',
-          borderColor: 'rgba(20,241,149,0.25)',
-          color: '#14F195',
-          boxShadow: '0 0 12px rgba(20,241,149,0.15)',
+          background: 'rgba(124,58,237,0.12)',
+          borderColor: 'rgba(167,139,250,0.26)',
+          color: '#ddd6fe',
+          boxShadow: '0 0 18px rgba(124,58,237,0.18)',
         }}
       >
         <span className="font-mono">{truncateAddress(publicKey!.toBase58())}</span>
@@ -144,7 +144,7 @@ export function WalletButton() {
                     {balance !== null ? `${balance.toFixed(4)} SOL` : '—'}
                   </p>
                 </div>
-                <span className="text-xs text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+                <span className="text-xs text-violet-200 px-2 py-0.5 rounded-full bg-violet-400/10 border border-violet-300/20">
                   Solana
                 </span>
               </div>

@@ -38,8 +38,8 @@ export function AgentCard({ agent, active, onClick }: AgentCardProps) {
     ? 100
     : Math.min(100, Math.round(((agent.xp - xpRequired) / (xpToNext - xpRequired)) * 100))
 
-  const hasStreak = agent.streak > 0
-  const achievementCount = agent.unlockedAchievements.length
+  const hasStreak = (agent.streak ?? 0) > 0
+  const achievementCount = agent.unlockedAchievements?.length ?? 0
 
   return (
     <motion.div

@@ -8,9 +8,9 @@
 /* ── 1. Design Tokens ─────────────────────────────────────── */
 :root {
   /* Base surfaces */
-  --background: #07070d;
-  --surface: #0d0d16;
-  --surface-elevated: #111120;
+  --background: #05030a;
+  --surface: #0b0714;
+  --surface-elevated: #120b20;
   --card: rgba(255, 255, 255, 0.035);
   --card-hover: rgba(255, 255, 255, 0.065);
   --border: rgba(255, 255, 255, 0.07);
@@ -191,22 +191,19 @@ body {
   position: relative;
 }
 
-/* Gradient orbs — layered behind everything */
+/* Subtle ambient planes layered behind everything */
 body::after {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 50% at 15% 20%, rgba(124, 58, 237, 0.09) 0%, transparent 65%),
-    radial-gradient(ellipse 50% 60% at 85% 75%, rgba(52, 211, 153, 0.06) 0%, transparent 65%),
-    radial-gradient(ellipse 70% 40% at 50% 50%, rgba(15, 15, 30, 0.95) 0%, transparent 80%);
+    linear-gradient(135deg, rgba(139, 92, 246, 0.06), transparent 34%),
+    linear-gradient(225deg, rgba(76, 29, 149, 0.08), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.014), transparent 58%);
   pointer-events: none;
   z-index: 0;
-  animation: mesh-drift 28s ease-in-out infinite;
-  will-change: transform;
 }
 
-/* Secondary ambient orb */
 body > * {
   position: relative;
   z-index: 1;
