@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useWallet, useConnection } from '@solana/wallet-adapter-react'
+import { WalletReadyState } from '@solana/wallet-adapter-base'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { Wallet, ChevronDown, LogOut, Copy, Check, Droplets } from 'lucide-react'
 
@@ -10,7 +11,7 @@ function truncateAddress(addr: string) {
 }
 
 export function WalletButton() {
-  const { publicKey, connected, connecting, disconnect, select, wallets } = useWallet()
+  const { publicKey, connected, connecting, disconnect, select, connect, wallets, wallet } = useWallet()
   const { connection } = useConnection()
 
   const [balance, setBalance] = useState<number | null>(null)
@@ -50,17 +51,35 @@ export function WalletButton() {
     }
   }, [publicKey, connection, airdropping])
 
+  const handleConnect = useCallback(async () => {
+    try {
+      const phantom = wallets.find((entry) => entry.adapter.name === 'Phantom')
+      const preferred =
+        phantom ??
+        wallets.find((entry) => entry.readyState === WalletReadyState.Installed) ??
+        wallets.find((entry) => entry.readyState === WalletReadyState.Loadable) ??
+        wallets[0]
+
+      if (!preferred) return
+
+      if (wallet?.adapter.name !== preferred.adapter.name) {
+        select(preferred.adapter.name)
+        await new Promise((resolve) => setTimeout(resolve, 0))
+      }
+
+      await connect()
+    } catch (error) {
+      console.warn('Wallet connect failed:', error)
+    }
+  }, [wallet, wallets, select, connect])
+
   // Not connected
   if (!connected) {
     return (
       <motion.button
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
-        onClick={() => {
-          const phantom = wallets.find((w) => w.adapter.name === 'Phantom')
-          if (phantom) select(phantom.adapter.name)
-          else select(wallets[0]?.adapter.name)
-        }}
+        onClick={() => void handleConnect()}
         disabled={connecting}
         className="relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white overflow-hidden border border-violet-300/20"
         style={{
