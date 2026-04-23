@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, CheckCircle2, ExternalLink, FlaskConical, Lock, Rocket, ShieldCheck, Trophy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { WalletButton } from '@/components/wallet/WalletButton'
+import { useForgeStore } from '@/lib/store'
 
 const STEPS = [
   {
@@ -70,6 +71,12 @@ const PROOF = [
 
 export default function DemoPage() {
   const router = useRouter()
+  const seedDemoProduct = useForgeStore((s) => s.seedDemoProduct)
+
+  function handleSeedDemo() {
+    const agent = seedDemoProduct()
+    router.push(`/products/${agent.generatedProject?.id ?? 'demo-product-signalforge'}`)
+  }
 
   return (
     <main className="min-h-screen px-6 py-6">
@@ -108,6 +115,10 @@ export default function DemoPage() {
               <Button onClick={() => router.push('/forge?demo=1')} className="bg-violet-400 text-zinc-950 hover:bg-violet-300">
                 <Rocket size={16} />
                 Start 3-minute demo
+              </Button>
+              <Button variant="secondary" onClick={handleSeedDemo}>
+                <FlaskConical size={16} />
+                Load sample product
               </Button>
               <Button variant="secondary" onClick={() => router.push('/products')}>
                 <Trophy size={16} />

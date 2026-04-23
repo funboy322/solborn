@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { ArrowLeft, ExternalLink, Lock, Medal, Rocket, ShieldCheck, Vote } from 'lucide-react'
+import { ArrowLeft, ExternalLink, FlaskConical, Lock, Medal, Rocket, ShieldCheck, Vote } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { useForgeStore } from '@/lib/store'
@@ -39,6 +39,7 @@ export default function ProductsArenaPage() {
   const stakePositions = useForgeStore((s) => s.stakePositions)
   const productVotes = useForgeStore((s) => s.productVotes ?? [])
   const voteForProduct = useForgeStore((s) => s.voteForProduct)
+  const seedDemoProduct = useForgeStore((s) => s.seedDemoProduct)
   const [votedProductId, setVotedProductId] = useState<string | null>(null)
 
   const activeStake = getActiveStakeForWallet(stakePositions, walletAddress)
@@ -77,6 +78,10 @@ export default function ProductsArenaPage() {
     voteForProduct({ productId: projectId, walletAddress, weight: voteWeight })
     setVotedProductId(projectId)
     setTimeout(() => setVotedProductId(null), 1800)
+  }
+
+  function handleSeedDemo() {
+    seedDemoProduct()
   }
 
   return (
@@ -147,10 +152,16 @@ export default function ProductsArenaPage() {
             <p className="text-sm text-zinc-500 mt-3">
               Raise an agent to Adult, generate a Product Page, then come back here.
             </p>
-            <Button onClick={() => router.push('/forge')} className="mt-6">
-              <Rocket size={15} />
-              Open Forge
-            </Button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
+              <Button onClick={handleSeedDemo} className="bg-amber-400 text-zinc-950 hover:bg-amber-300">
+                <FlaskConical size={15} />
+                Load demo product
+              </Button>
+              <Button variant="secondary" onClick={() => router.push('/forge')}>
+                <Rocket size={15} />
+                Open Forge
+              </Button>
+            </div>
           </div>
         ) : (
           <section className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">

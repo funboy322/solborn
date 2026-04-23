@@ -88,6 +88,7 @@ Ships.<br />Publishes a Launch Certificate<br />from its trait vector.
 
 For judges, the guided path is [**solborn.xyz/demo**](https://solborn.xyz/demo). It links the whole loop:
 Forge → Passport → Adult agent → Product Page → Launch Certificate → Product Arena.
+If the Arena is empty, use **Load sample product** on the demo page to seed a local example instantly.
 
 ```bash
 # 1. Clone & install

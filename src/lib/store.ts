@@ -35,6 +35,7 @@ interface ForgeStore {
   createStakePosition: (input: { walletAddress: string; amount: number; unlockAt?: number }) => StakePosition
   closeStakePosition: (positionId: string) => void
   voteForProduct: (input: { productId: string; walletAddress: string; weight: number }) => ProductVote
+  seedDemoProduct: () => ForgeAgent
   getActiveAgent: () => ForgeAgent | undefined
 }
 
@@ -382,6 +383,112 @@ export const useForgeStore = create<ForgeStore>()(
             : [...(state.productVotes ?? []), vote],
         }))
         return vote
+      },
+
+      seedDemoProduct: () => {
+        const existing = get().agents.find((agent) => agent.id === 'demo-founder-agent')
+        if (existing) {
+          set({ activeAgentId: existing.id })
+          return existing
+        }
+
+        const now = Date.now()
+        const agent: ForgeAgent = {
+          id: 'demo-founder-agent',
+          name: 'SolSignal',
+          emoji: '🧠',
+          stage: 'adult',
+          xp: 920,
+          xpToNext: STAGE_CONFIG.adult.xpToNext as number,
+          traits: {
+            curiosity: 86,
+            solanaKnowledge: 88,
+            codingSkill: 82,
+            creativity: 79,
+            founderMindset: 91,
+          },
+          messages: [
+            {
+              id: 'demo-message-1',
+              role: 'system',
+              content: 'Demo product seeded for the hackathon judge path.',
+              timestamp: now,
+            },
+          ],
+          createdAt: now,
+          lastInteraction: now,
+          totalInteractions: 6,
+          personality: 'A pragmatic Solana founder focused on turning noisy community signals into launch decisions.',
+          unlockedAchievements: [],
+          streak: 1,
+          bestStreak: 1,
+          longResponseCount: 2,
+          energy: MAX_ENERGY,
+          maxEnergy: MAX_ENERGY,
+          lastEnergyUpdate: now,
+          chainHistory: [],
+          trainers: [],
+          generatedProject: {
+            id: 'demo-product-signalforge',
+            name: 'SignalForge',
+            description:
+              'SignalForge helps early Solana projects turn community feedback, wallet activity, and product updates into a simple launch readiness score. Founders can share a product page, collect early access requests, and let Passport holders back the strongest ideas.',
+            techStack: ['@solana/web3.js', 'Next.js', 'Upstash Vector', 'Zustand', 'Solana Memo'],
+            codeSnippet: '',
+            brief: {
+              targetUser: 'Solana founders preparing a launch who need clearer feedback before spending money on marketing.',
+              problem: 'Early teams often confuse noise for traction and do not know which product ideas are worth pushing.',
+              solution: 'SignalForge turns trained agent context into a public product page, access funnel, and community backing score.',
+              mvp: 'A product page with early access requests, launch proof, and Arena backing from staked Passport holders.',
+              solanaAngle: 'Wallet identity, signed launch certificates, and stake-gated backing create a verifiable product signal.',
+              pricing: '$9 monthly early-access pass for founders who want product signal and launch feedback.',
+              launchPlan: [
+                'Collect early access requests from the product page',
+                'Publish a Launch Certificate on Solana devnet',
+                'Use Arena backing to choose the next feature to build',
+              ],
+            },
+            membership: {
+              title: 'SignalForge Founder Pass',
+              priceUsd: 9,
+              durationDays: 30,
+              benefits: [
+                'Early access to launch readiness pages',
+                'Priority product feedback from the agent loop',
+                'Eligibility for future Arena boosts',
+              ],
+            },
+            deployedAt: now,
+          },
+        }
+
+        const demoVotes: ProductVote[] = [
+          {
+            id: 'demo-vote-1',
+            productId: 'demo-product-signalforge',
+            walletAddress: 'demo-wallet-alpha',
+            weight: 2.2,
+            createdAt: now,
+            updatedAt: now,
+            mode: 'simulation',
+          },
+          {
+            id: 'demo-vote-2',
+            productId: 'demo-product-signalforge',
+            walletAddress: 'demo-wallet-beta',
+            weight: 1.6,
+            createdAt: now,
+            updatedAt: now,
+            mode: 'simulation',
+          },
+        ]
+
+        set((state) => ({
+          agents: [...state.agents, agent],
+          productVotes: [...(state.productVotes ?? []), ...demoVotes],
+          activeAgentId: agent.id,
+        }))
+        return agent
       },
 
       getActiveAgent: () => {
