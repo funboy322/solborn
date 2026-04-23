@@ -686,28 +686,6 @@ export default function HomePage() {
             <span>Open source</span>
           </motion.div>
 
-          {/* Token live banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            className="mt-6 flex items-center justify-center"
-          >
-            <a
-              href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all hover:scale-105"
-              style={{
-                background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(245,158,11,0.15))',
-                border: '1px solid rgba(245,158,11,0.35)',
-                color: 'rgb(252,211,77)',
-              }}
-            >
-              $SBORN is live · utility layer soon
-              <ExternalLink size={11} />
-            </a>
-          </motion.div>
         </div>
       </section>
 
