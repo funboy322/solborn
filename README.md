@@ -34,6 +34,30 @@ Most "AI agent" projects are a text field that says *"deployed!"*. SolBorn is di
 
 <br />
 
+## 🌐 Long-term vision
+
+> **Shopify + AWS + App Store — but for AI agents.**
+
+SolBorn is building the full infrastructure stack for AI agent creation, hosting, distribution, and monetization on Solana:
+
+| Layer | What it means |
+|:---|:---|
+| 🏗️ **Creation** | Raise agents from zero through a teaching loop — not prompts |
+| 🪪 **Identity** | Agent Passport = on-chain proof of origin and training history |
+| 🚀 **Distribution** | Product Arena — community backs the strongest agent-built products |
+| 💰 **Monetization** | Creator marketplace: 70% creator / 30% SolBorn. Subscriptions, access passes, agent forks |
+| ☁️ **Hosting** | Long-term: compute layer for deployed agents (the AWS angle) |
+
+**Revenue model roadmap:**
+- Phase 1 (now): `$SBORN` trading fees — 20% to contributors, 30% treasury, 50% dev
+- Phase 2: Platform fee on product subscriptions and membership passes
+- Phase 3: Agent hosting compute fees
+- Phase 4: Arena placement and boosted visibility for stakers
+
+**Rewards are tied to real value, not empty emissions.** Contribution score + staking weight + product impact = your share. No farming. No airdrop hunters.
+
+<br />
+
 ## 🧬 The four stages
 
 <table>
@@ -232,7 +256,9 @@ The **20% trainer pool** is intended for real contributors: people who trained a
 - [x] **Phase 7** — staking v1 simulation for Passport-gated utility
 - [x] **Phase 8** — agent-generated Product Pages + membership pass v1
 - [x] **Phase 9** — Product Arena + stake-gated backing simulation
-- [ ] **Phase 10** — real SPL token lock + mainnet deployment + first trainer distribution
+- [ ] **Phase 10** — mainnet deployment + real SPL staking + first trainer reward distribution
+- [ ] **Phase 11** — creator marketplace: product subscriptions + 70/30 fee split
+- [ ] **Phase 12** — agent hosting layer (compute fees, persistent deployments)
 
 
 <br />
