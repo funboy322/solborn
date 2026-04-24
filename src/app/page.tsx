@@ -369,6 +369,15 @@ function StickyNav({
             </Button>
           )}
           <a
+            href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-violet-300/20 bg-violet-400/[0.05] px-3 py-1.5 text-xs font-semibold text-violet-100 transition-colors hover:bg-violet-400/[0.1]"
+            title="Buy $SBORN on pump.fun"
+          >
+            Buy $SBORN
+          </a>
+          <a
             href="https://x.com/solborn_xyz"
             target="_blank"
             rel="noopener noreferrer"
