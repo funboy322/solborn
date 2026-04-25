@@ -39,31 +39,31 @@ interface ChatInterfaceProps {
 
 const SUGGESTED_PROMPTS: Record<ForgeAgent['stage'], string[]> = {
   baby: [
-    'Ask me what I want to build',
-    "Help me find a product idea",
-    "I'll explain who this should help",
+    "I'm a developer who loves DeFi",
+    "I work in finance and hate manual processes",
+    "I'm a designer interested in NFTs",
   ],
   toddler: [
-    'Help me shape an MVP',
-    'Ask who the users are',
-    'Turn this idea into a tiny product',
+    "I've tried building before but got stuck",
+    "My edge is knowing the gaming community",
+    "The problem I see is...",
   ],
   teen: [
-    'Interview me about the product',
-    'Find the Solana angle',
-    'Challenge my go-to-market',
+    'What idea fits my background best?',
+    'Challenge that idea — what could go wrong?',
+    "Let's narrow down to one concept",
   ],
   adult: [
-    'Create a product brief with me',
+    'Finalize the product brief',
     'Prepare the Launch Certificate',
-    'Turn our idea into a build plan',
+    'What should the MVP look like?',
   ],
 }
 
 const INPUT_PLACEHOLDERS: Record<ForgeAgent['stage'], string> = {
-  baby: 'Tell me what you want to create...',
-  toddler: 'Describe the user or problem...',
-  teen: 'Pitch the product idea...',
+  baby: 'Tell me about yourself...',
+  toddler: 'Share more about your background...',
+  teen: 'What do you think about this idea?',
   adult: 'Refine the launch plan...',
 }
 
@@ -133,7 +133,17 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (agent.stage === 'baby' && agent.xp === 0) {
+      return [{
+        id: 'welcome',
+        role: 'assistant',
+        content: `hey, i'm ${agent.name} 👀\n\nbefore we build anything — tell me about yourself. what do you do? like, day to day, what world do you come from?`,
+        timestamp: Date.now(),
+      }]
+    }
+    return []
+  })
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [xpEvents, setXpEvents] = useState<XPEvent[]>([])
