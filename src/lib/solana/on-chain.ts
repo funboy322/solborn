@@ -78,8 +78,7 @@ export async function mintAgentOnChain(
 
   const signed = await signTransaction(transaction)
   const txSignature = await DEVNET_CONNECTION.sendRawTransaction(signed.serialize(), {
-    skipPreflight: false,
-    preflightCommitment: 'confirmed',
+    skipPreflight: true, // bypass wallet-injected instruction simulation failures
   })
 
   await DEVNET_CONNECTION.confirmTransaction(
@@ -128,8 +127,7 @@ export async function publishLaunchCertificate(
 
   const signed = await signTransaction(transaction)
   const txSignature = await DEVNET_CONNECTION.sendRawTransaction(signed.serialize(), {
-    skipPreflight: false,
-    preflightCommitment: 'confirmed',
+    skipPreflight: true,
   })
 
   await DEVNET_CONNECTION.confirmTransaction(

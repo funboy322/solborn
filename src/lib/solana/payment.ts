@@ -76,8 +76,7 @@ export async function payBirthFee(
 
   const signed = await signTransaction(tx)
   const txSignature = await DEVNET_CONNECTION.sendRawTransaction(signed.serialize(), {
-    skipPreflight: false,
-    preflightCommitment: 'confirmed',
+    skipPreflight: true,
   })
 
   await DEVNET_CONNECTION.confirmTransaction(
@@ -118,8 +117,7 @@ export async function recordEvolution(
   tx.add(memoIx)
   const signed = await signTransaction(tx)
   const txSignature = await DEVNET_CONNECTION.sendRawTransaction(signed.serialize(), {
-    skipPreflight: false,
-    preflightCommitment: 'confirmed',
+    skipPreflight: true,
   })
   await DEVNET_CONNECTION.confirmTransaction(
     { signature: txSignature, blockhash, lastValidBlockHeight },
