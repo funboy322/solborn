@@ -739,6 +739,46 @@ export default function HomePage() {
         </motion.div>
       </section>
 
+      {/* ── DexScreener chart ── */}
+      <section className="py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-8"
+          >
+            <p className="text-xs font-mono text-violet-400 tracking-widest uppercase mb-2">Live Chart</p>
+            <h2 className="text-2xl font-bold text-zinc-100">$SBORN on Solana</h2>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="rounded-2xl overflow-hidden border border-violet-300/10"
+            style={{ height: 500 }}
+          >
+            <iframe
+              src="https://dexscreener.com/solana/8pudb4dhwxebktpgp3jrgzbcqrqodglc4d17w7dbvjqi?embed=1&theme=dark&trades=0&info=0"
+              style={{ width: '100%', height: '100%', border: 'none' }}
+              title="$SBORN DexScreener Chart"
+              loading="lazy"
+            />
+          </motion.div>
+          <div className="mt-4 flex justify-center">
+            <a
+              href="https://dexscreener.com/solana/8pudb4dhwxebktpgp3jrgzbcqrqodglc4d17w7dbvjqi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors flex items-center gap-1.5"
+            >
+              <ExternalLink size={11} />
+              View full chart on DexScreener
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* ── Footer ── */}
       <footer className="py-10 px-6 border-t border-violet-300/10">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
