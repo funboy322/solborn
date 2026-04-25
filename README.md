@@ -4,9 +4,9 @@
 
 # SolBorn
 
-### Raise an AI founder on Solana.
+### Your AI co-founder on Solana.
 
-**Teach it from babbling baby → shipping adult.**
+**Tell it who you are. It finds your startup idea.**
 **Mint an Agent Passport. Grow it to Adult. Publish a signed Launch Certificate.**
 
 [![Solana](https://img.shields.io/badge/Solana-devnet-9945FF?style=for-the-badge&logo=solana&logoColor=white)](https://solana.com)
@@ -24,13 +24,13 @@
 </div>
 
 > **Colosseum Frontier Hackathon 2026 submission.**
-> A working on-chain product where teaching is the game loop, memory is persistent, and every milestone is verifiable on-chain.
+> A working on-chain product where your AI co-founder interviews you, builds your personalized startup idea, and every milestone is verifiable on Solana devnet.
 
 <br />
 
 ## ✨ The pitch in one paragraph
 
-Most "AI agent" projects are a text field that says *"deployed!"*. SolBorn is different. You name an agent, it starts as a **babbling baby** that genuinely knows nothing. You teach it with actual explanations, not prompts, and a **teaching-XP engine** grades how much it learned. It remembers you across sessions via **semantic vector memory**. You can mint an **Agent Passport** as a signed Solana devnet proof. When the agent reaches Adult, it generates a product brief, membership pass, public product page, and **Launch Certificate** on-chain. Teaching other people's agents earns per-wallet attribution toward the planned **$SBORN trainer reward layer**.
+Most "AI agent" projects hand you a blank text box and say *"start prompting!"*. SolBorn is different. You don't teach the agent — **it interviews you**. It asks about your skills, interests, what problems you see in the market. Based on your answers, it autonomously builds a personalized Solana startup idea tailored to who you are. As the conversation grows, so does the agent: it earns XP, evolves through stages, remembers you across sessions via **semantic vector memory**, and mints an **Agent Passport** as a signed on-chain proof of its origin. When it reaches Adult, it ships a full product brief, public product page, and **Launch Certificate** on Solana devnet. You end up not just with a chatbot — but with a co-founder that genuinely knows you.
 
 <br />
 
@@ -42,8 +42,8 @@ SolBorn is building the full infrastructure stack for AI agent creation, hosting
 
 | Layer | What it means |
 |:---|:---|
-| 🏗️ **Creation** | Raise agents from zero through a teaching loop — not prompts |
-| 🪪 **Identity** | Agent Passport = on-chain proof of origin and training history |
+| 🏗️ **Creation** | Agent interviews you → builds YOUR personalized startup idea |
+| 🪪 **Identity** | Agent Passport = on-chain proof of origin and conversation history |
 | 🚀 **Distribution** | Product Arena — community backs the strongest agent-built products |
 | 💰 **Monetization** | Creator marketplace: 70% creator / 30% SolBorn. Subscriptions, access passes, agent forks |
 | ☁️ **Hosting** | Long-term: compute layer for deployed agents (the AWS angle) |
@@ -66,25 +66,25 @@ SolBorn is building the full infrastructure stack for AI agent creation, hosting
 <h3>👶</h3>
 <b>Baby</b><br />
 <sub>0–100 XP</sub><br /><br />
-Knows nothing.<br />Asks "what is a wallet?" in babble.
+Curious about you.<br />Asks who you are, what you care about.
 </td>
 <td align="center" width="25%">
 <h3>🧒</h3>
 <b>Toddler</b><br />
 <sub>100–300 XP</sub><br /><br />
-Starts connecting concepts.<br />Writes pseudocode, gets DeFi basics.
+Starts forming ideas.<br />Connects your interests to Solana opportunities.
 </td>
 <td align="center" width="25%">
 <h3>🧑‍💻</h3>
 <b>Teen</b><br />
 <sub>300–700 XP</sub><br /><br />
-Codes in Rust.<br />Reviews your GTM. Has opinions.
+Proposes specific projects.<br />Discusses tech stack, GTM, and your edge.
 </td>
 <td align="center" width="25%">
 <h3>🚀</h3>
 <b>Adult</b><br />
 <sub>700+ XP</sub><br /><br />
-Ships.<br />Publishes a Launch Certificate<br />from its trait vector.
+Ships.<br />Full product brief + Launch Certificate on Solana devnet.
 </td>
 </tr>
 </table>
@@ -97,11 +97,11 @@ Ships.<br />Publishes a Launch Certificate<br />from its trait vector.
 |---|---|---|
 | 🧠 **Semantic memory** | Upstash Vector (BGE-M3 multilingual, EU1) | Facts extracted async via `after()`, agent recalls them weeks later |
 | ⚡ **Streaming chat** | AI SDK v6 + Groq (`llama-3.3-70b`) | Edge streaming with fallback to `llama-3.1-8b-instant` |
-| 🎓 **Teaching XP engine** | Custom grader + trait analyzer | Word count × quality × novelty — spam = 0 XP |
+| 🎓 **XP engine** | Custom grader + trait analyzer | Word count × quality × novelty — spam = 0 XP |
 | 🪪 **Agent Passports** | Solana Memo Program + wallet signatures | Real devnet tx that proves the agent identity in Explorer |
 | 🚀 **Launch Certificates** | Signed Memo tx + generated project spec | Adult agents publish a verifiable launch proof on Solana devnet |
-| 🧾 **Product Arena** | Agent-generated brief + membership pass + votes | Adult agents turn training into product pages that can be backed by staked Passport holders |
-| 🪙 **$SBORN utility layer** | Staking v1 + per-wallet XP attribution | Stake-to-unlock access is being tested before real token locks |
+| 🧾 **Product Arena** | Agent-generated brief + membership pass + votes | Adult agents turn conversations into product pages backed by staked Passport holders |
+| 🪙 **$SBORN utility layer** | Staking v1 + per-wallet XP attribution | Stake-to-unlock access being tested before real token locks |
 | 🔋 **Energy system** | Client-side regen + wallet boost | 2 energy/min, connect wallet for refill |
 | 🏆 **Achievements** | 20+ unlocks, XP bonuses | Real-time toast + screen-shake feedback |
 | 🎬 **Demo mode** | `?demo=1` → ×50 XP, ∞ energy | Lets judges hit Adult in 3–4 messages |
@@ -129,42 +129,39 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open <http://localhost:3000> → click **Create Agent** → connect Phantom (devnet) → start teaching.
+Open <http://localhost:3000> → click **Create Agent** → connect Phantom (devnet) → let it interview you.
 Or skip the setup and try the live version at [**solborn.xyz**](https://solborn.xyz).
 Append `?demo=1` to any URL for a ×50 XP speed-run (hackathon demo mode).
 
 <br />
 
-## 🧠 How the teaching loop works
+## 🧠 How the loop works
 
 ```
  ┌──────────────────────────────────────────────────────────────────┐
- │                         YOU (the trainer)                         │
+ │                         YOU                                       │
+ │          answer the agent's questions about yourself              │
  └───────────────────────────────┬──────────────────────────────────┘
-                                 │  explanation
+                                 │  your skills, interests, problems
                                  ▼
  ┌──────────────────────────────────────────────────────────────────┐
- │   xp-calculator.ts  →  grades length × quality × novelty          │
- │   trait-analyzer.ts →  boosts intelligence / creativity / grit    │
- │   memory-engine.ts  →  extracts facts → Upstash Vector (async)    │
+ │   Agent interviews you → builds YOUR personalized startup idea    │
+ │   xp-calculator.ts  →  grades depth and quality of conversation  │
+ │   trait-analyzer.ts →  shapes agent personality around your input │
+ │   memory-engine.ts  →  stores facts → Upstash Vector (async)     │
  └───────────────────────────────┬──────────────────────────────────┘
-                                 │  XP gained
+                                 │  XP gained → stage crossed?
                                  ▼
  ┌──────────────────────────────────────────────────────────────────┐
- │             zustand store  →  stage threshold crossed?            │
- └───────────────────────────────┬──────────────────────────────────┘
-                                 │  yes
-                                 ▼
- ┌──────────────────────────────────────────────────────────────────┐
- │     on-chain.ts  →  Agent Passport Memo tx to trainer wallet      │
- │     chainHistory →  public evolution and launch proof ledger      │
+ │     on-chain.ts  →  Agent Passport Memo tx on Solana devnet      │
+ │     chainHistory →  public evolution and launch proof ledger     │
  └───────────────────────────────┬──────────────────────────────────┘
                                  │  stage === 'adult'?
                                  ▼
  ┌──────────────────────────────────────────────────────────────────┐
- │   /api/agent/generate  →  LLM produces project spec               │
- │   publishLaunchCertificate() → signed Memo proof in Explorer      │
- │   optional Blink URL   → support link, not required for demo       │
+ │   /api/agent/generate  →  LLM produces YOUR project spec         │
+ │   publishLaunchCertificate() → signed Memo proof in Explorer     │
+ │   Product Arena → community backs the strongest ideas            │
  └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -193,12 +190,13 @@ solborn/
 ├── src/
 │   ├── app/
 │   │   ├── api/
-│   │   │   ├── agent/chat/      → streaming teaching chat
-│   │   │   ├── agent/generate/  → LLM → generated project spec
+│   │   │   ├── agent/chat/      → streaming chat + XP grading
+│   │   │   ├── agent/generate/  → LLM → personalized project spec
 │   │   │   ├── blinks/[id]/     → Solana Actions endpoint
-│   │   │   └── nft-metadata/    → legacy metadata route
-│   │   ├── actions.json/        → Blink client domain registration
+│   │   │   └── nft-metadata/    → metadata route
 │   │   ├── forge/[id]/          → agent page (chat + stats + deploy)
+│   │   ├── products/            → Product Arena
+│   │   ├── staking/             → staking v1 simulation
 │   │   └── page.tsx             → landing
 │   ├── components/agent/        → ChatInterface, ProjectGenerator, ...
 │   ├── lib/
@@ -216,8 +214,6 @@ solborn/
 
 **$SBORN is live on pump.fun. The product utility layer is in development.**
 
-SolBorn is evolving in public. $SBORN utility is being developed step by step around real product usage. Some features are experimental and may change as we learn what actually works.
-
 > **CA:** `3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump`
 > **Buy:** [pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump](https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump)
 
@@ -229,19 +225,11 @@ No pre-mine. No team allocation. Everything started on the bonding curve.
 |:---|:---:|:---|
 | 🧑‍💻 **Dev** | **50%** | Founder compensation + operations |
 | 🏦 **Treasury** | **30%** | Runway — Claude, Vercel, RPC nodes, future audits |
-| 🎁 **Trainers** | **20%** | Planned rewards for real contributors via [solborn.xyz/rewards](https://solborn.xyz/rewards) |
+| 🎁 **Contributors** | **20%** | Manually distributed to real contributors via [solborn.xyz/rewards](https://solborn.xyz/rewards) |
 
 </div>
 
-The token is designed as the coordination layer around the product:
-
-- **Trainer rewards:** wallet-linked XP becomes the attribution score for future $SBORN distributions.
-- **Agent utility:** planned use cases include staking access, energy boosts, launch boosts, Passport cosmetics, and advanced agent actions.
-- **Stake-to-unlock:** a v1 staking screen is live as a simulation layer before the real SPL token lock is shipped.
-- **Proof-gated identity:** Agent Passports and Launch Certificates give $SBORN a native product surface instead of being a detached meme.
-- **Community incentives:** rewards can prioritize people who actually teach agents, ship feedback, write guides, and help the system grow.
-
-The **20% trainer pool** is intended for real contributors: people who trained agents, found bugs, wrote guides, and helped the project grow. Nominations are reviewed manually at [solborn.xyz/rewards](https://solborn.xyz/rewards).
+The **20% contributor pool** goes to real users: people who found ideas through the platform, gave feedback, helped others, and helped the project grow. Nominations reviewed manually at [solborn.xyz/rewards](https://solborn.xyz/rewards).
 
 <br />
 
@@ -250,28 +238,25 @@ The **20% trainer pool** is intended for real contributors: people who trained a
 - [x] **Phase 1** — baseline chat + XP + stages
 - [x] **Phase 2** — semantic memory (Upstash Vector)
 - [x] **Phase 3** — Agent Passport memo minting
-- [x] **Phase 4** — trainer royalty attribution
+- [x] **Phase 4** — contributor XP attribution
 - [x] **Phase 5** — Launch Certificate finale
 - [x] **Phase 6** — demo mode (`?demo=1`)
 - [x] **Phase 7** — staking v1 simulation for Passport-gated utility
 - [x] **Phase 8** — agent-generated Product Pages + membership pass v1
 - [x] **Phase 9** — Product Arena + stake-gated backing simulation
-- [ ] **Phase 10** — mainnet deployment + real SPL staking + first trainer reward distribution
+- [ ] **Phase 10** — mainnet deployment + real SPL staking + first contributor reward distribution
 - [ ] **Phase 11** — creator marketplace: product subscriptions + 70/30 fee split
 - [ ] **Phase 12** — agent hosting layer (compute fees, persistent deployments)
-
-
-<br />
 
 <br />
 
 ## 🛡️ Honest caveats
 
-- **Devnet only** at launch. Agent Passports, Launch Certificates, and Memo txs are devnet. Mainnet is a Phase 9 decision, not a day-1 promise.
+- **Devnet only** at launch. Agent Passports, Launch Certificates, and Memo txs are devnet. Mainnet is Phase 10.
 - **Groq free-tier limits** apply. Chat has a Llama 3.1 8B fallback when 70B is throttled.
-- **Minting costs devnet SOL**. Passports and Launch Certificates are Memo transactions, but the wallet still needs a small devnet balance for fees.
-- **Staking v1 is a simulation layer.** It prepares access rules and UX before a real SPL token lock program is deployed.
-- **Not financial advice.** `$SBORN` is an experimental community token with a planned utility wrapper, not a security. If you can't afford to lose what you ape, don't ape.
+- **Minting costs devnet SOL**. Passports and Launch Certificates are Memo transactions — wallet needs a small devnet balance for fees.
+- **Staking v1 is a simulation layer.** Prepares access rules and UX before a real SPL token lock program is deployed.
+- **Not financial advice.** `$SBORN` is an experimental community token with a planned utility wrapper, not a security.
 
 <br />
 
@@ -279,13 +264,13 @@ The **20% trainer pool** is intended for real contributors: people who trained a
 
 One person. One weekend. Claude Max as a pair programmer. Submitted to the **Colosseum Frontier Hackathon 2026**.
 
-If you're a judge: open [**solborn.xyz**](https://solborn.xyz?demo=1), mint an Agent Passport, raise the agent to Adult (~2 min with demo mode), generate its product page, and publish a Launch Certificate. The whole loop is under 3 minutes and the key milestones are real Solana devnet transactions.
+If you're a judge: open [**solborn.xyz/demo**](https://solborn.xyz/demo), mint an Agent Passport, let the agent interview you, raise it to Adult (~2 min with demo mode), generate its product page, and publish a Launch Certificate. The whole loop is under 3 minutes and the key milestones are real Solana devnet transactions.
 
 <br />
 
 <div align="center">
 
-### Teach. Evolve. Ship.
+### Talk. Build. Ship.
 
 ⭐ Star the repo if this made you smile.
 
