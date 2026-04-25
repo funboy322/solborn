@@ -14,7 +14,7 @@ const STAGES = [
   {
     emoji: '👶',
     label: 'Baby',
-    desc: 'Knows nothing. Asks "what is a wallet?" in babble.',
+    desc: 'Curious about you. Asks about your background, your world, what frustrates you.',
     color: '#8b5cf6',
     glow: 'rgba(139,92,246,0.28)',
     bg: 'rgba(139,92,246,0.09)',
@@ -23,7 +23,7 @@ const STAGES = [
   {
     emoji: '🧒',
     label: 'Toddler',
-    desc: 'Repeats what you taught. Gets it adorably wrong sometimes.',
+    desc: 'Starts connecting the dots. Probes your skills, your edge, your constraints.',
     color: '#a78bfa',
     glow: 'rgba(167,139,250,0.25)',
     bg: 'rgba(167,139,250,0.08)',
@@ -32,7 +32,7 @@ const STAGES = [
   {
     emoji: '🧑‍💻',
     label: 'Teen',
-    desc: 'Opinionated. Writes Anchor. Pushes back on bad ideas.',
+    desc: 'Proposes 1-2 specific Solana ideas tailored to YOUR skills. Pushes back if vague.',
     color: '#c084fc',
     glow: 'rgba(192,132,252,0.25)',
     bg: 'rgba(192,132,252,0.08)',
@@ -53,7 +53,7 @@ const FEATURES = [
   {
     icon: Brain,
     title: 'Persistent Memory',
-    desc: 'Your agent remembers you across sessions — what you taught, who you are, what you\'re building. Semantic recall per wallet.',
+    desc: 'Your agent remembers you across sessions — your background, your goals, the problems you shared. Semantic recall per wallet.',
     color: '#a78bfa',
     bg: 'rgba(167,139,250,0.08)',
     border: 'rgba(167,139,250,0.2)',
@@ -101,20 +101,20 @@ const TOKEN_UTILITIES = [
 
 const FLOW_STEPS = [
   {
-    label: 'Train',
-    desc: 'Teach the agent your product context.',
+    label: 'Interview',
+    desc: 'Answer your co-founder\'s questions. It learns who you are.',
   },
   {
     label: 'Passport',
-    desc: 'Mint a wallet-signed agent identity.',
+    desc: 'Mint a wallet-signed agent identity on Solana devnet.',
   },
   {
     label: 'Product Page',
-    desc: 'Turn training into a public product brief.',
+    desc: 'Your personalized startup idea, built from the conversation.',
   },
   {
     label: 'Arena',
-    desc: 'Let staked Passport holders back ideas.',
+    desc: 'Community backs the strongest ideas with staked Passports.',
   },
 ]
 
@@ -496,9 +496,9 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mb-6 text-4xl font-bold leading-[1.06] tracking-normal text-zinc-100 sm:text-6xl lg:text-7xl"
             >
-              Train a founder.
+              Tell it who you are.
               <br />
-              Launch the proof.
+              It finds your startup idea.
             </motion.h1>
 
             <motion.p
@@ -507,8 +507,8 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-lg text-zinc-400 max-w-xl mx-auto mb-9 leading-relaxed"
             >
-              SolBorn turns product training into a Passport, a public Product Page,
-              and a signed Launch Certificate on Solana devnet.
+              Your AI co-founder interviews you, builds a personalized Solana startup
+              idea based on who you are, then mints a signed Launch Certificate on devnet.
             </motion.p>
 
             <motion.div
