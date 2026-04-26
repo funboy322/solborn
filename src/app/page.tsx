@@ -498,7 +498,7 @@ export default function HomePage() {
             >
               Tell it who you are.
               <br />
-              It finds your startup idea.
+              It builds your startup.
             </motion.h1>
 
             <motion.p
@@ -507,8 +507,7 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-lg text-zinc-400 max-w-xl mx-auto mb-9 leading-relaxed"
             >
-              Answer its questions. It figures out your startup idea.
-              Every milestone — Passport, Product Page, Launch Certificate — lands on Solana devnet.
+              A signed Agent Passport, a personalized product brief, and a Launch Certificate on Solana devnet — all from one conversation.
             </motion.p>
 
             <motion.div
