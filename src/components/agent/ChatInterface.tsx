@@ -126,6 +126,7 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
   const consumeEnergy = useForgeStore((s) => s.consumeEnergy)
   const regenEnergy = useForgeStore((s) => s.regenEnergy)
   const registerTraining = useForgeStore((s) => s.registerTraining)
+  const addMessage = useForgeStore((s) => s.addMessage)
   const { publicKey } = useWallet()
   const trainerWallet = publicKey?.toBase58() ?? null
   const demo = useDemoMode()
@@ -258,6 +259,10 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
 
       SFX.message()
       setFirstReplyDone(true)
+
+      // Persist both sides of the exchange to the store (for generate context)
+      addMessage(agent.id, { role: 'user', content: text.trim() })
+      addMessage(agent.id, { role: 'agent', content: accumulated })
 
       if (accumulated.length > 200) incrementLongResponses(agent.id)
 

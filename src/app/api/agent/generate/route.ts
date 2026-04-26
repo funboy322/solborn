@@ -102,7 +102,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'AI not configured' }, { status: 500 })
   }
 
-  const prompt = buildGenerateProjectPrompt(agent)
+  // Build a readable conversation summary from stored messages (last 30 exchanges)
+  const storedMessages = Array.isArray(agent.messages) ? agent.messages : []
+  const chatSummary = storedMessages.length > 0
+    ? storedMessages
+        .slice(-30)
+        .map((m) => `${m.role === 'user' ? 'Human' : 'Agent'}: ${m.content}`)
+        .join('\n')
+    : undefined
+
+  const prompt = buildGenerateProjectPrompt(agent, chatSummary)
 
   let text: string
   try {
