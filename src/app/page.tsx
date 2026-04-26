@@ -496,9 +496,9 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mb-6 text-4xl font-bold leading-[1.06] tracking-normal text-zinc-100 sm:text-6xl lg:text-7xl"
             >
-              Tell it who you are.
+              Your Solana startup,
               <br />
-              It builds your startup.
+              found in 5 minutes of chat.
             </motion.h1>
 
             <motion.p
@@ -507,7 +507,7 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-lg text-zinc-400 max-w-xl mx-auto mb-9 leading-relaxed"
             >
-              A signed Agent Passport, a personalized product brief, and a Launch Certificate on Solana devnet — all from one conversation.
+              Your AI co-founder asks you about your background, your skills, what you&apos;d build. Then it ships your idea — with proof on Solana devnet.
             </motion.p>
 
             <motion.div
