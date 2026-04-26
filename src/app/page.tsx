@@ -14,7 +14,7 @@ const STAGES = [
   {
     emoji: '👶',
     label: 'Baby',
-    desc: 'Curious about you. Asks about your background, your world, what frustrates you.',
+    desc: 'Asks who you are. Your background, your day-to-day, what frustrates you. One question at a time.',
     color: '#8b5cf6',
     glow: 'rgba(139,92,246,0.28)',
     bg: 'rgba(139,92,246,0.09)',
@@ -23,7 +23,7 @@ const STAGES = [
   {
     emoji: '🧒',
     label: 'Toddler',
-    desc: 'Starts connecting the dots. Probes your skills, your edge, your constraints.',
+    desc: 'Connects what you said to real opportunities. Probes your skills, your edge, what you\'ve tried before.',
     color: '#a78bfa',
     glow: 'rgba(167,139,250,0.25)',
     bg: 'rgba(167,139,250,0.08)',
@@ -32,7 +32,7 @@ const STAGES = [
   {
     emoji: '🧑‍💻',
     label: 'Teen',
-    desc: 'Proposes 1-2 specific Solana ideas tailored to YOUR skills. Pushes back if vague.',
+    desc: 'Proposes specific Solana ideas built around your background. Pushes back when you\'re vague.',
     color: '#c084fc',
     glow: 'rgba(192,132,252,0.25)',
     bg: 'rgba(192,132,252,0.08)',
@@ -41,7 +41,7 @@ const STAGES = [
   {
     emoji: '🚀',
     label: 'Adult',
-    desc: 'Publishes a Launch Certificate. Real devnet proof.',
+    desc: 'Generates your full product brief and Product Page. Publishes a signed Launch Certificate on devnet.',
     color: '#e879f9',
     glow: 'rgba(232,121,249,0.24)',
     bg: 'rgba(232,121,249,0.075)',
@@ -52,8 +52,8 @@ const STAGES = [
 const FEATURES = [
   {
     icon: Brain,
-    title: 'Persistent Memory',
-    desc: 'Your agent remembers you across sessions — your background, your goals, the problems you shared. Semantic recall per wallet.',
+    title: 'Remembers You',
+    desc: 'The agent stores what you share — your background, goals, and ideas — and recalls them weeks later. Semantic memory per wallet.',
     color: '#a78bfa',
     bg: 'rgba(167,139,250,0.08)',
     border: 'rgba(167,139,250,0.2)',
@@ -61,7 +61,7 @@ const FEATURES = [
   {
     icon: Zap,
     title: 'Agent Passports',
-    desc: 'Mint a signed founder passport to your wallet. The proof lands on Solana devnet and opens in Explorer.',
+    desc: 'Mint your co-founder\'s identity to your wallet. A signed Memo transaction on Solana devnet — verifiable in Explorer.',
     color: '#8b5cf6',
     bg: 'rgba(139,92,246,0.08)',
     border: 'rgba(139,92,246,0.22)',
@@ -69,15 +69,15 @@ const FEATURES = [
   {
     icon: Rocket,
     title: 'Launch Certificates',
-    desc: 'Adult agents publish project certificates with a signed on-chain memo. Clear proof, no external viewer required.',
+    desc: 'When the agent reaches Adult, it publishes your product idea as a signed on-chain proof. Not a screenshot — a real devnet tx.',
     color: '#c084fc',
     bg: 'rgba(192,132,252,0.08)',
     border: 'rgba(192,132,252,0.2)',
   },
   {
     icon: Trophy,
-    title: 'Trainer Royalties',
-    desc: 'Anyone can train anyone\'s agent. XP you contribute becomes attribution for future $SBORN rewards.',
+    title: 'Contributor Rewards',
+    desc: 'XP earned through conversations is tracked per wallet. Early contributors build attribution for future $SBORN rewards.',
     color: '#e879f9',
     bg: 'rgba(232,121,249,0.075)',
     border: 'rgba(232,121,249,0.18)',
@@ -86,16 +86,16 @@ const FEATURES = [
 
 const TOKEN_UTILITIES = [
   {
-    label: 'Train-to-earn attribution',
-    desc: 'Teaching XP is tracked per wallet, creating the score layer for future $SBORN trainer rewards.',
+    label: 'Conversation attribution',
+    desc: 'XP from every conversation is logged per wallet — the score layer for future $SBORN contributor rewards.',
   },
   {
-    label: 'Agent economy sink',
-    desc: '$SBORN is planned for energy boosts, launch boosts, Passport cosmetics, and advanced agent actions.',
+    label: 'Economy utility layer',
+    desc: '$SBORN is planned for energy boosts, launch boosts, Passport upgrades, and gated agent features.',
   },
   {
-    label: 'Proof-gated community',
-    desc: 'Agent Passports and Launch Certificates give the token a native identity layer instead of a detached meme.',
+    label: 'Identity-backed token',
+    desc: 'Agent Passports and Launch Certificates give $SBORN a native product layer — not just a ticker on a chart.',
   },
 ]
 
@@ -251,12 +251,12 @@ function FeatureCard({ feature, index }: { feature: (typeof FEATURES)[0]; index:
 
 function StatsBar() {
   const items = [
-    { label: 'Solana devnet proof', code: '01' },
-    { label: 'Agent Passports', code: '02' },
-    { label: 'Launch Certificates', code: '03' },
+    { label: 'Interviews you first', code: '01' },
+    { label: 'Agent Passports on devnet', code: '02' },
+    { label: 'Signed Launch Certificates', code: '03' },
     { label: 'Product Arena', code: '04' },
-    { label: 'Persistent memory', code: '05' },
-    { label: 'Open source', code: '06' },
+    { label: 'Semantic memory per wallet', code: '05' },
+    { label: 'Open source on GitHub', code: '06' },
   ]
 
   return (
@@ -507,8 +507,8 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-lg text-zinc-400 max-w-xl mx-auto mb-9 leading-relaxed"
             >
-              Your AI co-founder interviews you, builds a personalized Solana startup
-              idea based on who you are, then mints a signed Launch Certificate on devnet.
+              Answer its questions. It figures out your startup idea.
+              Every milestone — Passport, Product Page, Launch Certificate — lands on Solana devnet.
             </motion.p>
 
             <motion.div
@@ -547,11 +547,11 @@ export default function HomePage() {
               transition={{ delay: 0.7 }}
               className="flex items-center justify-center gap-5 mt-10 text-xs text-zinc-600 flex-wrap"
             >
-              <span>Devnet proof</span>
+              <span>Real devnet transactions</span>
               <span className="text-zinc-800">/</span>
               <span>Open source</span>
               <span className="text-zinc-800">/</span>
-              <span>Product Arena</span>
+              <span>No teaching required</span>
             </motion.div>
           </div>
 
@@ -576,10 +576,10 @@ export default function HomePage() {
               The Journey
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-zinc-100 mb-4">
-              From Baby to Founder
+              Four stages. Real progression.
             </h2>
             <p className="text-zinc-500 max-w-md mx-auto text-sm leading-relaxed">
-              Four stages. Each one changes how your agent actually talks, what it knows, and what it can do on-chain.
+              Each stage changes how your co-founder thinks, what it asks, and what it can do on-chain. This isn't a level bar — it's a different agent.
             </p>
           </motion.div>
 
@@ -619,10 +619,10 @@ export default function HomePage() {
               Features
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-zinc-100 mb-4">
-              Built Different
+              Not a prompt box
             </h2>
             <p className="text-zinc-500 max-w-md mx-auto text-sm leading-relaxed">
-              Not a chatbot. A trainable founder with memory, an Agent Passport, a Launch Certificate to publish, and a token reward layer for real trainers.
+              It interviews you, remembers you across sessions, and ships verifiable proof to Solana devnet. The whole loop — from conversation to Launch Certificate — is real.
             </p>
           </motion.div>
 
@@ -651,17 +651,16 @@ export default function HomePage() {
                 Utility layer in development
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-zinc-100 mb-4">
-                The token is becoming the coordination layer
+                The token grows with the product
               </h2>
               <p className="text-zinc-500 text-sm leading-relaxed mb-6">
-                SolBorn is being designed so the token is not just a logo on a chart. Agents create
-                on-chain proofs, trainers create measurable XP, and $SBORN is planned to become the
-                reward and access layer around that activity.
+                $SBORN isn't detached from what SolBorn does. Conversations create XP, XP creates
+                attribution, and $SBORN is planned as the reward and access layer around all of it.
+                The more the product gets used, the more the token has to anchor to.
               </p>
               <p className="text-xs text-zinc-600 leading-relaxed mb-6 border-l border-violet-300/25 pl-3">
-                SolBorn is evolving in public. $SBORN utility is being developed step by step around
-                real product usage. Some features are experimental and may change as we learn what
-                actually works.
+                Building in public. Utility is being rolled out step by step as the product matures.
+                Early holders are early in the right place.
               </p>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -725,11 +724,11 @@ export default function HomePage() {
           >
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-300/35 to-transparent" />
             <p className="text-xs font-mono uppercase tracking-[0.22em] text-violet-300/70 mb-5">
-              Start the loop
+              Your turn
             </p>
-            <h2 className="text-3xl font-bold text-zinc-100 mb-3">Ready to begin?</h2>
+            <h2 className="text-3xl font-bold text-zinc-100 mb-3">What's your idea?</h2>
             <p className="text-zinc-500 mb-8 text-sm leading-relaxed">
-              Connect your wallet. Name your founder. Start teaching. Mint a Passport and publish a Launch Certificate when it grows up.
+              Connect your wallet, name your co-founder, and answer its first question. It does the rest — idea, brief, Launch Certificate on devnet.
             </p>
             <GradientCTA onClick={() => setModalOpen(true)} large>
               Create Agent
