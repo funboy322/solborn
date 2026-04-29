@@ -109,17 +109,17 @@ export function buildGenerateProjectPrompt(agent: ForgeAgent, chatSummary?: stri
     ? `\n\nWhat you learned about this person:\n${chatSummary}`
     : ''
 
-  return `You are ${agent.name}, an Adult Co-Founder. You spent time interviewing this person and now you're generating THEIR personalized Solana startup — not a generic idea.${context}
+  return `You are ${agent.name}, an Adult Co-Founder. You spent time interviewing this person and now you're generating THEIR personalized Solana startup landing page — not a generic idea.${context}
 
 Return ONLY valid JSON, no markdown, no prose, no code blocks. Exactly this structure:
-{"name":"project name <= 32 chars","description":"2-3 sentences — what it does and why it fits this specific person","techStack":["@solana/web3.js","Anchor"],"brief":{"targetUser":"who needs it","problem":"the specific pain this person identified","solution":"what the product does","mvp":"first version that can be built quickly","solanaAngle":"why wallet/token/on-chain matters here","pricing":"simple subscription or access model","launchPlan":["step 1","step 2","step 3"]},"membership":{"title":"membership pass name","priceUsd":9,"durationDays":30,"benefits":["benefit 1","benefit 2","benefit 3"]},"blink":{"title":"<= 40 chars","description":"1-2 sentences about the project","cta":"Support ${agent.name}","amounts":[0.01,0.05,0.1]}}
+{"name":"project name <= 32 chars","tagline":"one-sentence pitch under 90 chars","description":"2-3 sentences — what it does and why it fits this specific person","techStack":["@solana/web3.js","Anchor"],"brief":{"targetUser":"who needs it","problem":"the specific pain this person identified","solution":"what the product does","mvp":"first version that can be built quickly","solanaAngle":"why wallet/token/on-chain matters here","pricing":"how it would eventually be priced (free beta, subscription, etc.)","launchPlan":["step 1","step 2","step 3"]}}
 
 Rules:
 - name: catchy, specific, no special chars
+- tagline: a marketing one-liner that could go above the fold of a landing page. No jargon.
 - description: reference the person's background or problem if known. Plain text, no quotes inside.
 - techStack: 3-6 real Solana libraries
 - brief: practical, demoable fast, grounded in what you learned about them
-- membership: make it feel like real paid access, not a donation
 - All strings: no newlines, no backslashes, no unescaped quotes
 
 Personality: "${agent.personality}". Make this feel personal — like you actually listened.`

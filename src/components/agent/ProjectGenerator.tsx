@@ -50,10 +50,6 @@ function buildBlinkUrl(agent: ForgeAgent, project: GeneratedProject, origin: str
   return `${origin}/api/blinks/${agent.id}?${params.toString()}`
 }
 
-function dialToUrl(blinkUrl: string): string {
-  return `https://dial.to/?action=solana-action:${encodeURIComponent(blinkUrl)}`
-}
-
 export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
   const setGeneratedProject = useForgeStore((s) => s.setGeneratedProject)
   const addChainCheckpoint = useForgeStore((s) => s.addChainCheckpoint)
@@ -382,7 +378,7 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
             </Button>
           )}
 
-          {phase === 'deployed' && project.blinkUrl && (
+          {phase === 'deployed' && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -398,34 +394,7 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
                 The certificate is backed by a signed memo transaction.
               </p>
 
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-wider text-zinc-500">
-                  Optional Blink URL
-                </label>
-                <div className="flex items-center gap-2 rounded-lg bg-black/40 border border-white/10 px-3 py-2">
-                  <code className="flex-1 text-[11px] font-mono text-zinc-300 truncate">
-                    {project.blinkUrl}
-                  </code>
-                  <button
-                    onClick={() => handleCopy(project.blinkUrl!, 'url')}
-                    className="text-zinc-500 hover:text-zinc-300 transition-colors"
-                  >
-                    {copied === 'url' ? <Check size={14} /> : <Copy size={14} />}
-                  </button>
-                </div>
-              </div>
-
               <div className="flex flex-col gap-2">
-                <a
-                  href={dialToUrl(project.blinkUrl)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-opacity hover:opacity-80"
-                  style={{ background: config.color, color: '#0a0a0a' }}
-                >
-                  <ExternalLink size={12} />
-                  Optional external preview
-                </a>
                 <button
                   onClick={handleCopySummary}
                   className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium bg-white/5 border border-white/10 text-zinc-300 hover:bg-white/10 transition-colors"

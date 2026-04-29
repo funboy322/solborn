@@ -7,8 +7,19 @@ interface Body {
   productName?: string
   agentName?: string
   contact?: string
+  useCase?: string
   note?: string
   wallet?: string | null
+}
+
+const lastHit = new Map<string, number>()
+
+function rateLimited(ip: string): boolean {
+  const now = Date.now()
+  const prev = lastHit.get(ip) ?? 0
+  if (now - prev < 60_000) return true
+  lastHit.set(ip, now)
+  return false
 }
 
 function trim(value: unknown, max: number): string {
@@ -20,7 +31,7 @@ async function sendToTelegram(payload: {
   productName: string
   agentName: string
   contact: string
-  note: string
+  useCase: string
   wallet: string
   ip: string
 }) {
@@ -39,7 +50,7 @@ async function sendToTelegram(payload: {
     `Contact: ${payload.contact}`,
     payload.wallet ? `Wallet: ${payload.wallet}` : '',
     '',
-    payload.note ? `Note: ${payload.note}` : 'Note: none',
+    `Use case: ${payload.useCase}`,
     '',
     `Product ID: ${payload.productId}`,
     `IP: ${payload.ip}`,
@@ -70,6 +81,10 @@ export async function POST(req: Request) {
     req.headers.get('x-real-ip') ||
     'unknown'
 
+  if (rateLimited(ip)) {
+    return NextResponse.json({ ok: false, error: 'Please wait a minute before sending another request.' }, { status: 429 })
+  }
+
   let body: Body
   try {
     body = (await req.json()) as Body
@@ -81,11 +96,19 @@ export async function POST(req: Request) {
   const productName = trim(body.productName, 80)
   const agentName = trim(body.agentName, 60)
   const contact = trim(body.contact, 120)
-  const note = trim(body.note, 500)
+  const useCase = trim(body.useCase ?? body.note, 700)
   const wallet = trim(body.wallet ?? '', 64)
 
   if (!productId || !productName || !agentName || !contact) {
     return NextResponse.json({ ok: false, error: 'Contact is required.' }, { status: 400 })
+  }
+
+  if (contact.length < 3) {
+    return NextResponse.json({ ok: false, error: 'Please add a valid contact.' }, { status: 400 })
+  }
+
+  if (useCase.length < 20) {
+    return NextResponse.json({ ok: false, error: 'Please tell us how you would use the product.' }, { status: 400 })
   }
 
   const record = {
@@ -95,7 +118,7 @@ export async function POST(req: Request) {
     productName,
     agentName,
     contact,
-    note,
+    useCase,
     wallet,
     ip: ip.slice(0, 64),
   }
@@ -105,6 +128,6 @@ export async function POST(req: Request) {
 
   return NextResponse.json({
     ok: true,
-    message: 'Access request received. The founder will review it manually.',
+    message: 'Beta request received. The founder will review it manually and reach out if there is a fit.',
   })
 }

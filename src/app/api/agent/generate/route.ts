@@ -143,6 +143,9 @@ export async function POST(req: NextRequest) {
   const project: GeneratedProject = {
     id: nanoid(),
     name: String(raw.name ?? `${agent.name}'s Project`).slice(0, 60),
+    tagline: typeof raw.tagline === 'string' && raw.tagline.trim()
+      ? raw.tagline.trim().replace(/\s+/g, ' ').slice(0, 120)
+      : undefined,
     description: String(raw.description ?? '').slice(0, 500),
     techStack: Array.isArray(raw.techStack)
       ? raw.techStack.map(String).slice(0, 10)

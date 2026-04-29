@@ -82,15 +82,19 @@ function ProductContent({
 }) {
   const { publicKey } = useWallet()
   const brief = project.brief
-  const membership = project.membership
   const [contact, setContact] = useState('')
-  const [note, setNote] = useState('')
+  const [useCase, setUseCase] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null)
+  const canSubmit = contact.trim().length >= 3 && useCase.trim().length >= 20
+
+  function scrollToRequestAccess() {
+    document.getElementById('request-access')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   async function submitInterest(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!contact.trim() || submitting) return
+    if (!canSubmit || submitting) return
     setSubmitting(true)
     setResult(null)
     try {
@@ -102,7 +106,7 @@ function ProductContent({
           productName: project.name,
           agentName,
           contact: contact.trim(),
-          note: note.trim(),
+          useCase: useCase.trim(),
           wallet: publicKey?.toBase58() ?? null,
         }),
       })
@@ -112,7 +116,7 @@ function ProductContent({
       }
       setResult({ ok: true, message: data.message ?? 'Request received.' })
       setContact('')
-      setNote('')
+      setUseCase('')
     } catch (error) {
       setResult({
         ok: false,
@@ -131,12 +135,36 @@ function ProductContent({
           <div className="inline-flex items-center px-3 py-1 rounded-full border border-emerald-300/25 bg-emerald-300/10 text-[11px] font-semibold text-emerald-200 mb-5">
             Agent-built product
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-100 mb-4">
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-100 mb-3">
             {project.name}
           </h2>
+          {project.tagline && (
+            <p className="text-lg sm:text-xl text-zinc-200 leading-snug max-w-3xl mb-4">
+              {project.tagline}
+            </p>
+          )}
           <p className="text-zinc-400 leading-relaxed max-w-3xl">
             {project.description}
           </p>
+          <div className="flex flex-wrap gap-2 mt-5">
+            <button
+              onClick={scrollToRequestAccess}
+              className="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-400 transition-colors"
+            >
+              Request beta access
+            </button>
+            {project.txHash && (
+              <a
+                href={`https://explorer.solana.com/tx/${project.txHash}?cluster=devnet`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-zinc-200 hover:bg-white/[0.06] transition-colors"
+              >
+                <ExternalLink size={14} />
+                View launch proof
+              </a>
+            )}
+          </div>
           <div className="flex flex-wrap gap-2 mt-6">
             {project.techStack.map((tech) => (
               <span
@@ -160,6 +188,10 @@ function ProductContent({
             <StatusLine label="Product page" value="Ready" />
             <StatusLine label="Network" value="Solana devnet" />
           </div>
+          <div className="grid grid-cols-2 gap-2 mt-5">
+            <MiniSignal label="Proof" value={project.txHash ? 'Live' : 'Pending'} />
+            <MiniSignal label="Access" value="Waitlist" />
+          </div>
           {project.txHash ? (
             <a
               href={`https://explorer.solana.com/tx/${project.txHash}?cluster=devnet`}
@@ -182,36 +214,33 @@ function ProductContent({
         <div className="glass p-6 border border-white/10">
           <div className="flex items-center gap-2 mb-5">
             <Lock size={17} className="text-violet-300" />
-            <h3 className="text-sm font-semibold text-zinc-100">Membership Pass</h3>
+            <h3 className="text-sm font-semibold text-zinc-100">Beta Access</h3>
           </div>
           <h4 className="text-2xl font-bold text-zinc-100">
-            {membership?.title ?? `${project.name} Access Pass`}
+            Get on the early access list
           </h4>
           <p className="text-sm text-zinc-500 mt-2">
-            ${membership?.priceUsd ?? 9} for {membership?.durationDays ?? 30} days of early access.
+            Free during the build phase. Tell us how you&apos;d use it — we hand-pick first users.
           </p>
-          <div className="space-y-2 mt-5">
-            {(membership?.benefits ?? ['Early product access', 'Founder updates', 'Priority feedback loop']).map((benefit, index) => (
-              <div
-                key={benefit}
-                className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-zinc-300"
-              >
-                <span className="text-[10px] font-bold text-violet-300 mt-0.5">{index + 1}</span>
-                <span>{benefit}</span>
-              </div>
-            ))}
-          </div>
-          <Button disabled className="w-full mt-5 bg-violet-400 text-zinc-950 opacity-70">
-            Pass checkout soon
-          </Button>
 
-          <form onSubmit={submitInterest} className="mt-5 space-y-3 border-t border-white/10 pt-5">
+          <div className="mt-5 space-y-2 rounded-xl border border-violet-300/15 bg-violet-400/[0.04] p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-violet-200">
+              What happens next
+            </p>
+            <div className="space-y-2 text-sm text-zinc-300">
+              <StepRow index="01" text="You send a serious beta request with your use case." />
+              <StepRow index="02" text="We review fit manually instead of blasting open access." />
+              <StepRow index="03" text="If it matches, the founder reaches out directly on your contact." />
+            </div>
+          </div>
+
+          <form id="request-access" onSubmit={submitInterest} className="mt-5 space-y-3 border-t border-white/10 pt-5">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                  Request access
+                  Request beta access
                 </p>
-                <p className="text-xs text-zinc-600 mt-1">Capture early users before checkout is live.</p>
+                <p className="text-xs text-zinc-600 mt-1">Tell us how you would use it. We want real early users, not vanity signups.</p>
               </div>
               <WalletButton />
             </div>
@@ -223,19 +252,20 @@ function ProductContent({
               maxLength={120}
             />
             <textarea
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
-              placeholder="What do you want access for?"
-              className="min-h-20 w-full resize-none rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:outline-none focus:border-violet-300/60"
-              maxLength={500}
+              value={useCase}
+              onChange={(event) => setUseCase(event.target.value)}
+              placeholder="What are you building, and how would you use this product? Be specific."
+              className="min-h-24 w-full resize-none rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-700 focus:outline-none focus:border-violet-300/60"
+              maxLength={700}
             />
+            <p className="text-[10px] text-zinc-600">{useCase.length}/700 · min 20 chars</p>
             <Button
               type="submit"
-              disabled={!contact.trim() || submitting}
+              disabled={!canSubmit || submitting}
               className="w-full bg-white text-zinc-950 hover:bg-zinc-200"
             >
               {submitting ? <Loader2 size={15} className="animate-spin" /> : result?.ok ? <Check size={15} /> : <Send size={15} />}
-              {submitting ? 'Sending...' : result?.ok ? 'Request sent' : 'Request early access'}
+              {submitting ? 'Sending...' : result?.ok ? 'Request sent' : 'Request beta access'}
             </Button>
             {result && (
               <p className={`text-xs leading-relaxed ${result.ok ? 'text-emerald-300' : 'text-rose-300'}`}>
@@ -276,6 +306,24 @@ function ProductContent({
           </div>
         </div>
       </section>
+    </div>
+  )
+}
+
+function MiniSignal({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+      <p className="text-[10px] uppercase tracking-wider text-zinc-600">{label}</p>
+      <p className="text-sm font-semibold text-zinc-100 mt-1">{value}</p>
+    </div>
+  )
+}
+
+function StepRow({ index, text }: { index: string; text: string }) {
+  return (
+    <div className="flex items-start gap-3 rounded-lg border border-white/10 bg-black/20 px-3 py-2">
+      <span className="mt-0.5 text-[10px] font-mono text-violet-300">{index}</span>
+      <span>{text}</span>
     </div>
   )
 }

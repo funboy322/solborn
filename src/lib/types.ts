@@ -56,6 +56,8 @@ export interface MembershipOffer {
 export interface GeneratedProject {
   id: string
   name: string
+  /** One-sentence marketing pitch for the landing page hero */
+  tagline?: string
   description: string
   techStack: string[]
   codeSnippet: string      // key code snippet
