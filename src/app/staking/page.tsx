@@ -30,8 +30,6 @@ export default function StakingPage() {
   const walletAddress = publicKey?.toBase58() ?? null
   const agents = useForgeStore((s) => s.agents)
   const stakePositions = useForgeStore((s) => s.stakePositions)
-  const createStakePosition = useForgeStore((s) => s.createStakePosition)
-  const closeStakePosition = useForgeStore((s) => s.closeStakePosition)
   const [amount, setAmount] = useState(String(STAKING_MIN_SBORN))
 
   const numericAmount = Number(amount.replace(/,/g, ''))
@@ -49,18 +47,7 @@ export default function StakingPage() {
   const activePositions = walletAddress
     ? stakePositions.filter((position) => position.walletAddress === walletAddress && position.status === 'active')
     : []
-  const canStake = connected && walletAddress && ownedPassport && numericAmount >= STAKING_MIN_SBORN
   const hasAccess = Boolean(ownedPassport && activeStake >= STAKING_MIN_SBORN)
-
-  function handleStake() {
-    if (!canStake || !walletAddress) return
-    createStakePosition({
-      walletAddress,
-      amount: numericAmount,
-      unlockAt: Date.now() + LOCK_DAYS * 24 * 60 * 60 * 1000,
-    })
-    setAmount(String(STAKING_MIN_SBORN))
-  }
 
   return (
     <main className="min-h-screen px-6 py-6">
@@ -84,20 +71,21 @@ export default function StakingPage() {
             className="glass p-7 border border-amber-300/15 relative overflow-hidden"
           >
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/50 to-transparent" />
-            <div className="inline-flex items-center px-3 py-1 rounded-full border border-amber-300/25 bg-amber-300/10 text-[11px] font-semibold text-amber-200 mb-5">
-              v1 simulation
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-zinc-500/30 bg-zinc-500/10 text-[11px] font-semibold uppercase tracking-wider text-zinc-300 mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+              Soon
             </div>
             <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-100 mb-4">
               Stake to unlock votes, boosts, and build access
             </h2>
             <p className="text-zinc-500 leading-relaxed max-w-2xl">
-              The first staking layer prepares the SolBorn voting economy. Passport holders stake at
-              least ${STAKING_MIN_USD} worth of $SBORN to join future product votes, leaderboard seasons,
-              and trainer reward rounds.
+              The staking layer prepares the SolBorn voting economy. Passport holders will stake at
+              least ${STAKING_MIN_USD} worth of $SBORN to join product votes, leaderboard seasons,
+              and contributor reward rounds.
             </p>
-            <p className="text-xs text-zinc-600 leading-relaxed mt-5 border-l border-amber-300/25 pl-3">
-              This screen does not move tokens yet. It records a local stake intent while the real
-              SPL lock program is being built and audited.
+            <p className="text-xs text-zinc-600 leading-relaxed mt-5 border-l border-zinc-500/30 pl-3">
+              Live with mainnet launch. The real SPL lock program is being built and audited — this
+              page is a preview of how access will work.
             </p>
           </motion.div>
 
@@ -167,21 +155,17 @@ export default function StakingPage() {
             </div>
 
             <Button
-              onClick={handleStake}
-              disabled={!canStake}
-              className="w-full mt-5 bg-amber-500 hover:bg-amber-400 text-zinc-950"
+              disabled
+              aria-disabled="true"
+              className="w-full mt-5 bg-zinc-700 text-zinc-400 cursor-not-allowed opacity-70"
             >
               <Lock size={15} />
-              Stake for {LOCK_DAYS} days
+              Stake — available with mainnet
             </Button>
 
-            {!connected && <p className="text-xs text-zinc-600 mt-3">Connect wallet to start.</p>}
-            {connected && !ownedPassport && (
-              <p className="text-xs text-zinc-600 mt-3">Mint an Agent Passport before staking access unlocks.</p>
-            )}
-            {connected && ownedPassport && numericAmount < STAKING_MIN_SBORN && (
-              <p className="text-xs text-zinc-600 mt-3">Increase the amount to reach the $10 stake target.</p>
-            )}
+            <p className="text-xs text-zinc-600 mt-3">
+              Real SPL token locks ship with mainnet launch. Numbers above are a preview of the parameters.
+            </p>
           </motion.div>
 
           <motion.div
@@ -233,11 +217,12 @@ export default function StakingPage() {
                       </p>
                     </div>
                     <button
-                      onClick={() => closeStakePosition(position.id)}
-                      className="text-xs text-zinc-500 hover:text-zinc-200 inline-flex items-center gap-1"
+                      disabled
+                      aria-disabled="true"
+                      className="text-xs text-zinc-700 inline-flex items-center gap-1 cursor-not-allowed"
                     >
                       <Unlock size={12} />
-                      unstake
+                      unstake — soon
                     </button>
                   </div>
                 ))
