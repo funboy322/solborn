@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react'
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { Zap, Brain, Rocket, Trophy, ArrowRight, ExternalLink, Coins } from 'lucide-react'
+import { Zap, Brain, Rocket, Trophy, ArrowRight, ExternalLink, Coins, BarChart3, Flame } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CreateAgentModal } from '@/components/forge/CreateAgentModal'
 import { WalletButton } from '@/components/wallet/WalletButton'
@@ -82,20 +82,44 @@ const FEATURES = [
     bg: 'rgba(232,121,249,0.075)',
     border: 'rgba(232,121,249,0.18)',
   },
+  {
+    icon: BarChart3,
+    title: 'XP-Graded Chat',
+    desc: 'Every message scores 0–25 XP on clarity, novelty, and depth. Spam earns nothing. The bar moves only when the conversation does.',
+    color: '#22d3ee',
+    bg: 'rgba(34,211,238,0.075)',
+    border: 'rgba(34,211,238,0.18)',
+  },
+  {
+    icon: Flame,
+    title: 'Energy & Streaks',
+    desc: 'Daily energy regenerates at 2/min. Streaks multiply XP. The loop is built to compound, not to grind.',
+    color: '#f97316',
+    bg: 'rgba(249,115,22,0.07)',
+    border: 'rgba(249,115,22,0.20)',
+  },
 ]
 
 const TOKEN_UTILITIES = [
   {
-    label: 'Conversation attribution',
-    desc: 'XP from every conversation is logged per wallet — the score layer for future $SBORN contributor rewards.',
+    badge: 'MINT',
+    label: 'Passport seed',
+    desc: '$SBORN will gate Agent Passport mints once the on-chain program is live. Today\'s passports are devnet Memo proofs.',
   },
   {
-    label: 'Economy utility layer',
-    desc: '$SBORN is planned for energy boosts, launch boosts, Passport upgrades, and gated agent features.',
+    badge: 'STAKE',
+    label: 'Back launches',
+    desc: 'Stake on Adult agents that ship strong product briefs. Stakers share access to early product drops.',
   },
   {
-    label: 'Identity-backed token',
-    desc: 'Agent Passports and Launch Certificates give $SBORN a native product layer — not just a ticker on a chart.',
+    badge: 'FUEL',
+    label: 'Energy & boosts',
+    desc: 'Buy energy refills, launch boosts, and cosmetic Passport upgrades. Heavy users pay $SBORN, not USD.',
+  },
+  {
+    badge: 'EARN',
+    label: 'Contributor rewards',
+    desc: 'Streaks, top XP, and Arena performance distribute weekly contributor pools — paid in $SBORN.',
   },
 ]
 
@@ -453,6 +477,165 @@ function ProductFlow() {
   )
 }
 
+// ─── Hero Agent Preview (marketing showcase, static) ───────────────────────
+
+function AgentPreviewCard() {
+  return (
+    <div
+      className="relative rounded-3xl p-3.5 backdrop-blur-xl"
+      style={{
+        background: 'linear-gradient(180deg, rgba(124,58,237,0.10), rgba(255,255,255,0.025))',
+        border: '1px solid rgba(167,139,250,0.20)',
+        boxShadow: '0 30px 80px rgba(8,4,15,0.6), inset 0 1px 0 rgba(255,255,255,0.04)',
+      }}
+    >
+      {/* Top hairline highlight */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-6 top-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(167,139,250,0.5), transparent)' }}
+      />
+
+      {/* Header: avatar + name + stage chip + streak */}
+      <div className="flex items-center gap-3.5 px-2 pt-2 pb-3.5">
+        <div
+          className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
+          style={{
+            background: 'radial-gradient(circle at 30% 30%, rgba(167,139,250,0.40), rgba(167,139,250,0.10))',
+            border: '1px solid rgba(167,139,250,0.40)',
+            boxShadow: '0 0 28px rgba(167,139,250,0.20)',
+          }}
+        >
+          🧒
+        </div>
+        <div className="flex flex-col gap-1 min-w-0">
+          <div className="text-[17px] font-bold text-zinc-100 tracking-tight">Athena</div>
+          <span
+            className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.10em] text-violet-300 px-2 py-0.5 rounded-full w-fit"
+            style={{
+              background: 'rgba(139,92,246,0.10)',
+              border: '1px solid rgba(139,92,246,0.25)',
+            }}
+          >
+            <span className="w-1 h-1 rounded-full bg-violet-300" />
+            Teen · Stage 03
+          </span>
+        </div>
+        <div className="ml-auto flex gap-2">
+          <span
+            className="font-mono text-[11px] px-2.5 py-1 rounded-full"
+            style={{
+              background: 'rgba(249,115,22,0.08)',
+              color: '#fb923c',
+              border: '1px solid rgba(249,115,22,0.30)',
+            }}
+          >
+            🔥 12d
+          </span>
+          <span
+            className="font-mono text-[11px] px-2.5 py-1 rounded-full"
+            style={{
+              background: 'rgba(245,158,11,0.08)',
+              color: '#fbbf24',
+              border: '1px solid rgba(245,158,11,0.30)',
+            }}
+          >
+            🏆 8
+          </span>
+        </div>
+      </div>
+
+      {/* XP row */}
+      <div className="flex items-center justify-between px-2 pb-2">
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-zinc-600">XP · Teen → Adult</span>
+        <span className="font-mono text-[11px] text-violet-300 tabular-nums">312 / 500</span>
+      </div>
+
+      {/* XP bar with shimmer */}
+      <div className="relative h-2 mx-2 mb-3.5 rounded-full overflow-hidden bg-white/5">
+        <div
+          className="absolute inset-y-0 left-0 rounded-full overflow-hidden"
+          style={{
+            width: '62%',
+            background: 'linear-gradient(90deg, #8b5cf6, #a78bfa 60%, #22d3ee)',
+            boxShadow: '0 0 12px rgba(167,139,250,0.5)',
+          }}
+        >
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+              animation: 'agentShimmer 2.4s linear infinite',
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Chat */}
+      <div
+        className="rounded-2xl p-3.5 flex flex-col gap-2"
+        style={{ background: 'rgba(0,0,0,0.30)', border: '1px solid rgba(255,255,255,0.07)' }}
+      >
+        <PreviewMessage who="agent">Tell me one frustrating thing about your day — the smaller, the better.</PreviewMessage>
+        <PreviewMessage who="user">Customer support tools all assume one inbox. I run six.</PreviewMessage>
+        <PreviewMessage who="agent">Six inboxes. Different tools per channel, or different brands?</PreviewMessage>
+      </div>
+
+      {/* Compose stub */}
+      <div
+        className="mt-2.5 px-3 py-2.5 rounded-2xl flex items-center gap-2.5"
+        style={{ background: 'rgba(0,0,0,0.30)', border: '1px solid rgba(255,255,255,0.07)' }}
+      >
+        <span className="flex-1 text-[13px] text-zinc-600">Reply to Athena…</span>
+        <div className="w-7 h-7 rounded-lg bg-violet-600 flex items-center justify-center text-white">
+          <ArrowRight size={13} />
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes agentShimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+function PreviewMessage({ who, children }: { who: 'agent' | 'user'; children: React.ReactNode }) {
+  const isAgent = who === 'agent'
+  return (
+    <div className={`flex gap-2.5 items-start ${isAgent ? '' : 'flex-row-reverse'}`}>
+      <div
+        className="w-7 h-7 rounded-lg flex items-center justify-center text-[13px] flex-shrink-0"
+        style={{
+          background: isAgent ? 'rgba(167,139,250,0.15)' : 'rgba(34,211,238,0.15)',
+          border: isAgent ? '1px solid rgba(167,139,250,0.30)' : '1px solid rgba(34,211,238,0.30)',
+          color: isAgent ? '#c4b5fd' : '#67e8f9',
+          fontFamily: isAgent ? 'inherit' : 'var(--font-geist-mono, JetBrains Mono, monospace)',
+          fontSize: isAgent ? '13px' : '10px',
+        }}
+      >
+        {isAgent ? '🧒' : 'JD'}
+      </div>
+      <div
+        className="px-3 py-2 text-[13px] leading-snug max-w-[78%]"
+        style={{
+          background: isAgent ? 'rgba(255,255,255,0.04)' : 'rgba(34,211,238,0.10)',
+          border: isAgent ? '1px solid rgba(167,139,250,0.18)' : '1px solid rgba(34,211,238,0.22)',
+          borderRadius: '12px',
+          borderTopLeftRadius: isAgent ? '4px' : undefined,
+          borderTopRightRadius: !isAgent ? '4px' : undefined,
+          color: '#f4f4f5',
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
+
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function HomePage() {
@@ -480,8 +663,8 @@ export default function HomePage() {
           />
         </div>
 
-        <div className="relative max-w-4xl mx-auto z-10 text-center">
-          <div>
+        <div className="relative max-w-6xl mx-auto z-10 w-full grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-14 items-center">
+          <div className="text-center lg:text-left">
             <motion.p
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -505,7 +688,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-lg text-zinc-400 max-w-xl mx-auto mb-9 leading-relaxed"
+              className="text-lg text-zinc-400 max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed"
             >
               Your AI co-founder asks you about your background, your skills, what you&apos;d build. Then it ships your idea — with proof on Solana devnet.
             </motion.p>
@@ -514,7 +697,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.45 }}
-              className="flex items-center justify-center gap-3 flex-wrap"
+              className="flex items-center justify-center lg:justify-start gap-3 flex-wrap"
             >
               <GradientCTA onClick={() => setModalOpen(true)} large>
                 Create Agent
@@ -544,7 +727,7 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7 }}
-              className="flex items-center justify-center gap-5 mt-10 text-xs text-zinc-600 flex-wrap"
+              className="flex items-center justify-center lg:justify-start gap-5 mt-10 text-xs text-zinc-600 flex-wrap"
             >
               <span>Real devnet transactions</span>
               <span className="text-zinc-800">/</span>
@@ -553,6 +736,15 @@ export default function HomePage() {
               <span>No teaching required</span>
             </motion.div>
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.35 }}
+            className="hidden md:block"
+          >
+            <AgentPreviewCard />
+          </motion.div>
 
         </div>
       </section>
@@ -578,7 +770,7 @@ export default function HomePage() {
               Four stages. Real progression.
             </h2>
             <p className="text-zinc-500 max-w-md mx-auto text-sm leading-relaxed">
-              Each stage changes how your co-founder thinks, what it asks, and what it can do on-chain. This isn't a level bar — it's a different agent.
+              Each stage changes how your co-founder thinks, what it asks, and what it can do on-chain. This isn&apos;t a level bar — it&apos;s a different agent.
             </p>
           </motion.div>
 
@@ -625,7 +817,7 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {FEATURES.map((feature, i) => (
               <FeatureCard key={feature.title} feature={feature} index={i} />
             ))}
@@ -653,7 +845,7 @@ export default function HomePage() {
                 The token grows with the product
               </h2>
               <p className="text-zinc-500 text-sm leading-relaxed mb-6">
-                $SBORN isn't detached from what SolBorn does. Conversations create XP, XP creates
+                $SBORN isn&apos;t detached from what SolBorn does. Conversations create XP, XP creates
                 attribution, and $SBORN is planned as the reward and access layer around all of it.
                 The more the product gets used, the more the token has to anchor to.
               </p>
@@ -688,13 +880,21 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
-                  className="glass p-5 border border-violet-300/12 bg-violet-400/[0.025]"
+                  className="glass p-4 border border-violet-300/12 bg-violet-400/[0.025]"
                 >
-                  <div className="flex items-start gap-3">
-                    <span className="mt-0.5 text-[10px] font-mono text-violet-300/70">
-                      0{i + 1}
+                  <div className="flex items-start gap-3.5">
+                    <span
+                      className="font-mono text-[11px] font-semibold px-2.5 py-1 rounded-md min-w-[58px] text-center flex-shrink-0"
+                      style={{
+                        background: 'rgba(167,139,250,0.12)',
+                        color: '#c4b5fd',
+                        border: '1px solid rgba(167,139,250,0.25)',
+                        letterSpacing: '0.06em',
+                      }}
+                    >
+                      {item.badge}
                     </span>
-                    <div>
+                    <div className="min-w-0">
                       <h3 className="text-sm font-semibold text-zinc-100 mb-1">{item.label}</h3>
                       <p className="text-sm text-zinc-500 leading-relaxed">{item.desc}</p>
                     </div>
@@ -725,7 +925,7 @@ export default function HomePage() {
             <p className="text-xs font-mono uppercase tracking-[0.22em] text-violet-300/70 mb-5">
               Your turn
             </p>
-            <h2 className="text-3xl font-bold text-zinc-100 mb-3">What's your idea?</h2>
+            <h2 className="text-3xl font-bold text-zinc-100 mb-3">What&apos;s your idea?</h2>
             <p className="text-zinc-500 mb-8 text-sm leading-relaxed">
               Connect your wallet, name your co-founder, and answer its first question. It does the rest — idea, brief, Launch Certificate on devnet.
             </p>
