@@ -6,6 +6,7 @@ import { Zap, Brain, Rocket, Trophy, ArrowRight, ExternalLink, Coins, BarChart3,
 import { Button } from '@/components/ui/button'
 import { CreateAgentModal } from '@/components/forge/CreateAgentModal'
 import { WalletButton } from '@/components/wallet/WalletButton'
+import { PrivyLoginButton } from '@/components/wallet/PrivyLoginButton'
 import { useForgeStore } from '@/lib/store'
 
 // ─── Data ───────────────────────────────────────────────────────────────────
@@ -412,6 +413,7 @@ function StickyNav({
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
             </svg>
           </a>
+          <PrivyLoginButton />
           <WalletButton />
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
             <Button

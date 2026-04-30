@@ -8,7 +8,7 @@ import { EnergyBar } from '@/components/agent/EnergyBar'
 import { SupportBanner } from '@/components/agent/SupportBanner'
 import { MessageFeedback } from '@/components/agent/MessageFeedback'
 import { useForgeStore } from '@/lib/store'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
 import { STAGE_CONFIG, ENERGY_PER_MESSAGE, MAX_ENERGY, ENERGY_REGEN_PER_MIN } from '@/lib/constants'
 import { nanoid } from '@/lib/utils'
 import { applyTraitBoosts } from '@/lib/ai/trait-analyzer'
@@ -127,7 +127,7 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
   const regenEnergy = useForgeStore((s) => s.regenEnergy)
   const registerTraining = useForgeStore((s) => s.registerTraining)
   const addMessage = useForgeStore((s) => s.addMessage)
-  const { publicKey } = useWallet()
+  const { publicKey } = useSolanaSigner()
   const trainerWallet = publicKey?.toBase58() ?? null
   const demo = useDemoMode()
   const stageConfig = STAGE_CONFIG[agent.stage]

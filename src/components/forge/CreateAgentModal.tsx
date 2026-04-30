@@ -7,7 +7,7 @@ import { WalletButton } from '@/components/wallet/WalletButton'
 import { useForgeStore } from '@/lib/store'
 import { PERSONALITIES } from '@/lib/constants'
 import { SFX } from '@/lib/sounds'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
 
 const EMOJIS = ['🤖', '🦊', '🐉', '🦅', '🔥', '⚡', '🌟', '🎯', '💎', '🚀', '🧬', '🌊']
 
@@ -30,7 +30,7 @@ interface CreateAgentModalProps {
 
 export function CreateAgentModal({ open, onClose, onCreated }: CreateAgentModalProps) {
   const createAgent = useForgeStore((s) => s.createAgent)
-  const { publicKey, connected } = useWallet()
+  const { publicKey, connected } = useSolanaSigner()
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
   const [emoji, setEmoji] = useState('🤖')

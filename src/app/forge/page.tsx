@@ -8,12 +8,12 @@ import { WalletButton } from '@/components/wallet/WalletButton'
 import { AgentCard } from '@/components/agent/AgentCard'
 import { CreateAgentModal } from '@/components/forge/CreateAgentModal'
 import { useForgeStore } from '@/lib/store'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
 
 export default function ForgePage() {
   const router = useRouter()
   const allAgents = useForgeStore((s) => s.agents)
-  const { publicKey, connected } = useWallet()
+  const { publicKey, connected } = useSolanaSigner()
   const [modalOpen, setModalOpen] = useState(false)
 
   // "My agents" = agents I created (or unowned if disconnected)

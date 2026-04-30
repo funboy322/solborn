@@ -16,7 +16,7 @@ import { STAGE_CONFIG, STAGE_ORDER, MAX_ENERGY, ENERGY_REFILL_AMOUNT } from '@/l
 import { mintAgentOnChain } from '@/lib/solana/on-chain'
 import { recordEvolution } from '@/lib/solana/payment'
 import { WalletButton } from '@/components/wallet/WalletButton'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
 import { SFX } from '@/lib/sounds'
 import type { AgentStage } from '@/lib/types'
 
@@ -33,8 +33,7 @@ export default function AgentPage({ params }: PageProps) {
   const refillEnergy = useForgeStore((s) => s.refillEnergy)
   const agent = agents.find((a) => a.id === id)
 
-  const wallet = useWallet()
-  const { publicKey, signTransaction, connected } = wallet
+  const { publicKey, signTransaction, connected } = useSolanaSigner()
 
   const [minting, setMinting] = useState(false)
   const [mintError, setMintError] = useState<string | null>(null)

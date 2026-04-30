@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft, Check, ExternalLink, Loader2, Lock, Rocket, Send, ShieldCheck } from 'lucide-react'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
 import { Button } from '@/components/ui/button'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { useForgeStore } from '@/lib/store'
@@ -80,7 +80,7 @@ function ProductContent({
   agentName: string
   agentStage: string
 }) {
-  const { publicKey } = useWallet()
+  const { publicKey } = useSolanaSigner()
   const brief = project.brief
   const [contact, setContact] = useState('')
   const [useCase, setUseCase] = useState('')

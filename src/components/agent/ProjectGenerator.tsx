@@ -16,7 +16,7 @@ import { useForgeStore } from '@/lib/store'
 import { publishLaunchCertificate } from '@/lib/solana/on-chain'
 import { STAGE_CONFIG } from '@/lib/constants'
 import { SFX } from '@/lib/sounds'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
 import type { ForgeAgent, GeneratedProject } from '@/lib/types'
 
 interface ProjectGeneratorProps {
@@ -66,7 +66,7 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
   const [codeOpen, setCodeOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const { publicKey, signTransaction, connected } = useWallet()
+  const { publicKey, signTransaction, connected } = useSolanaSigner()
   const config = STAGE_CONFIG[agent.stage]
 
   const origin = typeof window !== 'undefined' ? window.location.origin : ''

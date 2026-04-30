@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { WalletProviderClient } from '@/components/wallet/WalletProviderClient'
+import { PrivyClientProvider } from '@/components/wallet/PrivyClientProvider'
 import { GitHubStarChip } from '@/components/GitHubStarChip'
 
 export const metadata: Metadata = {
@@ -44,10 +45,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased min-h-screen" style={{ background: '#0a0a0f' }}>
-        <WalletProviderClient>
-          {children}
-          <GitHubStarChip />
-        </WalletProviderClient>
+        <PrivyClientProvider>
+          <WalletProviderClient>
+            {children}
+            <GitHubStarChip />
+          </WalletProviderClient>
+        </PrivyClientProvider>
       </body>
     </html>
   )

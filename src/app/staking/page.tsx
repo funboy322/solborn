@@ -4,7 +4,7 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Check, Coins, ExternalLink, Lock, ShieldCheck, Trophy, Unlock, Vote } from 'lucide-react'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
 import { Button } from '@/components/ui/button'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { useForgeStore } from '@/lib/store'
@@ -26,7 +26,7 @@ function shortWallet(wallet: string): string {
 
 export default function StakingPage() {
   const router = useRouter()
-  const { publicKey, connected } = useWallet()
+  const { publicKey, connected } = useSolanaSigner()
   const walletAddress = publicKey?.toBase58() ?? null
   const agents = useForgeStore((s) => s.agents)
   const stakePositions = useForgeStore((s) => s.stakePositions)

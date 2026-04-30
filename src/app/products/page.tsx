@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
 import { ArrowLeft, ExternalLink, FlaskConical, Lock, Medal, Rocket, ShieldCheck, Vote } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { WalletButton } from '@/components/wallet/WalletButton'
@@ -33,7 +33,7 @@ function rankLabel(index: number): string {
 
 export default function ProductsArenaPage() {
   const router = useRouter()
-  const { publicKey, connected } = useWallet()
+  const { publicKey, connected } = useSolanaSigner()
   const walletAddress = publicKey?.toBase58() ?? null
   const agents = useForgeStore((s) => s.agents)
   const stakePositions = useForgeStore((s) => s.stakePositions)
