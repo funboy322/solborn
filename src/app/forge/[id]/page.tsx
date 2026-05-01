@@ -39,7 +39,13 @@ export default function AgentPage({ params }: PageProps) {
 
   const [minting, setMinting] = useState(false)
   const [mintError, setMintError] = useState<string | null>(null)
-  const [mintResult, setMintResult] = useState<{ mintAddress: string; txSignature: string; explorerUrl?: string } | null>(
+  const [mintResult, setMintResult] = useState<{
+    mintAddress: string
+    txSignature: string
+    explorerUrl?: string
+    magicEdenUrl?: string
+    isCoreAsset?: boolean
+  } | null>(
     agent?.mintAddress ? { mintAddress: agent.mintAddress, txSignature: '' } : null
   )
 
@@ -115,11 +121,15 @@ export default function AgentPage({ params }: PageProps) {
       let mintAddress: string
       let txSignature: string
       let explorerUrl: string
+      let magicEdenUrl: string | undefined
+      let isCoreAsset = false
       try {
         const core = await mintCorePassport(agent, signer)
         mintAddress = core.assetAddress
         txSignature = core.txSignature
         explorerUrl = core.explorerUrl
+        magicEdenUrl = core.magicEdenUrl
+        isCoreAsset = true
       } catch (coreErr) {
         console.warn('[mint] Core failed, falling back to Memo:', coreErr)
         const memo = await mintAgentOnChain(agent, publicKey, signTransaction)
@@ -134,7 +144,7 @@ export default function AgentPage({ params }: PageProps) {
         txSignature,
         timestamp: Date.now(),
       })
-      setMintResult({ mintAddress, txSignature, explorerUrl })
+      setMintResult({ mintAddress, txSignature, explorerUrl, magicEdenUrl, isCoreAsset })
       SFX.mint()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Transaction failed'
@@ -290,18 +300,36 @@ export default function AgentPage({ params }: PageProps) {
               ) : mintResult ? (
                 <div className="space-y-2">
                   <div className="text-xs text-emerald-400">
-                    Agent Passport minted
+                    {mintResult.isCoreAsset ? 'NFT Passport minted' : 'Agent Passport minted'}
                   </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/api/nft-metadata/og?id=${agent.id}&n=${encodeURIComponent(agent.name)}&s=${agent.stage}&p=${encodeURIComponent(agent.personality)}&xp=${agent.xp}`}
+                    alt={`${agent.name} Passport NFT`}
+                    className="w-full rounded-lg border border-white/10"
+                    style={{ aspectRatio: '1 / 1' }}
+                  />
                   <p className="text-xs text-zinc-600 font-mono break-all">{mintResult.mintAddress.slice(0, 24)}...</p>
-                  {mintResult.txSignature && (
-                    <a
-                      href={mintResult.explorerUrl ?? `https://explorer.solana.com/tx/${mintResult.txSignature}?cluster=devnet`}
-                      target="_blank" rel="noopener noreferrer"
-                      className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1"
-                    >
-                      <ExternalLink size={11} /> View on Explorer
-                    </a>
-                  )}
+                  <div className="flex flex-col gap-1">
+                    {mintResult.txSignature && (
+                      <a
+                        href={mintResult.explorerUrl ?? `https://explorer.solana.com/tx/${mintResult.txSignature}?cluster=devnet`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1"
+                      >
+                        <ExternalLink size={11} /> View tx on Explorer
+                      </a>
+                    )}
+                    {mintResult.magicEdenUrl && (
+                      <a
+                        href={mintResult.magicEdenUrl}
+                        target="_blank" rel="noopener noreferrer"
+                        className="text-xs text-amber-300 hover:text-amber-200 flex items-center gap-1"
+                      >
+                        <ExternalLink size={11} /> View NFT on Magic Eden
+                      </a>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-2">
