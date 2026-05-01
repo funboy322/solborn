@@ -24,9 +24,9 @@ function PrivyLoginButtonInner() {
     return (
       <button
         disabled
-        className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium border border-white/10 text-zinc-500"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 text-zinc-500 whitespace-nowrap"
       >
-        <Mail size={14} />
+        <Mail size={12} />
         Loading…
       </button>
     )
@@ -37,7 +37,7 @@ function PrivyLoginButtonInner() {
     return (
       <button
         onClick={() => logout()}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border border-white/10 text-zinc-400 hover:text-rose-300 hover:border-rose-300/30 transition-colors"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 text-zinc-400 hover:text-rose-300 hover:border-rose-300/30 transition-colors whitespace-nowrap"
         title="Sign out"
       >
         <Mail size={12} />
@@ -51,15 +51,15 @@ function PrivyLoginButtonInner() {
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.97 }}
       onClick={() => login()}
-      className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium border"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border whitespace-nowrap"
       style={{
         background: 'rgba(34,211,238,0.06)',
         borderColor: 'rgba(34,211,238,0.22)',
         color: '#67e8f9',
       }}
     >
-      <Mail size={14} />
-      Sign in with email
+      <Mail size={12} />
+      Sign in
     </motion.button>
   )
 }

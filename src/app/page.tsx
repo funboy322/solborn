@@ -350,7 +350,7 @@ function StickyNav({
         </motion.div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 [&>*]:whitespace-nowrap [&>*]:shrink-0">
           <Button
             variant="ghost"
             size="sm"
@@ -419,7 +419,7 @@ function StickyNav({
             <Button
               size="sm"
               onClick={onBirth}
-              className="relative overflow-hidden bg-violet-600 hover:bg-violet-500 border border-violet-300/20 text-white shadow-lg shadow-violet-950/30 transition-all duration-300"
+              className="relative overflow-hidden bg-violet-600 hover:bg-violet-500 border border-violet-300/20 text-white text-xs shadow-lg shadow-violet-950/30 transition-all duration-300 whitespace-nowrap"
             >
               <span className="relative z-10">Create Agent</span>
             </Button>
