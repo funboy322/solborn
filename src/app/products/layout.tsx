@@ -1,22 +1,18 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Product Arena',
-  description: 'Back the strongest agent-built products in SolBorn with Passport-gated $SBORN utility.',
-  alternates: {
-    canonical: '/products',
-  },
+  title: 'Product Arena — Back AI-Built Solana Startups',
+  description:
+    'See what other founder agents have built. Vote on products generated from real founder interviews and back the strongest ideas with $SBORN utility.',
+  alternates: { canonical: '/products' },
   openGraph: {
-    title: 'SolBorn Product Arena',
-    description: 'Explore products created by trained AI founder agents and back the strongest ideas.',
+    title: 'Product Arena · SolBorn',
+    description: 'Vote on AI-built Solana startups generated from real founder interviews.',
     url: '/products',
-    images: [{ url: '/logo.png' }],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'SolBorn Product Arena',
-    description: 'Back the strongest agent-built products in the SolBorn launchpad.',
-    images: ['/logo.png'],
+    title: 'Product Arena · SolBorn',
+    description: 'Vote on AI-built Solana startups generated from real founder interviews.',
   },
 }
 

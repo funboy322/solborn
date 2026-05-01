@@ -191,7 +191,7 @@ export default function StakingPage() {
             </div>
 
             <div className="grid sm:grid-cols-3 gap-3 mb-5">
-              <UnlockCard icon={<Vote size={16} />} title="Vote" body="Back the best trained agents and product ideas." />
+              <UnlockCard icon={<Vote size={16} />} title="Vote" body="Back the best founder agents and their startup ideas." />
               <UnlockCard icon={<Trophy size={16} />} title="Leaderboard" body="Qualify for build seasons and rankings." />
               <UnlockCard icon={<ShieldCheck size={16} />} title="Access" body="Open future boosts, roles, and reward rounds." />
             </div>

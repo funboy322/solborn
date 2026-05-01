@@ -1,22 +1,18 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Hackathon Demo Path',
-  description: 'A judge-friendly 3-minute route through SolBorn: Forge, Passport, Product Page, Launch Certificate, and Product Arena.',
-  alternates: {
-    canonical: '/demo',
-  },
+  title: 'Demo Path — A 3-Minute Walkthrough',
+  description:
+    'See SolBorn end-to-end in three minutes: an AI agent interviews you, mints a Passport NFT, generates a product page, and publishes a Launch Certificate on Solana devnet.',
+  alternates: { canonical: '/demo' },
   openGraph: {
-    title: 'SolBorn Hackathon Demo Path',
-    description: 'Follow the full SolBorn loop in about 3 minutes, from AI founder training to Product Arena.',
+    title: 'Demo Path · SolBorn',
+    description: '3-minute walkthrough of the SolBorn co-founder loop on Solana devnet.',
     url: '/demo',
-    images: [{ url: '/logo.png' }],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'SolBorn Hackathon Demo Path',
-    description: 'A judge-friendly 3-minute route through the SolBorn AI founder launchpad.',
-    images: ['/logo.png'],
+    title: 'Demo Path · SolBorn',
+    description: '3-minute walkthrough of the SolBorn co-founder loop on Solana devnet.',
   },
 }
 

@@ -438,7 +438,7 @@ export const useForgeStore = create<ForgeStore>()(
             brief: {
               targetUser: 'Solana founders preparing a launch who need clearer feedback before spending money on marketing.',
               problem: 'Early teams often confuse noise for traction and do not know which product ideas are worth pushing.',
-              solution: 'SignalForge turns trained agent context into a public product page, access funnel, and community backing score.',
+              solution: 'SignalForge turns a founder interview into a public product page, access funnel, and community backing score.',
               mvp: 'A product page with early access requests, launch proof, and Arena backing from staked Passport holders.',
               solanaAngle: 'Wallet identity, signed launch certificates, and stake-gated backing create a verifiable product signal.',
               pricing: '$9 monthly early-access pass for founders who want product signal and launch feedback.',

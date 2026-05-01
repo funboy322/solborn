@@ -105,11 +105,12 @@ export default function DemoPage() {
               Judge mode
             </div>
             <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-100 mb-4">
-              Raise an AI founder and launch its product
+              Tell the agent who you are. Ship a Solana startup.
             </h2>
             <p className="text-zinc-500 leading-relaxed max-w-3xl">
-              This path shows the full SolBorn loop: train an agent, mint its identity, generate a
-              product page, publish on-chain proof, and back products through $SBORN utility.
+              This path shows the full SolBorn loop: an AI co-founder interviews you, mints a
+              Passport NFT, generates a product page, and publishes a Launch Certificate on Solana
+              devnet — all backed by $SBORN utility.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 mt-6">
               <Button onClick={() => router.push('/forge?demo=1')} className="bg-violet-400 text-zinc-950 hover:bg-violet-300">

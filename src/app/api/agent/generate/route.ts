@@ -49,12 +49,12 @@ function safeBrief(raw: unknown, projectName: string): ProductBrief {
   return {
     targetUser: cleanText(r.targetUser, 'Solana builders who need a faster way to turn rough ideas into launchable product pages.'),
     problem: cleanText(r.problem, 'Most early projects cannot explain who they serve, what they build first, or why the wallet layer matters.'),
-    solution: cleanText(r.solution, `${projectName} turns an agent-trained idea into a focused product brief and launch page.`),
+    solution: cleanText(r.solution, `${projectName} turns the founder's interview answers into a focused product brief and launch page.`),
     mvp: cleanText(r.mvp, 'A public product page, access pass, and launch proof that can be shown to early users.'),
     solanaAngle: cleanText(r.solanaAngle, 'Wallet identity, token access, and signed launch proofs make each project verifiable from day one.'),
     pricing: cleanText(r.pricing, 'A simple monthly access pass for early supporters and beta users.'),
     launchPlan: cleanList(r.launchPlan, [
-      'Create the product page from the trained agent context',
+      'Create the product page from the founder interview',
       'Publish a signed launch certificate',
       'Invite early users to request access',
     ]),
