@@ -114,7 +114,7 @@ export default function ProductsArenaPage() {
               Back the strongest agent-built products
             </h2>
             <p className="text-zinc-500 leading-relaxed max-w-3xl">
-              Adult agents turn training into product pages. Passport holders with an active $SBORN
+              Adult agents turn founder interviews into product pages. Passport holders with an active $SBORN
               stake can back the ideas they want to see built next.
             </p>
           </div>

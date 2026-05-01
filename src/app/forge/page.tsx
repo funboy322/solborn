@@ -37,17 +37,17 @@ export default function ForgePage() {
     <main className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8 pt-4">
-          <Button variant="ghost" size="sm" onClick={() => router.push('/')}>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-8 pt-4">
+          <Button variant="ghost" size="sm" onClick={() => router.push('/')} className="hidden sm:inline-flex">
             <ArrowLeft size={16} />
           </Button>
-          <img src="/logo.png" alt="SolBorn" className="w-8 h-8 rounded-xl cursor-pointer" onClick={() => router.push('/')} />
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-zinc-100">The Forge</h1>
-            <p className="text-sm text-zinc-500">
+          <img src="/logo.png" alt="SolBorn" className="w-8 h-8 rounded-xl cursor-pointer shrink-0" onClick={() => router.push('/')} />
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 leading-tight">The Forge</h1>
+            <p className="text-xs sm:text-sm text-zinc-500">
               {agents.length} agent{agents.length !== 1 ? 's' : ''}
               {connected && walletAddr && (
-                <span className="ml-2 text-emerald-400 text-xs">
+                <span className="ml-2 text-emerald-400 text-[10px] sm:text-xs">
                   · {walletAddr.slice(0, 6)}...{walletAddr.slice(-4)}
                 </span>
               )}
@@ -62,9 +62,10 @@ export default function ForgePage() {
             <Lock size={14} />
             Stake
           </Button>
-          <Button size="sm" onClick={() => setModalOpen(true)}>
+          <Button size="sm" onClick={() => setModalOpen(true)} className="whitespace-nowrap">
             <Plus size={16} />
-            New Agent
+            <span className="hidden sm:inline">New Agent</span>
+            <span className="sm:hidden">New</span>
           </Button>
         </div>
 
@@ -73,15 +74,17 @@ export default function ForgePage() {
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 rounded-2xl flex items-center gap-4"
+            className="mb-6 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4"
             style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}
           >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(139,92,246,0.15)' }}>
-              <Wallet size={18} className="text-violet-400" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-zinc-200">Connect wallet to see your agents</p>
-              <p className="text-xs text-zinc-500 mt-0.5">Agents are bound to your wallet. Connect to access them.</p>
+            <div className="flex items-center gap-3 sm:contents">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(139,92,246,0.15)' }}>
+                <Wallet size={18} className="text-violet-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-zinc-200">Connect wallet to see your agents</p>
+                <p className="text-xs text-zinc-500 mt-0.5">Agents are bound to your wallet. Connect to access them.</p>
+              </div>
             </div>
             <WalletButton />
           </motion.div>

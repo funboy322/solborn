@@ -81,7 +81,7 @@ export function WalletButton() {
         whileTap={{ scale: 0.97 }}
         onClick={() => void handleConnect()}
         disabled={connecting}
-        className="relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white overflow-hidden border border-violet-300/20"
+        className="relative inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold text-white overflow-hidden border border-violet-300/20 whitespace-nowrap"
         style={{
           background: 'linear-gradient(135deg, #8b5cf6, #6d28d9 55%, #3b0764)',
           boxShadow: '0 16px 38px rgba(88,28,135,0.35), inset 0 1px 0 rgba(255,255,255,0.16)',
@@ -94,8 +94,12 @@ export function WalletButton() {
           animate={{ x: ['-100%', '200%'] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: 'linear' }}
         />
-        <Wallet size={15} />
-        {connecting ? 'Connecting...' : 'Connect Wallet'}
+        <Wallet size={14} />
+        {connecting ? (
+          <>Connecting<span className="hidden sm:inline">...</span></>
+        ) : (
+          <>Connect<span className="hidden sm:inline"> Wallet</span></>
+        )}
       </motion.button>
     )
   }

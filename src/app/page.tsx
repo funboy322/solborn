@@ -343,8 +343,8 @@ function StickyNav({
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <span className="font-bold text-zinc-100 tracking-normal">SolBorn</span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/25 font-mono">
+          <span className="hidden sm:inline font-bold text-zinc-100 tracking-normal">SolBorn</span>
+          <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/25 font-mono">
             Beta
           </span>
         </motion.div>
@@ -379,7 +379,7 @@ function StickyNav({
             variant="ghost"
             size="sm"
             onClick={() => router.push('/rewards')}
-            className="text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
+            className="hidden sm:flex text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
           >
             Rewards
           </Button>
@@ -388,7 +388,7 @@ function StickyNav({
               variant="ghost"
               size="sm"
               onClick={() => router.push('/forge')}
-              className="text-zinc-400 hover:text-zinc-100"
+              className="hidden sm:flex text-zinc-400 hover:text-zinc-100"
             >
               My Agents ({(agents as unknown[]).length})
             </Button>
@@ -413,7 +413,9 @@ function StickyNav({
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
             </svg>
           </a>
-          <PrivyLoginButton />
+          <div className="hidden sm:contents">
+            <PrivyLoginButton />
+          </div>
           <WalletButton />
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
             <Button
