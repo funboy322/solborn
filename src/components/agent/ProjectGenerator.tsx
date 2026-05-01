@@ -404,9 +404,17 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
               </div>
 
               <p className="text-xs text-zinc-400 leading-relaxed">
-                {agent.name} published a project proof to Solana devnet.
-                The certificate is backed by a signed memo transaction.
+                {agent.name} published an on-chain Launch Certificate for{' '}
+                <span className="text-zinc-200 font-semibold">{project.name}</span> on Solana devnet.
               </p>
+
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`/api/nft-metadata/og?id=${agent.id}&n=${encodeURIComponent(agent.name)}&s=${agent.stage}&p=${encodeURIComponent(agent.personality)}&xp=${agent.xp}&kind=launch&proj=${encodeURIComponent(project.name)}&pid=${project.id}`}
+                alt={`${project.name} Launch Certificate NFT`}
+                className="w-full rounded-lg border border-white/10"
+                style={{ aspectRatio: '1 / 1' }}
+              />
 
               <div className="flex flex-col gap-2">
                 <button
