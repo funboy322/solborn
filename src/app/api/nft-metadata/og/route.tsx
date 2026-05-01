@@ -57,9 +57,17 @@ export async function GET(req: NextRequest) {
   const stage: StageKey = (stageRaw in STAGE_META ? stageRaw : 'baby') as StageKey
   const personality = (q.get('p') ?? 'curious').slice(0, 32)
   const xp = num(q.get('xp'))
+  const kind = q.get('kind') === 'launch' ? 'launch' : 'passport'
+  const projectName = (q.get('proj') ?? '').slice(0, 28)
 
-  const meta = STAGE_META[stage]
+  // For launch certificates, use Adult color theme + 🚀 emoji and overlay
+  // the project name as the primary subject. Passport uses agent stage.
+  const meta = kind === 'launch' ? STAGE_META.adult : STAGE_META[stage]
   const shortId = id.slice(0, 4).toUpperCase()
+  const headline = kind === 'launch' && projectName ? projectName : name
+  const sublabel = kind === 'launch' ? `Launch Certificate · ${name}` : meta.label
+  const emoji = kind === 'launch' ? '🚀' : meta.emoji
+  const brandLabel = kind === 'launch' ? 'SOLBORN · LAUNCH CERT' : 'SOLBORN'
 
   return new ImageResponse(
     (
@@ -92,7 +100,7 @@ export async function GET(req: NextRequest) {
             letterSpacing: 4,
           }}
         >
-          SOLBORN
+          {brandLabel}
         </div>
 
         {/* Top-right id chip */}
@@ -131,35 +139,38 @@ export async function GET(req: NextRequest) {
             fontSize: 220,
           }}
         >
-          {meta.emoji}
+          {emoji}
         </div>
 
-        {/* Name */}
+        {/* Headline (project name for launch, agent name for passport) */}
         <div
           style={{
-            fontSize: 80,
+            fontSize: 72,
             fontWeight: 800,
             letterSpacing: -2,
             display: 'flex',
             marginBottom: 12,
             textShadow: `0 4px 20px ${meta.color}60`,
+            textAlign: 'center',
+            maxWidth: 800,
           }}
         >
-          {name}
+          {headline}
         </div>
 
-        {/* Stage */}
+        {/* Sublabel */}
         <div
           style={{
-            fontSize: 32,
+            fontSize: 30,
             fontWeight: 600,
             color: meta.color,
             display: 'flex',
             marginBottom: 8,
             letterSpacing: 1,
+            textAlign: 'center',
           }}
         >
-          {meta.label}
+          {sublabel}
         </div>
 
         {/* Personality */}

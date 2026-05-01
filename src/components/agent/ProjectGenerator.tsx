@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { useForgeStore } from '@/lib/store'
 import { publishLaunchCertificate } from '@/lib/solana/on-chain'
+import { mintCoreLaunchCertificate } from '@/lib/solana/core-mint'
 import { STAGE_CONFIG } from '@/lib/constants'
 import { SFX } from '@/lib/sounds'
 import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
@@ -66,7 +67,8 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
   const [codeOpen, setCodeOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const { publicKey, signTransaction, connected } = useSolanaSigner()
+  const signer = useSolanaSigner()
+  const { publicKey, signTransaction, connected } = signer
   const config = STAGE_CONFIG[agent.stage]
 
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
@@ -113,13 +115,25 @@ export function ProjectGenerator({ agent }: ProjectGeneratorProps) {
     let txSignature = ''
     if (connected && publicKey && signTransaction) {
       try {
-        const r = await publishLaunchCertificate(agent, publicKey, signTransaction, {
-          projectId: project.id,
-          projectName: project.name,
-          projectDescription: project.description,
-          techStack: project.techStack,
-        })
-        txSignature = r.txSignature
+        // Try Metaplex Core first — produces a real Launch Certificate NFT
+        // visible in Phantom and Magic Eden. Fall back to Memo if Core fails
+        // so the launch ceremony always lands something on-chain.
+        try {
+          const core = await mintCoreLaunchCertificate(agent, signer, {
+            projectId: project.id,
+            projectName: project.name,
+          })
+          txSignature = core.txSignature
+        } catch (coreErr) {
+          console.warn('[launch] Core failed, falling back to Memo:', coreErr)
+          const r = await publishLaunchCertificate(agent, publicKey, signTransaction, {
+            projectId: project.id,
+            projectName: project.name,
+            projectDescription: project.description,
+            techStack: project.techStack,
+          })
+          txSignature = r.txSignature
+        }
         addChainCheckpoint(agent.id, {
           kind: 'mint',
           stage: agent.stage,

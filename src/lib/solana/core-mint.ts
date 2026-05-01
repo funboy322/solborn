@@ -150,3 +150,74 @@ export async function mintCorePassport(
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
+
+/**
+ * Builds the metadata URI for a Launch Certificate asset.
+ * Same OG endpoint as Passport but with kind=launch + the project name so the
+ * artwork can render differently and wallets show distinct titles.
+ */
+function buildLaunchMetadataUri(agent: ForgeAgent, projectId: string, projectName: string): string {
+  const origin =
+    typeof window !== 'undefined'
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_SITE_URL || 'https://solborn.xyz'
+  const params = new URLSearchParams({
+    kind: 'launch',
+    id: agent.id,
+    n: agent.name,
+    s: agent.stage,
+    p: agent.personality,
+    xp: String(agent.xp),
+    proj: projectName,
+    pid: projectId,
+  })
+  return `${origin}/api/nft-metadata?${params.toString()}`
+}
+
+export interface LaunchCertCoreInput {
+  projectId: string
+  projectName: string
+}
+
+/**
+ * Mints a Core NFT Launch Certificate when an Adult agent ships a project.
+ * Lives in the user's wallet alongside their Passport — the on-chain proof
+ * that "this founder shipped that product".
+ */
+export async function mintCoreLaunchCertificate(
+  agent: ForgeAgent,
+  signer: SolanaSigner,
+  project: LaunchCertCoreInput,
+): Promise<CoreMintResult> {
+  if (!signer.publicKey || !signer.signTransaction) {
+    throw new Error('Wallet not connected. Sign in or connect Phantom first.')
+  }
+
+  const umi = buildUmi(signer.publicKey, signer.signTransaction)
+  const asset = generateSigner(umi)
+
+  const name = `🚀 ${project.projectName}`.slice(0, 32)
+  const uri = buildLaunchMetadataUri(agent, project.projectId, project.projectName)
+
+  const builder = create(umi, {
+    asset,
+    name,
+    uri,
+    owner: umi.identity.publicKey,
+  })
+
+  const { signature } = await builder.sendAndConfirm(umi, {
+    confirm: { commitment: 'confirmed' },
+  })
+
+  const txSignature = base58.deserialize(signature)[0]
+  const assetAddress = asset.publicKey
+
+  return {
+    assetAddress,
+    txSignature,
+    explorerUrl: `https://explorer.solana.com/tx/${txSignature}?cluster=devnet`,
+    magicEdenUrl: `https://magiceden.io/item-details/${assetAddress}?network=devnet`,
+    network: 'devnet',
+  }
+}

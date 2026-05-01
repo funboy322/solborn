@@ -36,32 +36,49 @@ export async function GET(req: NextRequest) {
 
   const cfg = STAGE_CONFIG[stage]
   const origin = req.nextUrl.origin
+  const kind = q.get('kind') === 'launch' ? 'launch' : 'passport'
+  const projectName = (q.get('proj') ?? '').slice(0, 60)
   // Dynamic stage-specific artwork generated on-demand. Each agent gets a
   // unique poster with their emoji, name, and XP — distinct in Phantom / ME.
   const image = `${origin}/api/nft-metadata/og?${q.toString()}`
 
-  const body = {
-    name: `${name} #${id.slice(0, 4).toUpperCase()}`,
-    symbol: 'SOLBORN',
-    description: `${cfg.label} raised on SolBorn — ${cfg.description}`,
-    image,
-    external_url: `${origin}/forge/${id}`,
-    attributes: [
-      { trait_type: 'Stage', value: cfg.label },
-      { trait_type: 'Personality', value: personality },
-      { trait_type: 'XP', value: xp },
-      { trait_type: 'Interactions', value: interactions },
-      { trait_type: 'Curiosity', value: curiosity },
-      { trait_type: 'Solana Knowledge', value: solanaKnowledge },
-      { trait_type: 'Coding Skill', value: codingSkill },
-      { trait_type: 'Creativity', value: creativity },
-      { trait_type: 'Founder Mindset', value: founderMindset },
-    ],
-    properties: {
-      category: 'image',
-      files: [{ uri: image, type: 'image/png' }],
-    },
-  }
+  // Launch certificates: NFT title is the project, attributes describe the launch.
+  // Passport: NFT title is the agent, attributes describe their stage + traits.
+  const body = kind === 'launch'
+    ? {
+        name: `${projectName || 'Project Launch'}`.slice(0, 32),
+        symbol: 'SOLBORN-LAUNCH',
+        description: `Launch Certificate — ${name} shipped ${projectName || 'a project'} on Solana devnet via SolBorn.`,
+        image,
+        external_url: `${origin}/forge/${id}`,
+        attributes: [
+          { trait_type: 'Type', value: 'Launch Certificate' },
+          { trait_type: 'Founder', value: name },
+          { trait_type: 'Project', value: projectName || 'Untitled' },
+          { trait_type: 'Stage', value: cfg.label },
+          { trait_type: 'XP at launch', value: xp },
+        ],
+        properties: { category: 'image', files: [{ uri: image, type: 'image/png' }] },
+      }
+    : {
+        name: `${name} #${id.slice(0, 4).toUpperCase()}`,
+        symbol: 'SOLBORN',
+        description: `${cfg.label} raised on SolBorn — ${cfg.description}`,
+        image,
+        external_url: `${origin}/forge/${id}`,
+        attributes: [
+          { trait_type: 'Stage', value: cfg.label },
+          { trait_type: 'Personality', value: personality },
+          { trait_type: 'XP', value: xp },
+          { trait_type: 'Interactions', value: interactions },
+          { trait_type: 'Curiosity', value: curiosity },
+          { trait_type: 'Solana Knowledge', value: solanaKnowledge },
+          { trait_type: 'Coding Skill', value: codingSkill },
+          { trait_type: 'Creativity', value: creativity },
+          { trait_type: 'Founder Mindset', value: founderMindset },
+        ],
+        properties: { category: 'image', files: [{ uri: image, type: 'image/png' }] },
+      }
 
   return new Response(JSON.stringify(body), {
     status: 200,
