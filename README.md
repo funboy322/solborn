@@ -98,8 +98,9 @@ Ships.<br />Full product brief + Launch Certificate on Solana devnet.
 | 🧠 **Semantic memory** | Upstash Vector (BGE-M3 multilingual, EU1) | Facts extracted async via `after()`, agent recalls them weeks later |
 | ⚡ **Streaming chat** | AI SDK v6 + Groq (`llama-3.3-70b`) | Edge streaming with fallback to `llama-3.1-8b-instant` |
 | 🎓 **XP engine** | Custom grader + trait analyzer | Word count × quality × novelty — spam = 0 XP |
-| 🪪 **Agent Passports** | Solana Memo Program + wallet signatures | Real devnet tx that proves the agent identity in Explorer |
-| 🚀 **Launch Certificates** | Signed Memo tx + generated project spec | Adult agents publish a verifiable launch proof on Solana devnet |
+| 🪪 **NFT Passports** | Metaplex Core + dynamic OG artwork (Memo fallback) | Real devnet NFT visible in Phantom & Magic Eden — each agent gets unique stage-themed art |
+| 🚀 **Launch Certificate NFTs** | Metaplex Core with project metadata (Memo fallback) | Adult agents publish a real on-chain NFT certificate, distinct artwork per project |
+| 📧 **Email + wallet auth** | Privy embedded Solana wallets + Phantom adapter | Sign in with email/Google/Apple → auto-provisioned Solana wallet, OR connect Phantom — both flows mint the same Passports |
 | 🧾 **Product Arena** | Agent-generated brief + membership pass + votes | Adult agents turn conversations into product pages backed by staked Passport holders |
 | 🪙 **$SBORN utility layer** | Staking v1 + per-wallet XP attribution | Stake-to-unlock access being tested before real token locks |
 | 🔋 **Energy system** | Client-side regen + wallet boost | 2 energy/min, connect wallet for refill |
@@ -153,14 +154,15 @@ Append `?demo=1` to any URL for a ×50 XP speed-run (hackathon demo mode).
                                  │  XP gained → stage crossed?
                                  ▼
  ┌──────────────────────────────────────────────────────────────────┐
- │     on-chain.ts  →  Agent Passport Memo tx on Solana devnet      │
- │     chainHistory →  public evolution and launch proof ledger     │
+ │  core-mint.ts  →  Metaplex Core NFT Passport on Solana devnet    │
+ │  /api/nft-metadata/og →  unique stage-themed artwork per agent   │
+ │  Sign with Phantom OR Privy embedded wallet (email login)        │
  └───────────────────────────────┬──────────────────────────────────┘
                                  │  stage === 'adult'?
                                  ▼
  ┌──────────────────────────────────────────────────────────────────┐
  │   /api/agent/generate  →  LLM produces YOUR project spec         │
- │   publishLaunchCertificate() → signed Memo proof in Explorer     │
+ │   mintCoreLaunchCertificate() → real Launch NFT in Explorer + ME │
  │   Product Arena → community backs the strongest ideas            │
  └──────────────────────────────────────────────────────────────────┘
 ```
@@ -171,15 +173,27 @@ Append `?demo=1` to any URL for a ×50 XP speed-run (hackathon demo mode).
 
 <div align="center">
 
-| Frontend | AI & Memory | Solana |
+| Frontend | AI & Memory | Solana / Auth |
 |:---:|:---:|:---:|
-| Next.js 16 + Turbopack | AI SDK v6 | `@solana/web3.js` |
-| React 19 | Groq (Llama 3.3 70B) | SPL Memo Program |
-| Tailwind v4 | Upstash Vector | Helius/devnet RPC |
-| Framer Motion | BGE-M3 embeddings | Umi + wallet adapter |
-| Zustand v5 + persist | `after()` background tasks | SPL Memo |
+| Next.js 16 + Turbopack | AI SDK v6 | **Metaplex Core** (NFTs) |
+| React 19 | Groq (Llama 3.3 70B) | **Privy** (embedded wallets) |
+| Tailwind v4 | Upstash Vector | `@solana/web3.js` + UMI |
+| Framer Motion | BGE-M3 embeddings | Phantom wallet-adapter |
+| Zustand v5 + persist | `after()` background tasks | Helius / devnet RPC |
 
 </div>
+
+<br />
+
+## 🤝 Frontier hackathon — sponsor integrations
+
+| Sponsor | How SolBorn uses it | Where in code |
+|---|---|---|
+| **Phantom** (primary) | Default wallet adapter for crypto-native users — connects, signs, mints | `src/components/wallet/WalletProvider.tsx`, `WalletButton.tsx` |
+| **Privy** (secondary) | Email / Google / Apple login → auto-provisioned Solana embedded wallet → can mint Passport without ever installing Phantom. Removes the biggest UX barrier for non-crypto founders. | `src/components/wallet/PrivyProvider.tsx`, `src/lib/hooks/useSolanaSigner.ts` |
+| **Metaplex** (secondary) | Agent Passports and Launch Certificates are real Metaplex Core NFTs with dynamic stage-themed artwork generated per agent via `next/og`. Visible in Phantom and Magic Eden. | `src/lib/solana/core-mint.ts`, `src/app/api/nft-metadata/og/route.tsx` |
+
+Both Privy and Phantom flows route through a single `useSolanaSigner()` hook, so the rest of the app doesn't care which auth path the user took. Same code mints the same NFT.
 
 <br />
 
