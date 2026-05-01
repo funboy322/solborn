@@ -14,6 +14,7 @@ import { EnergyBar } from '@/components/agent/EnergyBar'
 import { useForgeStore } from '@/lib/store'
 import { STAGE_CONFIG, STAGE_ORDER, MAX_ENERGY, ENERGY_REFILL_AMOUNT } from '@/lib/constants'
 import { mintAgentOnChain } from '@/lib/solana/on-chain'
+import { mintCorePassport } from '@/lib/solana/core-mint'
 import { recordEvolution } from '@/lib/solana/payment'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
@@ -33,7 +34,8 @@ export default function AgentPage({ params }: PageProps) {
   const refillEnergy = useForgeStore((s) => s.refillEnergy)
   const agent = agents.find((a) => a.id === id)
 
-  const { publicKey, signTransaction, connected } = useSolanaSigner()
+  const signer = useSolanaSigner()
+  const { publicKey, signTransaction, connected } = signer
 
   const [minting, setMinting] = useState(false)
   const [mintError, setMintError] = useState<string | null>(null)
@@ -107,10 +109,24 @@ export default function AgentPage({ params }: PageProps) {
     setMinting(true)
     setMintError(null)
     try {
-      const memo = await mintAgentOnChain(agent, publicKey, signTransaction)
-      const mintAddress = memo.mintAddress
-      const txSignature = memo.txSignature
-      const explorerUrl = memo.explorerUrl
+      // Try Metaplex Core first — produces a real NFT visible in Phantom & Magic Eden.
+      // Fall back to Memo if Core mint fails for any reason (program error, RPC, etc.)
+      // so the user always gets *some* on-chain proof.
+      let mintAddress: string
+      let txSignature: string
+      let explorerUrl: string
+      try {
+        const core = await mintCorePassport(agent, signer)
+        mintAddress = core.assetAddress
+        txSignature = core.txSignature
+        explorerUrl = core.explorerUrl
+      } catch (coreErr) {
+        console.warn('[mint] Core failed, falling back to Memo:', coreErr)
+        const memo = await mintAgentOnChain(agent, publicKey, signTransaction)
+        mintAddress = memo.mintAddress
+        txSignature = memo.txSignature
+        explorerUrl = memo.explorerUrl
+      }
       updateAgentNFT(agent.id, mintAddress)
       addChainCheckpoint(agent.id, {
         kind: 'mint',

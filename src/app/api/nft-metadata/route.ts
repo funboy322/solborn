@@ -14,16 +14,6 @@ import type { AgentStage } from '@/lib/types'
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
-// TODO(Phase 6): replace with stage-specific generated artwork.
-// For now every cNFT shares the SolBorn brand image; the attributes
-// differentiate stages so wallets still render distinct cards.
-const STAGE_IMAGES: Record<AgentStage, string> = {
-  baby: '/logo.png',
-  toddler: '/logo.png',
-  teen: '/logo.png',
-  adult: '/logo.png',
-}
-
 function num(v: string | null, d = 0): number {
   const n = Number(v ?? d)
   return Number.isFinite(n) ? n : d
@@ -46,7 +36,9 @@ export async function GET(req: NextRequest) {
 
   const cfg = STAGE_CONFIG[stage]
   const origin = req.nextUrl.origin
-  const image = `${origin}${STAGE_IMAGES[stage]}`
+  // Dynamic stage-specific artwork generated on-demand. Each agent gets a
+  // unique poster with their emoji, name, and XP — distinct in Phantom / ME.
+  const image = `${origin}/api/nft-metadata/og?${q.toString()}`
 
   const body = {
     name: `${name} #${id.slice(0, 4).toUpperCase()}`,
