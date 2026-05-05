@@ -3,7 +3,11 @@ import { useMemo } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js'
 import { usePrivy } from '@privy-io/react-auth'
-import { useWallets as usePrivySolanaWallets } from '@privy-io/react-auth/solana'
+import {
+  useWallets as usePrivySolanaWallets,
+  useSignTransaction as usePrivySignTransaction,
+  type ConnectedStandardSolanaWallet,
+} from '@privy-io/react-auth/solana'
 
 /**
  * Unified Solana signer — abstracts whether the user is signed in via:
@@ -20,8 +24,11 @@ import { useWallets as usePrivySolanaWallets } from '@privy-io/react-auth/solana
  * Build-time env makes this stable across renders, so React's rules-of-hooks
  * are not violated.
  *
- * Privy's Solana wallets speak the Solana Wallet Standard (byte-based). We
- * bridge to web3.js Transaction objects by serializing → signing → rehydrating.
+ * Privy v3 note: ConnectedStandardSolanaWallet objects do NOT carry a
+ * signTransaction method directly — signing goes through the useSignTransaction
+ * hook, which requires the wallet to be passed as part of the input. We capture
+ * the hook function once and close over it inside makePrivySigner so the rest of
+ * the codebase keeps the simple `(tx) => Promise<tx>` shape.
  */
 
 export interface SolanaSigner {
@@ -63,6 +70,7 @@ function usePhantomAndPrivy(): SolanaSigner {
   const wa = useWallet()
   const privy = usePrivy()
   const { wallets: privyWallets, ready: privyReady } = usePrivySolanaWallets()
+  const { signTransaction: privySignTx } = usePrivySignTransaction()
 
   return useMemo<SolanaSigner>(() => {
     // Phantom first
@@ -98,7 +106,7 @@ function usePhantomAndPrivy(): SolanaSigner {
         connecting: false,
         publicKey: pk,
         walletAddress: w.address,
-        signTransaction: makePrivySigner(w),
+        signTransaction: makePrivySigner(w, privySignTx),
       }
     }
     return {
@@ -109,19 +117,33 @@ function usePhantomAndPrivy(): SolanaSigner {
       walletAddress: null,
       signTransaction: null,
     }
-  }, [wa.connected, wa.publicKey, wa.signTransaction, wa.connecting, privy.authenticated, privy.ready, privyReady, privyWallets])
+  }, [wa.connected, wa.publicKey, wa.signTransaction, wa.connecting, privy.authenticated, privy.ready, privyReady, privyWallets, privySignTx])
 }
 
 /**
- * Bridge a Privy ConnectedStandardSolanaWallet (byte-based Standard Wallet API)
- * into the wallet-adapter-style `(tx) => Promise<tx>` shape that the rest of
- * the app uses.
+ * Bridge a Privy ConnectedStandardSolanaWallet into the wallet-adapter-style
+ * `(tx) => Promise<tx>` shape that the rest of the app expects.
  *
- * - Serializes the Transaction to bytes
- * - Calls `wallet.signTransaction({ transaction, chain })`
- * - Rehydrates the signed bytes back into a Transaction / VersionedTransaction
+ * Privy v3 separates the signing capability from the wallet object itself —
+ * the actual signature happens through `useSignTransaction()`, which takes the
+ * wallet as an input parameter. We capture both at hook level and close over
+ * them here so callers don't see the indirection.
+ *
+ * Steps:
+ *   - Serialize the Transaction (or VersionedTransaction) to bytes
+ *   - Call hookSign({ transaction, wallet, chain })
+ *   - Rehydrate the signed bytes back into the original transaction shape
  */
-function makePrivySigner(wallet: { address: string; signTransaction: (input: { transaction: Uint8Array; chain: `solana:${string}` }) => Promise<{ signedTransaction: Uint8Array }> }): SolanaSigner['signTransaction'] {
+type PrivyHookSign = (input: {
+  transaction: Uint8Array
+  wallet: ConnectedStandardSolanaWallet
+  chain?: `solana:${string}`
+}) => Promise<{ signedTransaction: Uint8Array }>
+
+function makePrivySigner(
+  wallet: ConnectedStandardSolanaWallet,
+  hookSign: PrivyHookSign,
+): SolanaSigner['signTransaction'] {
   // Default to devnet — matches DEVNET_CONNECTION used elsewhere.
   // If we ever ship to mainnet we'll thread cluster through; for now devnet is hardcoded
   // because every other Solana-touching path in the codebase is also devnet-only.
@@ -133,8 +155,9 @@ function makePrivySigner(wallet: { address: string; signTransaction: (input: { t
       ? (tx as VersionedTransaction).serialize()
       : (tx as Transaction).serialize({ requireAllSignatures: false, verifySignatures: false })
 
-    const { signedTransaction } = await wallet.signTransaction({
+    const { signedTransaction } = await hookSign({
       transaction: new Uint8Array(serialized),
+      wallet,
       chain,
     })
 

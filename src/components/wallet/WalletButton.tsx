@@ -40,12 +40,19 @@ export function WalletButton() {
     if (!publicKey || airdropping) return
     setAirdropping(true)
     try {
-      const sig = await connection.requestAirdrop(publicKey, 0.5 * LAMPORTS_PER_SOL)
-      await connection.confirmTransaction(sig, 'confirmed')
+      const res = await fetch('/api/faucet', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ address: publicKey.toBase58() }),
+      })
+      const data = (await res.json().catch(() => ({}))) as { signature?: string; error?: string }
+      if (!res.ok) {
+        console.warn('[faucet]', data.error ?? `HTTP ${res.status}`)
+      }
       const b = await connection.getBalance(publicKey)
       setBalance(b / LAMPORTS_PER_SOL)
     } catch (e) {
-      console.warn('Airdrop failed (rate limited):', e)
+      console.warn('[faucet] request failed:', e)
     } finally {
       setAirdropping(false)
     }

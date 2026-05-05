@@ -1,6 +1,6 @@
 'use client'
 import { PrivyProvider as Privy } from '@privy-io/react-auth'
-import { toSolanaWalletConnectors } from '@privy-io/react-auth/solana'
+import { toSolanaWalletConnectors, defaultSolanaRpcsPlugin } from '@privy-io/react-auth/solana'
 import { useMemo, type ReactNode } from 'react'
 
 /**
@@ -8,11 +8,14 @@ import { useMemo, type ReactNode } from 'react'
  * Solana-focused: embedded wallet auto-created on first login, Phantom and
  * other external Solana wallets shown as connector options too.
  *
- * RPC for embedded wallet ops is taken from Privy's defaults — devnet is wired
- * server-side via the dashboard. We don't override that here.
+ * The defaultSolanaRpcsPlugin registers Privy's hosted RPC endpoints for
+ * solana:mainnet and solana:devnet. Without it, useSignTransaction throws
+ * "No RPC configuration found for chain solana:devnet" because the SDK has
+ * no default chain → RPC mapping built in.
  */
 export function PrivyProvider({ appId, children }: { appId: string; children: ReactNode }) {
   const solanaConnectors = useMemo(() => toSolanaWalletConnectors(), [])
+  const solanaRpcs = useMemo(() => defaultSolanaRpcsPlugin(), [])
 
   return (
     <Privy
@@ -35,6 +38,7 @@ export function PrivyProvider({ appId, children }: { appId: string; children: Re
             connectors: solanaConnectors,
           },
         },
+        plugins: [solanaRpcs],
       }}
     >
       {children}
