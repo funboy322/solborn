@@ -332,7 +332,7 @@ function StickyNav({
       <div className="relative max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
         {/* Logo */}
         <motion.div
-          className="flex items-center gap-2.5 cursor-pointer"
+          className="flex items-center gap-2.5 cursor-pointer shrink-0"
           onClick={() => router.push('/')}
           whileHover={{ scale: 1.02 }}
         >
@@ -343,8 +343,8 @@ function StickyNav({
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <span className="hidden sm:inline font-bold text-zinc-100 tracking-normal">SolBorn</span>
-          <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/25 font-mono">
+          <span className="hidden lg:inline font-bold text-zinc-100 tracking-normal">SolBorn</span>
+          <span className="hidden lg:inline text-xs px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/25 font-mono">
             Beta
           </span>
         </motion.div>
@@ -355,7 +355,7 @@ function StickyNav({
             variant="ghost"
             size="sm"
             onClick={() => router.push('/demo')}
-            className="hidden sm:flex text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
+            className="hidden lg:flex text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
           >
             Demo
           </Button>
@@ -363,7 +363,7 @@ function StickyNav({
             variant="ghost"
             size="sm"
             onClick={() => router.push('/products')}
-            className="hidden sm:flex text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
+            className="hidden lg:flex text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
           >
             Arena
           </Button>
@@ -371,7 +371,7 @@ function StickyNav({
             variant="ghost"
             size="sm"
             onClick={() => router.push('/staking')}
-            className="hidden sm:flex text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
+            className="hidden lg:flex text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
           >
             Stake
           </Button>
@@ -379,7 +379,7 @@ function StickyNav({
             variant="ghost"
             size="sm"
             onClick={() => router.push('/rewards')}
-            className="hidden sm:flex text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
+            className="hidden lg:flex text-zinc-400 hover:text-zinc-100 text-xs gap-1.5"
           >
             Rewards
           </Button>
@@ -388,7 +388,7 @@ function StickyNav({
               variant="ghost"
               size="sm"
               onClick={() => router.push('/forge')}
-              className="hidden sm:flex text-zinc-400 hover:text-zinc-100"
+              className="hidden lg:flex text-zinc-400 hover:text-zinc-100"
             >
               My Agents ({(agents as unknown[]).length})
             </Button>
@@ -397,7 +397,7 @@ function StickyNav({
             href="https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-violet-300/20 bg-violet-400/[0.05] px-3 py-1.5 text-xs font-semibold text-violet-100 transition-colors hover:bg-violet-400/[0.1]"
+            className="hidden lg:inline-flex items-center gap-1.5 rounded-lg border border-violet-300/20 bg-violet-400/[0.05] px-3 py-1.5 text-xs font-semibold text-violet-100 transition-colors hover:bg-violet-400/[0.1]"
             title="Buy $SBORN on pump.fun"
           >
             Buy $SBORN
@@ -406,7 +406,7 @@ function StickyNav({
             href="https://x.com/solborn_xyz"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex items-center justify-center w-8 h-8 rounded-lg text-zinc-500 hover:text-violet-100 hover:bg-violet-400/[0.08] transition-all"
+            className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg text-zinc-500 hover:text-violet-100 hover:bg-violet-400/[0.08] transition-all"
             title="Follow on X"
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
