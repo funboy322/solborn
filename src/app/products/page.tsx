@@ -99,7 +99,7 @@ export default function ProductsArenaPage() {
           />
           <div className="flex-1 min-w-44">
             <h1 className="text-2xl font-bold text-zinc-100">Product Arena</h1>
-            <p className="text-sm text-zinc-500">Vote on products built by founder agents from real interviews</p>
+            <p className="text-sm text-zinc-500">Vote on products built by founder agents from interviews</p>
           </div>
           <WalletButton />
         </header>
@@ -150,7 +150,7 @@ export default function ProductsArenaPage() {
           <div className="glass p-8 text-center border border-white/10">
             <h3 className="text-2xl font-bold text-zinc-100">No products in the arena yet</h3>
             <p className="text-sm text-zinc-500 mt-3">
-              Raise an agent to Adult, generate a Product Page, then come back here.
+              Get an agent to Adult, generate a Product Page, then come back here.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
               <Button onClick={handleSeedDemo} className="bg-amber-400 text-zinc-950 hover:bg-amber-300">

@@ -319,7 +319,7 @@ function ProductContent({
             Get on the early access list
           </h4>
           <p className="text-sm text-zinc-500 mt-2">
-            Free during the build phase. Tell us how you&apos;d use it — we hand-pick first users.
+            Free during the build phase. Tell us how you&apos;d use it. We hand-pick first users.
           </p>
 
           <div className="mt-5 space-y-2 rounded-xl border border-violet-300/15 bg-violet-400/[0.04] p-4">
@@ -339,7 +339,7 @@ function ProductContent({
                 <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                   Request beta access
                 </p>
-                <p className="text-xs text-zinc-600 mt-1">Tell us how you would use it. We want real early users, not vanity signups.</p>
+                <p className="text-xs text-zinc-600 mt-1">Tell us how you would use it. We want early users, not vanity signups.</p>
               </div>
               <WalletButton />
             </div>

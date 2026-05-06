@@ -30,7 +30,7 @@
 
 ## ✨ The pitch in one paragraph
 
-Most "AI agent" projects hand you a blank text box and say *"start prompting!"*. SolBorn is different. You don't teach the agent — **it interviews you**. It asks about your skills, interests, what problems you see in the market. Based on your answers, it autonomously builds a personalized Solana startup idea tailored to who you are. As the conversation grows, so does the agent: it earns XP, evolves through stages, remembers you across sessions via **semantic vector memory**, and mints an **Agent Passport** as a signed on-chain proof of its origin. When it reaches Adult, it ships a full product brief, public product page, and **Launch Certificate** on Solana devnet. You end up not just with a chatbot — but with a co-founder that genuinely knows you.
+Most "AI agent" projects hand you a blank text box and say *"start prompting!"*. SolBorn flips it. You don't teach the agent. **It interviews you.** It asks about your skills and what problems you see in the market. Based on your answers, it builds a personalized Solana startup idea around who you are. As the conversation grows, the agent earns XP and evolves through stages. It remembers you across sessions via **semantic vector memory** and mints an **Agent Passport** as a signed on-chain proof of its origin. When it reaches Adult, it ships a full product brief, public product page, and **Launch Certificate** on Solana devnet. You don't end up with a chatbot. You end up with a co-founder that knows you.
 
 <br />
 
@@ -54,7 +54,7 @@ SolBorn is building the full infrastructure stack for AI agent creation, hosting
 - Phase 3: Agent hosting compute fees
 - Phase 4: Arena placement and boosted visibility for stakers
 
-**Rewards are tied to real value, not empty emissions.** Contribution score + staking weight + product impact = your share. No farming. No airdrop hunters.
+**Rewards tie to actual contribution, not empty emissions.** Contribution score + staking weight + product impact = your share. No farming. No airdrop hunters.
 
 <br />
 
@@ -98,11 +98,11 @@ Ships.<br />Full product brief + Launch Certificate on Solana devnet.
 | 🧠 **Semantic memory** | Upstash Vector (BGE-M3 multilingual, EU1) | Facts extracted async via `after()`, agent recalls them weeks later |
 | ⚡ **Streaming chat** | AI SDK v6 + Groq (`llama-3.3-70b`) | Edge streaming with fallback to `llama-3.1-8b-instant` |
 | 🎓 **XP engine** | Custom grader + trait analyzer | Word count × quality × novelty — spam = 0 XP |
-| 🪪 **NFT Passports** | Metaplex Core + dynamic OG artwork (Memo fallback) | Real devnet NFT visible in Phantom & Magic Eden — each agent gets unique stage-themed art |
-| 🚀 **Launch Certificate NFTs** | Metaplex Core with project metadata (Memo fallback) | Adult agents publish a real on-chain NFT certificate, distinct artwork per project |
-| 📧 **Email + wallet auth** | Privy embedded Solana wallets + Phantom adapter | Sign in with email/Google/Apple → auto-provisioned Solana wallet, OR connect Phantom — both flows mint the same Passports |
+| 🪪 **NFT Passports** | Metaplex Core + dynamic OG artwork (Memo fallback) | Devnet NFT visible in Phantom and Magic Eden; each agent gets unique stage-themed art |
+| 🚀 **Launch Certificate NFTs** | Metaplex Core with project metadata (Memo fallback) | Adult agents publish an on-chain NFT certificate with distinct artwork per project |
+| 📧 **Email + wallet auth** | Privy embedded Solana wallets + Phantom adapter | Sign in with email/Google/Apple for an auto-provisioned Solana wallet, or connect Phantom. Both flows mint the same Passports |
 | 🧾 **Product Arena** | Agent-generated brief + membership pass + votes | Adult agents turn conversations into product pages backed by staked Passport holders |
-| 🪙 **$SBORN utility layer** | Staking v1 + per-wallet XP attribution | Stake-to-unlock access being tested before real token locks |
+| 🪙 **$SBORN utility layer** | Staking v1 + per-wallet XP attribution | Stake-to-unlock access being tested before mainnet token locks |
 | 🔋 **Energy system** | Client-side regen + wallet boost | 2 energy/min, connect wallet for refill |
 | 🏆 **Achievements** | 20+ unlocks, XP bonuses | Real-time toast + screen-shake feedback |
 | 🎬 **Demo mode** | `?demo=1` → ×50 XP, ∞ energy | Lets judges hit Adult in 3–4 messages |

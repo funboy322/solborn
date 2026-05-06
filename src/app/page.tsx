@@ -24,7 +24,7 @@ const STAGES = [
   {
     emoji: '🧒',
     label: 'Toddler',
-    desc: 'Connects what you said to real opportunities. Probes your skills, your edge, what you\'ve tried before.',
+    desc: 'Connects what you said to specific opportunities. Probes your skills, your edge, what you\'ve tried before.',
     color: '#a78bfa',
     glow: 'rgba(167,139,250,0.25)',
     bg: 'rgba(167,139,250,0.08)',
@@ -62,7 +62,7 @@ const FEATURES = [
   {
     icon: Zap,
     title: 'Agent Passports',
-    desc: 'Mint your co-founder\'s identity to your wallet. A signed Memo transaction on Solana devnet — verifiable in Explorer.',
+    desc: 'Mint your co-founder\'s identity to your wallet. A Metaplex Core NFT on Solana devnet, visible in Phantom, Magic Eden, and Explorer.',
     color: '#8b5cf6',
     bg: 'rgba(139,92,246,0.08)',
     border: 'rgba(139,92,246,0.22)',
@@ -70,7 +70,7 @@ const FEATURES = [
   {
     icon: Rocket,
     title: 'Launch Certificates',
-    desc: 'When the agent reaches Adult, it publishes your product idea as a signed on-chain proof. Not a screenshot — a real devnet tx.',
+    desc: 'When the agent reaches Adult, it publishes your product idea as a signed on-chain proof. Verifiable in Solana Explorer, not just a screenshot.',
     color: '#c084fc',
     bg: 'rgba(192,132,252,0.08)',
     border: 'rgba(192,132,252,0.2)',
@@ -86,7 +86,7 @@ const FEATURES = [
   {
     icon: BarChart3,
     title: 'XP-Graded Chat',
-    desc: 'Every message scores 0–25 XP on clarity, novelty, and depth. Spam earns nothing. The bar moves only when the conversation does.',
+    desc: 'Every message scores 0–25 XP on clarity and depth. Spam earns nothing. The bar moves only when the conversation does.',
     color: '#22d3ee',
     bg: 'rgba(34,211,238,0.075)',
     border: 'rgba(34,211,238,0.18)',
@@ -105,7 +105,7 @@ const TOKEN_UTILITIES = [
   {
     badge: 'MINT',
     label: 'Passport seed',
-    desc: '$SBORN will gate Agent Passport mints once the on-chain program is live. Today\'s passports are devnet Memo proofs.',
+    desc: '$SBORN will gate Passport mints once the on-chain program is live. Today\'s passports are Metaplex Core NFTs on devnet.',
   },
   {
     badge: 'STAKE',
@@ -115,12 +115,12 @@ const TOKEN_UTILITIES = [
   {
     badge: 'FUEL',
     label: 'Energy & boosts',
-    desc: 'Buy energy refills, launch boosts, and cosmetic Passport upgrades. Heavy users pay $SBORN, not USD.',
+    desc: 'Buy energy refills and launch boosts. Heavy users pay $SBORN, not USD.',
   },
   {
     badge: 'EARN',
     label: 'Contributor rewards',
-    desc: 'Streaks, top XP, and Arena performance distribute weekly contributor pools — paid in $SBORN.',
+    desc: 'Streaks, top XP, and Arena performance distribute weekly contributor pools, paid in $SBORN.',
   },
 ]
 
@@ -684,7 +684,7 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-lg text-zinc-400 max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed"
             >
-              Your AI co-founder asks you about your background, your skills, what you&apos;d build. Then it ships your idea — with proof on Solana devnet.
+              Your AI co-founder asks who you are and what you&apos;d build. Then it ships the idea, with proof on Solana devnet.
             </motion.p>
 
             <motion.div
@@ -723,7 +723,7 @@ export default function HomePage() {
               transition={{ delay: 0.7 }}
               className="flex items-center justify-center lg:justify-start gap-5 mt-10 text-xs text-zinc-600 flex-wrap"
             >
-              <span>Real devnet transactions</span>
+              <span>Devnet transactions</span>
               <span className="text-zinc-800">/</span>
               <span>Open source</span>
               <span className="text-zinc-800">/</span>
@@ -764,7 +764,7 @@ export default function HomePage() {
               Four stages. Real progression.
             </h2>
             <p className="text-zinc-500 max-w-md mx-auto text-sm leading-relaxed">
-              Each stage changes how your co-founder thinks, what it asks, and what it can do on-chain. This isn&apos;t a level bar — it&apos;s a different agent.
+              Each stage changes how your co-founder thinks, what it asks, and what it can do on-chain. Not a progress bar. A different agent.
             </p>
           </motion.div>
 
@@ -807,7 +807,7 @@ export default function HomePage() {
               Not a prompt box
             </h2>
             <p className="text-zinc-500 max-w-md mx-auto text-sm leading-relaxed">
-              It interviews you, remembers you across sessions, and ships verifiable proof to Solana devnet. The whole loop — from conversation to Launch Certificate — is real.
+              It interviews you, remembers you across sessions, and ships verifiable proof to Solana devnet. The full loop, from conversation to Launch Certificate, runs end-to-end.
             </p>
           </motion.div>
 
@@ -921,7 +921,7 @@ export default function HomePage() {
             </p>
             <h2 className="text-3xl font-bold text-zinc-100 mb-3">What&apos;s your idea?</h2>
             <p className="text-zinc-500 mb-8 text-sm leading-relaxed">
-              Connect your wallet, name your co-founder, and answer its first question. It does the rest — idea, brief, Launch Certificate on devnet.
+              Connect your wallet, name your co-founder, and answer its first question. It handles the rest: idea, brief, Launch Certificate on devnet.
             </p>
             <GradientCTA onClick={() => setModalOpen(true)} large>
               Create Agent
