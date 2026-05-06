@@ -514,16 +514,6 @@ function AgentPreviewCard() {
         </div>
         <div className="flex flex-col gap-1 min-w-0">
           <div className="text-[17px] font-bold text-zinc-100 tracking-tight">Athena</div>
-          <span
-            className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.10em] text-violet-300 px-2 py-0.5 rounded-full w-fit"
-            style={{
-              background: 'rgba(139,92,246,0.10)',
-              border: '1px solid rgba(139,92,246,0.25)',
-            }}
-          >
-            <span className="w-1 h-1 rounded-full bg-violet-300" />
-            Teen · Stage 03
-          </span>
         </div>
         <div className="ml-auto flex gap-2">
           <span
