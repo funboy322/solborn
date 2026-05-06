@@ -1,13 +1,28 @@
 'use client'
 
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { Fragment, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Check, ExternalLink, Loader2, Lock, MessageCircle, Rocket, Send, Share2, ShieldCheck, Sparkles } from 'lucide-react'
+import { Activity, ArrowLeft, Check, ExternalLink, Loader2, Lock, Rocket, Send, Share2, ShieldCheck, Sparkles } from 'lucide-react'
 import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
 import { Button } from '@/components/ui/button'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { useForgeStore } from '@/lib/store'
-import type { ForgeAgent, GeneratedProject } from '@/lib/types'
+import type { AgentStage, ForgeAgent, GeneratedProject } from '@/lib/types'
+
+const STAGE_JOURNEY: Array<{ stage: AgentStage; emoji: string }> = [
+  { stage: 'baby', emoji: '👶' },
+  { stage: 'toddler', emoji: '🧒' },
+  { stage: 'teen', emoji: '🧑‍💻' },
+  { stage: 'adult', emoji: '🚀' },
+]
+
+const TRAIT_FIELDS: Array<{ key: keyof ForgeAgent['traits']; label: string; gradient: string }> = [
+  { key: 'curiosity', label: 'Curiosity', gradient: 'from-violet-400 to-fuchsia-300' },
+  { key: 'solanaKnowledge', label: 'Solana Knowledge', gradient: 'from-emerald-400 to-teal-300' },
+  { key: 'codingSkill', label: 'Coding Skill', gradient: 'from-cyan-400 to-sky-300' },
+  { key: 'creativity', label: 'Creativity', gradient: 'from-amber-400 to-orange-300' },
+  { key: 'founderMindset', label: 'Founder Mindset', gradient: 'from-rose-400 to-pink-300' },
+]
 
 function shortHash(hash: string): string {
   return `${hash.slice(0, 8)}...${hash.slice(-8)}`
@@ -111,10 +126,6 @@ function ProductContent({
     return `https://twitter.com/intent/tweet?${params.toString()}`
   }, [project.name, project.id])
 
-  const interviewBubbles = useMemo(() => {
-    return agent.messages.filter((m) => m.role !== 'system').slice(-3)
-  }, [agent.messages])
-
   function scrollToRequestAccess() {
     document.getElementById('request-access')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -217,19 +228,54 @@ function ProductContent({
           <div className="flex items-center gap-2 mb-5">
             <Rocket size={17} className="text-amber-300" />
             <h3 className="text-sm font-semibold text-zinc-100">Launch status</h3>
+            {project.txHash && (
+              <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-emerald-300/25 bg-emerald-300/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-emerald-200">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inset-0 animate-ping rounded-full bg-emerald-300 opacity-75" />
+                  <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-300" />
+                </span>
+                Verified
+              </span>
+            )}
           </div>
-          <div className="relative aspect-square w-full overflow-hidden rounded-xl border border-white/10 bg-black/30 mb-5">
-            <img
-              src={artworkUrl}
-              alt={`${project.name} Launch Certificate`}
-              className="absolute inset-0 h-full w-full object-cover"
-              loading="lazy"
-            />
-            <div className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-md border border-white/10 bg-black/60 px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-zinc-300 backdrop-blur">
-              <ShieldCheck size={10} className="text-emerald-300" />
-              Launch Certificate
+          {project.txHash ? (
+            <a
+              href={`https://explorer.solana.com/tx/${project.txHash}?cluster=devnet`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Verify launch certificate on Solana Explorer"
+              className="group relative block aspect-square w-full overflow-hidden rounded-xl border border-white/10 bg-black/30 mb-5 transition-all duration-300 hover:scale-[1.015] hover:border-emerald-300/40 hover:shadow-[0_0_50px_-8px_rgba(52,211,153,0.45)]"
+            >
+              <img
+                src={artworkUrl}
+                alt={`${project.name} Launch Certificate`}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                loading="lazy"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              <div className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-md border border-white/10 bg-black/60 px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-zinc-300 backdrop-blur">
+                <ShieldCheck size={10} className="text-emerald-300" />
+                Launch Certificate
+              </div>
+              <div className="absolute bottom-2 right-2 inline-flex translate-y-1 items-center gap-1 rounded-md border border-emerald-300/30 bg-emerald-300/10 px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-emerald-200 opacity-0 backdrop-blur transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                <ExternalLink size={10} />
+                Verify on-chain
+              </div>
+            </a>
+          ) : (
+            <div className="relative aspect-square w-full overflow-hidden rounded-xl border border-white/10 bg-black/30 mb-5">
+              <img
+                src={artworkUrl}
+                alt={`${project.name} Launch Certificate preview`}
+                className="absolute inset-0 h-full w-full object-cover opacity-70"
+                loading="lazy"
+              />
+              <div className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-md border border-white/10 bg-black/60 px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-zinc-300 backdrop-blur">
+                <ShieldCheck size={10} className="text-amber-300" />
+                Pending mint
+              </div>
             </div>
-          </div>
+          )}
           <div className="space-y-3">
             <StatusLine label="Founder agent" value={agentName} />
             <StatusLine label="Stage" value={agentStage} />
@@ -260,7 +306,7 @@ function ProductContent({
 
       <section className="grid lg:grid-cols-[0.92fr_1.08fr] gap-5">
         <AgentIdCard agent={agent} />
-        <InterviewExcerpt agent={agent} bubbles={interviewBubbles} />
+        <FounderProfile agent={agent} />
       </section>
 
       <section className="grid lg:grid-cols-[0.92fr_1.08fr] gap-5">
@@ -399,35 +445,88 @@ function StatusLine({ label, value }: { label: string; value: string }) {
   )
 }
 
+function AnimatedBar({ value, gradient }: { value: number; gradient: string }) {
+  const target = Math.max(0, Math.min(100, value))
+  const [width, setWidth] = useState(0)
+  useEffect(() => {
+    const t = setTimeout(() => setWidth(target), 90)
+    return () => clearTimeout(t)
+  }, [target])
+  return (
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.05]">
+      <div
+        className={`h-full rounded-full bg-gradient-to-r ${gradient} transition-[width] duration-1000 ease-out`}
+        style={{ width: `${width}%` }}
+      />
+    </div>
+  )
+}
+
 function AgentIdCard({ agent }: { agent: ForgeAgent }) {
   const xpPct = Math.min(100, Math.round((agent.xp / Math.max(1, agent.xp + agent.xpToNext)) * 100))
+  const stageIndex = STAGE_JOURNEY.findIndex((s) => s.stage === agent.stage)
   return (
-    <div className="glass p-6 border border-white/10">
+    <div className="glass p-6 border border-white/10 relative overflow-hidden">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-300/40 to-transparent" />
       <div className="flex items-center gap-2 mb-5">
         <Sparkles size={17} className="text-violet-300" />
         <h3 className="text-sm font-semibold text-zinc-100">Founder Agent</h3>
       </div>
       <div className="flex items-center gap-4">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-violet-500/20 to-emerald-300/10 text-4xl">
+        <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-violet-500/25 to-emerald-300/15 text-4xl shadow-[0_0_30px_-8px_rgba(167,139,250,0.45)]">
           {agent.emoji}
+          <div className="absolute -bottom-1 -right-1 inline-flex items-center justify-center rounded-full border border-emerald-300/30 bg-zinc-950/90 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-wider text-emerald-300 backdrop-blur">
+            {agent.stage}
+          </div>
         </div>
         <div className="min-w-0">
           <p className="truncate text-lg font-bold text-zinc-100">{agent.name}</p>
-          <p className="text-xs text-zinc-500 capitalize">{agent.stage} · {agent.personality}</p>
+          <p className="text-xs text-zinc-500 capitalize">{agent.personality}</p>
         </div>
       </div>
+
+      <div className="mt-5 flex items-center justify-between gap-1">
+        {STAGE_JOURNEY.map((s, i) => {
+          const reached = i <= stageIndex
+          const current = i === stageIndex
+          return (
+            <Fragment key={s.stage}>
+              <div className="flex flex-col items-center gap-1">
+                <span
+                  className={`text-lg leading-none transition-all duration-500 ${
+                    current ? 'opacity-100 scale-110 drop-shadow-[0_0_8px_rgba(167,139,250,0.6)]' : reached ? 'opacity-70' : 'opacity-25 grayscale'
+                  }`}
+                >
+                  {s.emoji}
+                </span>
+                <span
+                  className={`text-[8px] font-mono uppercase tracking-wider ${
+                    current ? 'text-violet-200' : 'text-zinc-700'
+                  }`}
+                >
+                  {s.stage}
+                </span>
+              </div>
+              {i < STAGE_JOURNEY.length - 1 && (
+                <div
+                  className={`mb-3 h-px flex-1 ${
+                    i < stageIndex ? 'bg-gradient-to-r from-violet-400/60 to-emerald-300/40' : 'bg-white/[0.06]'
+                  }`}
+                />
+              )}
+            </Fragment>
+          )
+        })}
+      </div>
+
       <div className="mt-5 space-y-2">
         <div className="flex items-center justify-between text-[11px]">
           <span className="uppercase tracking-wider text-zinc-600">XP</span>
-          <span className="font-mono text-zinc-300">{agent.xp.toLocaleString()}</span>
+          <span className="font-mono text-zinc-300">{agent.xp.toLocaleString()} <span className="text-zinc-700">/ {(agent.xp + agent.xpToNext).toLocaleString()}</span></span>
         </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-violet-400 to-emerald-300"
-            style={{ width: `${xpPct}%` }}
-          />
-        </div>
+        <AnimatedBar value={xpPct} gradient="from-violet-400 to-emerald-300" />
       </div>
+
       <a
         href={`/forge/${agent.id}`}
         className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold text-violet-300 hover:text-violet-200 transition-colors"
@@ -438,47 +537,47 @@ function AgentIdCard({ agent }: { agent: ForgeAgent }) {
   )
 }
 
-function InterviewExcerpt({
-  agent,
-  bubbles,
-}: {
-  agent: ForgeAgent
-  bubbles: ForgeAgent['messages']
-}) {
+function FounderProfile({ agent }: { agent: ForgeAgent }) {
+  const ageDays = Math.max(1, Math.round((Date.now() - agent.createdAt) / 86400000))
+  const totalScore = TRAIT_FIELDS.reduce((sum, t) => sum + (agent.traits?.[t.key] ?? 0), 0)
   return (
-    <div className="glass p-6 border border-white/10">
+    <div className="glass p-6 border border-white/10 relative overflow-hidden">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300/40 to-transparent" />
       <div className="flex items-center gap-2 mb-5">
-        <MessageCircle size={17} className="text-emerald-300" />
-        <h3 className="text-sm font-semibold text-zinc-100">Interview excerpt</h3>
+        <Activity size={17} className="text-emerald-300" />
+        <h3 className="text-sm font-semibold text-zinc-100">Founder Profile</h3>
+        <span className="ml-auto text-[9px] uppercase tracking-wider text-zinc-600">measured during interview</span>
       </div>
-      {bubbles.length === 0 ? (
-        <p className="text-sm text-zinc-500">No interview transcript captured for this agent.</p>
-      ) : (
-        <div className="space-y-3">
-          {bubbles.map((m) => {
-            const isAgent = m.role === 'agent'
-            return (
-              <div key={m.id} className={`flex gap-2 ${isAgent ? '' : 'flex-row-reverse'}`}>
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-base">
-                  {isAgent ? agent.emoji : '🧑'}
-                </div>
-                <div
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${
-                    isAgent
-                      ? 'bg-violet-500/10 border border-violet-300/15 text-zinc-200'
-                      : 'bg-white/[0.04] border border-white/10 text-zinc-300'
-                  }`}
-                >
-                  <p className="text-[10px] font-semibold uppercase tracking-wider opacity-50 mb-1">
-                    {isAgent ? agent.name : 'Founder'}
-                  </p>
-                  <p className="whitespace-pre-wrap">{m.content}</p>
-                </div>
+
+      <div className="space-y-3">
+        {TRAIT_FIELDS.map((t) => {
+          const value = agent.traits?.[t.key] ?? 0
+          return (
+            <div key={t.key}>
+              <div className="flex items-center justify-between text-[11px] mb-1">
+                <span className="text-zinc-400">{t.label}</span>
+                <span className="font-mono text-zinc-300">{value}<span className="text-zinc-700">/100</span></span>
               </div>
-            )
-          })}
-        </div>
-      )}
+              <AnimatedBar value={value} gradient={t.gradient} />
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="mt-5 grid grid-cols-3 gap-2 border-t border-white/10 pt-4">
+        <ProfileStat label="Score" value={totalScore.toString()} accent="text-emerald-300" />
+        <ProfileStat label="Interactions" value={agent.totalInteractions.toString()} />
+        <ProfileStat label="Days alive" value={ageDays.toString()} />
+      </div>
+    </div>
+  )
+}
+
+function ProfileStat({ label, value, accent }: { label: string; value: string; accent?: string }) {
+  return (
+    <div>
+      <p className="text-[9px] uppercase tracking-wider text-zinc-600">{label}</p>
+      <p className={`text-sm font-bold mt-1 truncate ${accent ?? 'text-zinc-200'}`}>{value}</p>
     </div>
   )
 }
