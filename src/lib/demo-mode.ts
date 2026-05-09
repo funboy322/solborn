@@ -18,9 +18,11 @@ import { useEffect, useState } from 'react'
 
 const KEY = 'solborn-demo-mode'
 
-/** XP multiplier when demo mode is active. Chosen so a ~20-word message
- *  gives ~200–400 XP — enough to hit Adult (700 XP) in 3–4 messages. */
-export const DEMO_XP_MULTIPLIER = 50
+/** XP multiplier when demo mode is active. Chosen so a single short
+ *  message reliably crosses the Adult threshold (700 XP). At ×200 a
+ *  ~10-word answer scoring ~15 base XP × 1.8 baby stage = ~27 → ×200
+ *  ≈ 5,400 XP, which jumps from Baby straight to Adult in one message. */
+export const DEMO_XP_MULTIPLIER = 200
 
 /** Energy cost override. 0 = infinite energy in demo. */
 export const DEMO_ENERGY_COST = 0

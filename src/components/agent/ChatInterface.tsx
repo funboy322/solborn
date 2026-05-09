@@ -119,6 +119,7 @@ function SpamWarning({ onDone }: { onDone: () => void }) {
 
 export function ChatInterface({ agent }: ChatInterfaceProps) {
   const gainXP = useForgeStore((s) => s.gainXP)
+  const evolveAgent = useForgeStore((s) => s.evolveAgent)
   const updateTraits = useForgeStore((s) => s.updateTraits)
   const unlockAchievement = useForgeStore((s) => s.unlockAchievement)
   const updateStreak = useForgeStore((s) => s.updateStreak)
@@ -363,10 +364,30 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
               border: '1px solid rgba(245,158,11,0.5)',
               boxShadow: '0 0 12px rgba(245,158,11,0.3)',
             }}
-            title="Demo mode: ×50 XP, infinite energy. Remove ?demo=1 to return to normal play."
+            title={`Demo mode: ×${DEMO_XP_MULTIPLIER} XP, infinite energy. Remove ?demo=1 to return to normal play.`}
           >
             DEMO ×{DEMO_XP_MULTIPLIER}
           </motion.div>
+        )}
+        {demo && agent.stage !== 'adult' && (
+          <button
+            onClick={() => {
+              // Bump the agent up one stage at a time until Adult.
+              // evolveAgent is a no-op once stage === 'adult'.
+              for (let i = 0; i < 4 && agent.stage !== 'adult'; i++) {
+                evolveAgent(agent.id)
+              }
+            }}
+            className="px-2 py-0.5 rounded-md text-[10px] font-black tracking-wider text-violet-100 hover:text-white transition-colors"
+            style={{
+              background: 'linear-gradient(135deg, rgba(139,92,246,0.35), rgba(217,70,239,0.30))',
+              border: '1px solid rgba(167,139,250,0.6)',
+              boxShadow: '0 0 12px rgba(167,139,250,0.35)',
+            }}
+            title="Demo mode: jump straight to Adult so you can mint a Launch Certificate without a full interview."
+          >
+            ⚡ SKIP TO ADULT
+          </button>
         )}
       </div>
 
