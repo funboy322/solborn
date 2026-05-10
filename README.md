@@ -243,13 +243,12 @@ Pump.fun routes a portion of every swap to the creator wallet. Those incoming fe
 
 | Allocation | Share | Use |
 |:---|:---:|:---|
-| 🧑‍💻 **Dev** | **50%** | Founder compensation and operations |
-| 🏦 **Treasury** | **30%** | Runway: Claude, Vercel, RPC nodes, future security audit |
-| 🎁 **Contributors** | **20%** | Manual distribution via [solborn.xyz/rewards](https://solborn.xyz/rewards) |
+| 🧑‍💻 **Development** | **80%** | Founder compensation, infrastructure (Claude, Vercel, RPC nodes), future security audit, cost recovery for the build phase |
+| 🎁 **Community** | **20%** | Distributed to people who used the platform, gave feedback, or helped the project grow. Manual today via [solborn.xyz/rewards](https://solborn.xyz/rewards). Planned to move to programmatic on-chain distribution at mainnet. |
 
 </div>
 
-The **20% contributor pool** goes to people who used the platform, gave feedback, or helped the project grow. Nominations reviewed manually at [solborn.xyz/rewards](https://solborn.xyz/rewards).
+Honest framing: this is a solo project. "Development" is one bucket because in practice the founder, the infrastructure, and the audit fund all come from the same pool. The 20% community share is the clean line between operating budget and what gets returned to people who showed up early.
 
 <br />
 
