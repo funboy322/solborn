@@ -231,19 +231,25 @@ solborn/
 > **CA:** `3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump`
 > **Buy:** [pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump](https://pump.fun/coin/3VNSmRLTvS54LWnynJNqEege21nzdjy1rEsPhsNxpump)
 
-No pre-mine. No team allocation. Everything started on the bonding curve.
+Standard pump.fun bonding curve launch. No pre-mine, no team allocation, no airdrop. Every token in circulation came from the curve.
+
+**Dev tokens (the initial creator-buy) are locked until end of 2026.**
+
+### Trading fee allocation
+
+Pump.fun routes a portion of every swap to the creator wallet. Those incoming fees are split:
 
 <div align="center">
 
-| Bucket | Share | Purpose |
+| Allocation | Share | Use |
 |:---|:---:|:---|
-| 🧑‍💻 **Dev** | **50%** | Founder compensation + operations |
-| 🏦 **Treasury** | **30%** | Runway — Claude, Vercel, RPC nodes, future audits |
-| 🎁 **Contributors** | **20%** | Manually distributed to real contributors via [solborn.xyz/rewards](https://solborn.xyz/rewards) |
+| 🧑‍💻 **Dev** | **50%** | Founder compensation and operations |
+| 🏦 **Treasury** | **30%** | Runway: Claude, Vercel, RPC nodes, future security audit |
+| 🎁 **Contributors** | **20%** | Manual distribution via [solborn.xyz/rewards](https://solborn.xyz/rewards) |
 
 </div>
 
-The **20% contributor pool** goes to real users: people who found ideas through the platform, gave feedback, helped others, and helped the project grow. Nominations reviewed manually at [solborn.xyz/rewards](https://solborn.xyz/rewards).
+The **20% contributor pool** goes to people who used the platform, gave feedback, or helped the project grow. Nominations reviewed manually at [solborn.xyz/rewards](https://solborn.xyz/rewards).
 
 <br />
 
