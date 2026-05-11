@@ -6,6 +6,7 @@ import { Activity, ArrowLeft, Check, ExternalLink, Loader2, Lock, Rocket, Send, 
 import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
 import { Button } from '@/components/ui/button'
 import { WalletButton } from '@/components/wallet/WalletButton'
+import { TipButton } from '@/components/agent/TipButton'
 import { useForgeStore } from '@/lib/store'
 import type { AgentStage, ForgeAgent, GeneratedProject } from '@/lib/types'
 
@@ -211,6 +212,11 @@ function ProductContent({
               <Share2 size={14} />
               Share on X
             </a>
+            <TipButton
+              recipientWallet={agent.walletAddress}
+              projectId={project.id}
+              projectName={project.name}
+            />
           </div>
           <div className="flex flex-wrap gap-2 mt-6">
             {project.techStack.map((tech) => (
