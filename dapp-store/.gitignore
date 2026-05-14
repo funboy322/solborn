@@ -1,0 +1,12 @@
+# Never commit signing keys or APK builds.
+publisher-keypair.json
+*.keystore
+*.jks
+build/
+twa-manifest.json
+
+# Banner is generated from the production endpoint, not stored in git.
+assets/banner.png
+
+# Screenshots are captured per device and replaced often.
+assets/screenshot-*.png

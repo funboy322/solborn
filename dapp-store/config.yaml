@@ -1,0 +1,96 @@
+###############################################################################
+# Solana dApp Store publishing config for SolBorn
+#
+# Used by the Solana Mobile dapp-publishing CLI to mint Publisher / App /
+# Release NFTs and submit for review.
+#   https://github.com/solana-mobile/dapp-publishing
+#   https://docs.solanamobile.com/dapp-publishing/overview
+#
+# Workflow (operational, run from this dapp-store/ directory):
+#   npx dapp-store create publisher -k <keypair> -u <rpc>      # one-time
+#   npx dapp-store create app       -k <keypair> -u <rpc>      # one-time
+#   npx dapp-store create release   -k <keypair> -u <rpc> --apk ./build/solborn-release.apk
+#   npx dapp-store publish submit   -k <keypair> -u <rpc> --requestor-is-authorized
+#
+# Wallet that runs these commands must be funded with ~0.2 SOL on Solana
+# mainnet to cover Metaplex Core mint fees + Arweave uploads.
+###############################################################################
+
+publisher:
+  # Filled in by `dapp-store create publisher`; leave commented until minted.
+  # address: <publisher NFT address>
+  name: 'SolBorn'
+  website: 'https://solborn.xyz'
+  email: 'REPLACE_WITH_REAL_EMAIL@solborn.xyz'  # required, replace before submit
+
+app:
+  # Filled in by `dapp-store create app`; leave commented until minted.
+  # address: <app NFT address>
+  name: 'SolBorn'
+  android_package: 'xyz.solborn.app'
+  urls:
+    license_url: 'https://github.com/funboy322/solborn/blob/main/LICENSE'
+    copyright_url: 'https://solborn.xyz/privacy'
+    privacy_policy_url: 'https://solborn.xyz/privacy'
+  media:
+    - purpose: icon
+      uri: './assets/icon.png'
+    - purpose: banner
+      uri: './assets/banner.png'
+
+release:
+  # Filled in by `dapp-store create release`.
+  # address: <release NFT address>
+  media:
+    - purpose: screenshot
+      uri: './assets/screenshot-1.png'
+    - purpose: screenshot
+      uri: './assets/screenshot-2.png'
+    - purpose: screenshot
+      uri: './assets/screenshot-3.png'
+    - purpose: screenshot
+      uri: './assets/screenshot-4.png'
+  files:
+    - purpose: install
+      uri: './build/solborn-release.apk'  # produced by Bubblewrap build
+  catalog:
+    en-US:
+      name: 'SolBorn'
+      short_description: 'AI co-founder that ships your startup on Solana'
+      long_description: |
+        SolBorn is an AI co-founder for Solana builders who have ideas but no partner.
+
+        Most AI agents wait for you to prompt them. SolBorn does the opposite. The agent interviews you about your background, your skills, what frustrates you, what you would build. Four conversation stages — Baby, Toddler, Teen, Adult. Each stage is a different agent with different tone and different on-chain abilities.
+
+        At Adult, the agent ships your startup as three on-chain artifacts to your wallet:
+
+        - Agent Passport NFT (co-founder identity, signed at birth)
+        - Product brief (generated from your interview)
+        - Launch Certificate NFT (project metadata, verifiable on Solana Explorer)
+
+        All three are Metaplex Core assets on Solana devnet. Visible in Phantom and Magic Eden.
+
+        Two ways to use it:
+
+        - Connect Phantom (default for crypto-native users)
+        - Sign in with email through Privy (embedded Solana wallet provisioned automatically — no seed phrase, no extension)
+
+        Both flows produce the same NFTs.
+
+        Honest disclosure:
+        - Devnet only for now. Mainnet ships with a security audit.
+        - Solo founder, three weeks of build, 83 commits, open source.
+        - $SBORN token on pump.fun: standard bonding curve launch, no pre-mine, no team allocation, dev tokens locked until end of 2026. The token is not a precondition for using SolBorn.
+
+        Try the demo path: append ?demo=1 to any URL on solborn.xyz for fast progression through the four stages.
+
+      new_in_version: |
+        First Solana dApp Store release.
+
+        Web app live on solborn.xyz since April 16, 2026. This mobile release wraps the same product as a Trusted Web Activity. Native MWA and Seed Vault integration are planned for the next release.
+
+      saga_features: |
+        Built for Saga and Seeker. Sign Passport and Launch Certificate mints natively through Phantom mobile. Solana devnet flows fully supported. Future release adds Seed Vault custody for the Passport private key and Mobile Wallet Adapter Local for in-app signing.
+
+      sentiment: |
+        For solo Solana builders who have ideas but no co-founder. The agent does what a real partner would do: asks the awkward questions, finds the angle, turns a conversation into a product brief instead of another empty Notion doc.
