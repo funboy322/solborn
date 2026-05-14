@@ -34,53 +34,59 @@ export async function GET() {
       >
         {/* Left: brand + tagline */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 700 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div
               style={{
-                width: 72,
-                height: 72,
-                borderRadius: 20,
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 50%, #3b0764 100%)',
+                fontSize: 72,
+                fontWeight: 800,
+                letterSpacing: -2,
+                lineHeight: 1,
+                color: '#fafafa',
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 40,
-                boxShadow: '0 10px 28px rgba(124,58,237,0.50)',
               }}
             >
-              ◎
+              SolBorn
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ fontSize: 56, fontWeight: 800, letterSpacing: -1, lineHeight: 1 }}>
-                SolBorn
-              </div>
-              <div
-                style={{
-                  fontSize: 18,
-                  color: '#a78bfa',
-                  letterSpacing: 4,
-                  textTransform: 'uppercase',
-                  marginTop: 6,
-                  fontWeight: 600,
-                }}
-              >
-                AI co-founder · Solana
-              </div>
+            <div
+              style={{
+                fontSize: 18,
+                color: '#a78bfa',
+                letterSpacing: 4,
+                textTransform: 'uppercase',
+                marginTop: 10,
+                fontWeight: 600,
+                display: 'flex',
+              }}
+            >
+              AI co-founder · Solana
             </div>
           </div>
 
-          <div
-            style={{
-              fontSize: 38,
-              fontWeight: 700,
-              lineHeight: 1.15,
-              letterSpacing: -0.8,
-              color: '#fafafa',
-            }}
-          >
-            The agent interviews you.
-            <br />
-            Then ships your startup on-chain.
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div
+              style={{
+                fontSize: 40,
+                fontWeight: 700,
+                lineHeight: 1.15,
+                letterSpacing: -0.8,
+                color: '#fafafa',
+                display: 'flex',
+              }}
+            >
+              The agent interviews you.
+            </div>
+            <div
+              style={{
+                fontSize: 40,
+                fontWeight: 700,
+                lineHeight: 1.15,
+                letterSpacing: -0.8,
+                color: '#fafafa',
+                display: 'flex',
+              }}
+            >
+              Then ships your startup on-chain.
+            </div>
           </div>
 
           <div
@@ -89,6 +95,7 @@ export async function GET() {
               color: '#d4d4d8',
               lineHeight: 1.4,
               fontWeight: 400,
+              display: 'flex',
             }}
           >
             Passport NFT · Product brief · Launch Certificate

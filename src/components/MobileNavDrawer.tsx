@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { X, Play, Trophy, Lock, Gift, Hammer, ShoppingBag, ExternalLink } from 'lucide-react'
+import { X, Play, Trophy, Lock, Gift, Hammer, ShoppingBag, ExternalLink, Plus } from 'lucide-react'
 import { PrivyLoginButton } from '@/components/wallet/PrivyLoginButton'
 
 /**
@@ -29,6 +29,9 @@ interface MobileNavDrawerProps {
   open: boolean
   onClose: () => void
   agentCount: number
+  /** Triggers the Create Agent modal (hoisted from the landing navbar
+   *  so the drawer's primary CTA stays in sync with the top-bar one). */
+  onCreateAgent: () => void
 }
 
 interface NavItem {
@@ -46,7 +49,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Rewards', href: '/rewards', icon: Gift, description: 'Contributor pool' },
 ]
 
-export function MobileNavDrawer({ open, onClose, agentCount }: MobileNavDrawerProps) {
+export function MobileNavDrawer({ open, onClose, agentCount, onCreateAgent }: MobileNavDrawerProps) {
   const router = useRouter()
 
   // Esc to close.
@@ -117,6 +120,22 @@ export function MobileNavDrawer({ open, onClose, agentCount }: MobileNavDrawerPr
                 aria-label="Close menu"
               >
                 <X size={18} />
+              </button>
+            </div>
+
+            {/* Primary CTA — moved here from the top bar on mobile so the
+                Create Agent button always has somewhere to live regardless of
+                viewport width. */}
+            <div className="border-b border-white/[0.06] p-4">
+              <button
+                onClick={() => {
+                  onClose()
+                  onCreateAgent()
+                }}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-950/30 transition-colors hover:bg-violet-500"
+              >
+                <Plus size={16} />
+                Create Agent
               </button>
             </div>
 

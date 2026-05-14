@@ -329,6 +329,7 @@ function StickyNav({
       open={mobileMenuOpen}
       onClose={() => setMobileMenuOpen(false)}
       agentCount={agentCount}
+      onCreateAgent={onBirth}
     />
     <motion.nav
       className="fixed top-0 inset-x-0 z-50 border-b border-violet-300/10"
@@ -426,7 +427,13 @@ function StickyNav({
             <PrivyLoginButton />
           </div>
           <WalletButton />
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+          {/* Create Agent — hidden on mobile (<sm) since it lives inside the
+              drawer there. On sm+ it sits in the navbar as the primary CTA. */}
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            className="hidden sm:block"
+          >
             <Button
               size="sm"
               onClick={onBirth}
@@ -437,11 +444,13 @@ function StickyNav({
           </motion.div>
 
           {/* Hamburger menu — visible on mobile and tablet, hidden on lg+ since
-              all secondary nav links live in the top bar from that breakpoint. */}
+              all secondary nav links live in the top bar from that breakpoint.
+              Styled to match the violet brand chips so it doesn't disappear
+              against the dark navbar background. */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-white/[0.05] hover:text-zinc-100"
+            className="lg:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-violet-300/25 bg-violet-400/[0.08] text-violet-100 transition-colors hover:bg-violet-400/[0.15] hover:text-white"
             aria-label="Open navigation menu"
             aria-expanded={mobileMenuOpen}
           >
