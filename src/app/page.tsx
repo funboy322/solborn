@@ -2,11 +2,12 @@
 import { useState, useRef } from 'react'
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { Zap, Brain, Rocket, Trophy, ArrowRight, ExternalLink, Coins, BarChart3, Flame } from 'lucide-react'
+import { Zap, Brain, Rocket, Trophy, ArrowRight, ExternalLink, Coins, BarChart3, Flame, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CreateAgentModal } from '@/components/forge/CreateAgentModal'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { PrivyLoginButton } from '@/components/wallet/PrivyLoginButton'
+import { MobileNavDrawer } from '@/components/MobileNavDrawer'
 import { useForgeStore } from '@/lib/store'
 
 // ─── Data ───────────────────────────────────────────────────────────────────
@@ -319,8 +320,16 @@ function StickyNav({
   const { scrollY } = useScroll()
   const blur = useTransform(scrollY, [0, 80], [8, 20])
   const bgOpacity = useTransform(scrollY, [0, 80], [0.1, 0.6])
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const agentCount = (agents as unknown[]).length
 
   return (
+    <>
+    <MobileNavDrawer
+      open={mobileMenuOpen}
+      onClose={() => setMobileMenuOpen(false)}
+      agentCount={agentCount}
+    />
     <motion.nav
       className="fixed top-0 inset-x-0 z-50 border-b border-violet-300/10"
       style={{ backdropFilter: useSpring(useTransform(blur, (v) => `blur(${v}px)`), { stiffness: 200, damping: 30 }) as never }}
@@ -426,9 +435,22 @@ function StickyNav({
               <span className="relative z-10">Create Agent</span>
             </Button>
           </motion.div>
+
+          {/* Hamburger menu — visible on mobile and tablet, hidden on lg+ since
+              all secondary nav links live in the top bar from that breakpoint. */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(true)}
+            className="lg:hidden flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-white/[0.05] hover:text-zinc-100"
+            aria-label="Open navigation menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            <Menu size={18} />
+          </button>
         </div>
       </div>
     </motion.nav>
+    </>
   )
 }
 
