@@ -21,7 +21,7 @@ publisher:
   # address: <publisher NFT address>
   name: 'SolBorn'
   website: 'https://solborn.xyz'
-  email: 'REPLACE_WITH_REAL_EMAIL@solborn.xyz'  # required, replace before submit
+  email: 'landishser49@gmail.com'
 
 app:
   # Filled in by `dapp-store create app`; leave commented until minted.
