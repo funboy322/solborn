@@ -1,70 +1,104 @@
 # Submit SolBorn to Solana dApp Store — final steps
 
-Everything is built and verified. Only **two things** stand between you and a submitted listing.
+> **Note:** Solana Mobile changed the publishing flow in early 2026. The old
+> "mint Publisher + App + Release NFTs from CLI" workflow is gone. Now apps
+> are registered via the **portal** at https://publish.solanamobile.com,
+> and the CLI only uploads new releases against a portal API key.
 
-## 1. Fund the publisher wallet with 0.2 SOL on mainnet
+Everything is built and TWA-verified. Three steps remain.
 
-```
-Address: AKpZ68kWBf6htCBE8Vz1WVJN1Kg5adXtuUwsoVidMDoj
-Amount:  ~0.2 SOL (covers 3 NFT mint fees + Arweave uploads)
-```
+## Step 1 — Import publisher keypair into Phantom (for portal sign-in)
 
-Send from Phantom (mainnet) or via CLI:
+The portal at publish.solanamobile.com signs you in with a Solana wallet. The
+publisher identity should match the keypair you use for signing CLI releases.
 
-```bash
-solana transfer AKpZ68kWBf6htCBE8Vz1WVJN1Kg5adXtuUwsoVidMDoj 0.2 \
-  --url https://api.mainnet-beta.solana.com \
-  --from <your-funding-wallet.json>
-```
-
-Verify:
+Open Phantom → ⚙ Settings → Manage Accounts → Add / Connect Wallet → **Import Private Key** → paste:
 
 ```bash
-solana balance AKpZ68kWBf6htCBE8Vz1WVJN1Kg5adXtuUwsoVidMDoj \
-  --url https://api.mainnet-beta.solana.com
+# Show the base58 secret key for Phantom import:
+cat /Users/ilyas/Downloads/soldad/founder-forge/dapp-store/publisher-keypair.json \
+  | python3 -c "import sys,json,base58; print(base58.b58encode(bytes(json.load(sys.stdin))).decode())"
 ```
 
-Should show `0.2 SOL` (or whatever you sent).
+(Or just keep using your main wallet — the portal doesn't require this exact
+keypair to be the signer; you can pass any keypair via `--keypair` later.)
 
-## 2. Run the submit script
+## Step 2 — Register SolBorn in the portal (web, one-time)
+
+1. Go to https://publish.solanamobile.com
+2. Sign in with your wallet (Phantom)
+3. Create a new app entry. Fields the portal will ask for — they're already
+   in `dapp-store/config.yaml`, just copy across:
+
+| Portal field | Value from config.yaml |
+|---|---|
+| App name | `SolBorn` |
+| Package ID | `xyz.solborn.app` |
+| Publisher name | `SolBorn` |
+| Publisher email | `landishser49@gmail.com` |
+| Publisher website | `https://solborn.xyz` |
+| Icon | upload `dapp-store/assets/icon.png` (512×512) |
+| Banner | upload `dapp-store/assets/banner.png` (1200×600) |
+| Short description | `AI co-founder that ships your startup on Solana` |
+| Long description | copy from `config.yaml` lines 64-89 |
+| License URL | `https://github.com/funboy322/solborn/blob/main/LICENSE` |
+| Privacy URL | `https://solborn.xyz/privacy` |
+| Copyright URL | `https://solborn.xyz/privacy` |
+
+4. The portal will mint an **App NFT** to your wallet (~0.05 SOL fee). The
+   address gets stored server-side — you don't need to track it.
+
+5. After App NFT mints, go to https://publish.solanamobile.com/dashboard/settings/api-keys
+   and **Generate API key**. Copy it.
+
+## Step 3 — Upload release via CLI
+
+In your terminal:
 
 ```bash
+export DAPP_STORE_API_KEY=<paste the key from step 2>
+
 cd /Users/ilyas/Downloads/soldad/founder-forge/dapp-store
 ./submit.sh
 ```
 
-The script does pre-flight checks first (balance, assetlinks, all files), then runs the four CLI commands in order:
+The script:
+1. Pre-flight checks (keypair, APK, assetlinks deployed, API key set, balance)
+2. Calls `dapp-store --apk-file ./build/solborn-release.apk --whats-new "..."`
+3. Portal extracts package name from APK → matches your registered app →
+   uploads to Arweave → mints Release NFT → queues for review
 
-1. `create publisher` — mints Publisher NFT (~5-10 sec)
-2. `create app` — mints App NFT, writes address to `config.yaml`
-3. `create release` — uploads APK + 6 screenshots + icon + banner to Arweave, mints Release NFT (~30-60 sec)
-4. `publish submit` — flips the submission to "in review"
-
-Total run time: **3-5 minutes**. After step 4, you're done — Solana Mobile will email `landishser49@gmail.com` within 2-5 business days with approval or feedback.
-
-## Verified pre-conditions (already done, don't worry about them)
-
-- ✅ APK built and signed (`build/solborn-release.apk`, package `xyz.solborn.app`)
-- ✅ Keystore secured (`build/android.keystore`, gitignored)
-- ✅ Digital Asset Links live: https://www.solborn.xyz/.well-known/assetlinks.json
-- ✅ Google verification API confirms SHA-256 matches
-- ✅ 6 screenshots at 1080×2140 portrait in `assets/`
-- ✅ Icon (512×512) and banner (1200×600) in `assets/`
-- ✅ `config.yaml` complete (name, package, URLs, all media listed)
-- ✅ Publisher keypair gitignored and backed up via seed phrase
-
-## If something fails
-
-Re-run `./submit.sh` — it's idempotent. Steps that already wrote addresses to `config.yaml` are skipped.
-
-Common failure modes:
-- **`HTTP 000` on assetlinks** → no internet or Vercel down → check VPN
-- **`< 0.2 SOL`** → wallet not yet funded → wait for tx confirmation
-- **Arweave upload timeout during `create release`** → network flakiness → just re-run, idempotent
-- **`publish submit` rejected** → check email at `landishser49@gmail.com` for review notes
+Total CLI runtime: 2-4 minutes. Solana Mobile reviews in **2-5 business days**.
+Email at `landishser49@gmail.com`.
 
 ## After approval
 
-- Listing goes live at https://dappstore.solanamobile.com/
+- Listing live at https://dappstore.solanamobile.com/
 - Update the grant application's "Existing assets" with the listing URL
-- Tweet about it from `@solborn_xyz` (warm-up post script in `docs/twitter-warmup.md`)
+- Tweet from `@solborn_xyz` (script in `docs/twitter-warmup.md`)
+
+## Sanity checks (already passed, do not re-run unless something breaks)
+
+- ✅ APK built and signed (`build/solborn-release.apk`, package `xyz.solborn.app`)
+- ✅ assetlinks.json live: `curl https://www.solborn.xyz/.well-known/assetlinks.json`
+- ✅ Google verifies the TWA fingerprint:
+  ```
+  curl 'https://digitalassetlinks.googleapis.com/v1/statements:list?source.web.site=https%3A%2F%2Fwww.solborn.xyz&relation=delegate_permission%2Fcommon.handle_all_urls'
+  ```
+- ✅ Publisher wallet funded with 0.2 SOL on mainnet
+- ✅ 6 portrait screenshots in `assets/`
+
+## Files in this folder
+
+| File | What it is |
+|---|---|
+| `config.yaml` | Reference for portal form fields (App NFT metadata) |
+| `submit.sh` | Final upload runner |
+| `publisher-keypair.json` | Solana keypair (gitignored, back up the seed) |
+| `assets/icon.png` | 512×512 app icon for portal upload |
+| `assets/banner.png` | 1200×600 store banner for portal upload |
+| `assets/screenshot-1..6.png` | 1080×2140 portrait shots for portal upload |
+| `build/solborn-release.apk` | Signed TWA APK (1.1 MB, gitignored) |
+| `build/android.keystore` | Signing key (gitignored — never lose!) |
+| `README.md` | Original (outdated) instructions for legacy CLI |
+| `SUBMIT_NOW.md` | This file — current portal-flow guide |
