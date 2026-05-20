@@ -60,7 +60,7 @@ release:
   catalog:
     en-US:
       name: 'SolBorn'
-      short_description: 'AI co-founder that ships your startup on Solana'
+      short_description: 'AI co-founder on Solana'    # ≤30 chars (portal cap)
       long_description: |
         SolBorn is an AI co-founder for Solana builders who have ideas but no partner.
 

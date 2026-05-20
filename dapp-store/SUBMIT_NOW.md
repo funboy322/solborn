@@ -27,26 +27,29 @@ the wrong phrase.
 
 1. Go to https://publish.solanamobile.com
 2. Sign in with your wallet (Phantom)
-3. Create a new app entry. Fields the portal will ask for — they're already
-   in `dapp-store/config.yaml`, just copy across:
+3. Click **Add a dApp → New dApp**. The portal form asks for (per the
+   2026 listing-page spec — only these are required, the portal may show
+   extra optional fields you can skip):
 
-| Portal field | Value from config.yaml |
-|---|---|
-| App name | `SolBorn` |
-| Package ID | `xyz.solborn.app` |
-| Publisher name | `SolBorn` |
-| Publisher email | `landishser49@gmail.com` |
-| Publisher website | `https://solborn.xyz` |
-| Icon | upload `dapp-store/assets/icon.png` (512×512) |
-| Banner | upload `dapp-store/assets/banner.png` (1200×600) |
-| Short description | `AI co-founder that ships your startup on Solana` |
-| Long description | copy from `config.yaml` lines 64-89 |
-| License URL | `https://github.com/funboy322/solborn/blob/main/LICENSE` |
-| Privacy URL | `https://solborn.xyz/privacy` |
-| Copyright URL | `https://solborn.xyz/privacy` |
+| Portal field | Source / value | Notes |
+|---|---|---|
+| App icon | upload `dapp-store/assets/icon.png` | 512×512 PNG |
+| App name | `SolBorn` | Unique, memorable |
+| Short description | `AI co-founder on Solana` | **≤30 chars** (portal hard limit) |
+| Long description | copy from `config.yaml` `long_description` block | Multi-paragraph, no length cap |
+| Screenshots | upload all 6 from `dapp-store/assets/screenshot-*.png` | 1080×2140 portrait, consistent aspect ratio |
 
-4. The portal will mint an **App NFT** to your wallet (~0.05 SOL fee). The
-   address gets stored server-side — you don't need to track it.
+The portal may also surface extra optional fields (publisher website, email,
+categories, age rating). All optional inputs map to values already in
+`config.yaml`:
+
+- Publisher website: `https://solborn.xyz`
+- Publisher email: `landishser49@gmail.com`
+- License URL: `https://github.com/funboy322/solborn/blob/main/LICENSE`
+- Privacy URL: `https://solborn.xyz/privacy`
+
+4. Submit the app entry. The portal mints an **App NFT** to your wallet
+   (~0.05 SOL fee). Address is tracked server-side — you don't need it.
 
 5. After App NFT mints, go to https://publish.solanamobile.com/dashboard/settings/api-keys
    and **Generate API key**. Copy it.
