@@ -50,6 +50,10 @@ release:
       uri: './assets/screenshot-3.png'
     - purpose: screenshot
       uri: './assets/screenshot-4.png'
+    - purpose: screenshot
+      uri: './assets/screenshot-5.png'
+    - purpose: screenshot
+      uri: './assets/screenshot-6.png'
   files:
     - purpose: install
       uri: './build/solborn-release.apk'  # produced by Bubblewrap build

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "xyz.solborn.app",
+      "sha256_cert_fingerprints": [
+        "4E:F8:59:98:37:AE:0F:11:38:7B:38:BE:57:0E:7E:58:18:B5:BD:E4:34:CF:35:A4:F2:E6:C0:B8:A1:94:8D:F8"
+      ]
+    }
+  }
+]
