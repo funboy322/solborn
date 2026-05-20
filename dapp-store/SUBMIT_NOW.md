@@ -10,18 +10,18 @@ Everything is built and TWA-verified. Three steps remain.
 ## Step 1 — Import publisher keypair into Phantom (for portal sign-in)
 
 The portal at publish.solanamobile.com signs you in with a Solana wallet. The
-publisher identity should match the keypair you use for signing CLI releases.
+publisher identity should match the keypair the CLI signs releases with —
+otherwise the portal sees "publisher X registered the app, but the upload
+is signed by Y" and rejects it.
 
-Open Phantom → ⚙ Settings → Manage Accounts → Add / Connect Wallet → **Import Private Key** → paste:
+Open Phantom → ⚙ Settings → **Add / Connect Wallet** → **Import Recovery Phrase**
+→ paste the BIP39 mnemonic that was emitted when `solana-keygen new` created
+`publisher-keypair.json`. The mnemonic is stored locally in your password
+manager / Claude memory file — never commit it to git.
 
-```bash
-# Show the base58 secret key for Phantom import:
-cat /Users/ilyas/Downloads/soldad/founder-forge/dapp-store/publisher-keypair.json \
-  | python3 -c "import sys,json,base58; print(base58.b58encode(bytes(json.load(sys.stdin))).decode())"
-```
-
-(Or just keep using your main wallet — the portal doesn't require this exact
-keypair to be the signer; you can pass any keypair via `--keypair` later.)
+After import, verify the derived first account matches public key
+`AKpZ68kWBf6htCBE8Vz1WVJN1Kg5adXtuUwsoVidMDoj`. If it doesn't, you imported
+the wrong phrase.
 
 ## Step 2 — Register SolBorn in the portal (web, one-time)
 
