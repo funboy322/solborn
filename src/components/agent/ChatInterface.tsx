@@ -13,6 +13,8 @@ import { STAGE_CONFIG, ENERGY_PER_MESSAGE, MAX_ENERGY, ENERGY_REGEN_PER_MIN } fr
 import { nanoid } from '@/lib/utils'
 import { applyTraitBoosts } from '@/lib/ai/trait-analyzer'
 import { calculateTeachingXP, isRepetitive } from '@/lib/ai/xp-calculator'
+import { parseAgentMessage, type McOption } from '@/lib/ai/mc-parser'
+import { McQuestionCard } from '@/components/agent/McQuestionCard'
 import { checkNewAchievements, calculateStreak, getStreakBonus } from '@/lib/achievements'
 import { SFX } from '@/lib/sounds'
 import { useDemoMode, DEMO_XP_MULTIPLIER, DEMO_ENERGY_COST } from '@/lib/demo-mode'
@@ -127,6 +129,7 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
   const consumeEnergy = useForgeStore((s) => s.consumeEnergy)
   const regenEnergy = useForgeStore((s) => s.regenEnergy)
   const registerTraining = useForgeStore((s) => s.registerTraining)
+  const recordPreference = useForgeStore((s) => s.recordPreference)
   const addMessage = useForgeStore((s) => s.addMessage)
   const { publicKey } = useSolanaSigner()
   const trainerWallet = publicKey?.toBase58() ?? null
@@ -155,6 +158,10 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
   const [screenShake, setScreenShake] = useState(false)
   const [hoveredMsgId, setHoveredMsgId] = useState<string | null>(null)
   const [inputFocused, setInputFocused] = useState(false)
+  // Tracks which MC questions the user has resolved this session.
+  // Map<messageId, selectedOptionId | '__escape__'>. Persistence is intentional:
+  // when the chat scrolls back, answered cards re-render locked w/ the same pick.
+  const [mcAnswers, setMcAnswers] = useState<Record<string, string>>({})
   // Flips true after the first assistant reply finishes streaming. Drives SupportBanner.
   const [firstReplyDone, setFirstReplyDone] = useState(false)
 
@@ -339,6 +346,41 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
     sendMessage(input)
   }
 
+  /**
+   * MC option tapped. Order matters: record preference + trait bump FIRST so
+   * the UI updates instantly, then push the user message which kicks off the
+   * agent's follow-up stream.
+   */
+  const handleMcSelect = useCallback(
+    (msgId: string, question: { saveAs?: string }, opt: McOption) => {
+      // Idempotency: ignore double-taps and re-renders.
+      setMcAnswers((prev) => (prev[msgId] ? prev : { ...prev, [msgId]: opt.id }))
+
+      if (question.saveAs) {
+        recordPreference(agent.id, {
+          key: question.saveAs,
+          value: opt.label,
+          optionId: opt.id,
+          stage: agent.stage,
+        })
+      }
+
+      if (opt.trait && opt.delta) {
+        const boosted = applyTraitBoosts(agent.traits, [{ trait: opt.trait, amount: opt.delta }])
+        updateTraits(agent.id, boosted)
+        SFX.xpGain()
+      }
+
+      sendMessage(opt.label)
+    },
+    [agent.id, agent.traits, agent.stage, recordPreference, updateTraits, sendMessage]
+  )
+
+  const handleMcEscape = useCallback((msgId: string) => {
+    setMcAnswers((prev) => (prev[msgId] ? prev : { ...prev, [msgId]: '__escape__' }))
+    setTimeout(() => inputRef.current?.focus(), 80)
+  }, [])
+
   const noEnergy = !demo && displayEnergy < ENERGY_PER_MESSAGE
   const suggested = SUGGESTED_PROMPTS[agent.stage]
   const hasInput = input.trim().length > 0
@@ -465,23 +507,53 @@ export function ChatInterface({ agent }: ChatInterfaceProps) {
                     {msg.content}
                   </div>
                 ) : (
-                  <div
-                    className="px-4 py-2.5 rounded-2xl rounded-tl-sm text-sm leading-relaxed whitespace-pre-wrap text-zinc-200"
-                    style={{
-                      background: 'rgba(255,255,255,0.04)',
-                      backdropFilter: 'blur(12px)',
-                      border: `1px solid ${stageConfig.color}28`,
-                    }}
-                  >
-                    {msg.content}
-                    {msg.id === streamingId && (
-                      <motion.span
-                        animate={{ opacity: [1, 0] }}
-                        transition={{ duration: 0.5, repeat: Infinity }}
-                        className="inline-block w-0.5 h-3.5 bg-zinc-400 ml-0.5 align-middle"
-                      />
-                    )}
-                  </div>
+                  (() => {
+                    const parsed = parseAgentMessage(msg.content)
+                    const isStreamingHere = msg.id === streamingId
+                    const previousAnswer = mcAnswers[msg.id]
+
+                    if (parsed.kind === 'mc_question') {
+                      return (
+                        <McQuestionCard
+                          question={parsed.question}
+                          preText={parsed.preText || undefined}
+                          accentColor={stageConfig.color}
+                          alreadyAnswered={Boolean(previousAnswer)}
+                          selectedOptionId={previousAnswer && previousAnswer !== '__escape__' ? previousAnswer : undefined}
+                          onSelect={(opt) => handleMcSelect(msg.id, parsed.question, opt)}
+                          onEscape={() => handleMcEscape(msg.id)}
+                        />
+                      )
+                    }
+
+                    const displayText =
+                      parsed.kind === 'streaming_mc' ? parsed.preText : parsed.text
+
+                    return (
+                      <div
+                        className="px-4 py-2.5 rounded-2xl rounded-tl-sm text-sm leading-relaxed whitespace-pre-wrap text-zinc-200"
+                        style={{
+                          background: 'rgba(255,255,255,0.04)',
+                          backdropFilter: 'blur(12px)',
+                          border: `1px solid ${stageConfig.color}28`,
+                        }}
+                      >
+                        {displayText}
+                        {parsed.kind === 'streaming_mc' && (
+                          <span className="block mt-2 text-xs italic text-zinc-500">
+                            preparing a question…
+                          </span>
+                        )}
+                        {isStreamingHere && parsed.kind === 'text' && (
+                          <motion.span
+                            animate={{ opacity: [1, 0] }}
+                            transition={{ duration: 0.5, repeat: Infinity }}
+                            className="inline-block w-0.5 h-3.5 bg-zinc-400 ml-0.5 align-middle"
+                          />
+                        )}
+                      </div>
+                    )
+                  })()
                 )}
 
                 {/* Feedback (only on completed assistant messages) */}

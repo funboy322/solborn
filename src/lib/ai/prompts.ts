@@ -83,10 +83,54 @@ Stage guidance:
 ${stageGuide[stage]}`
 }
 
+/**
+ * Instructs the agent on WHEN and HOW to emit a multiple-choice question.
+ * The frontend parses these blocks at render time and shows tappable buttons.
+ * Frequency target: roughly 1 in every 4–6 agent turns.
+ */
+function buildMcQuestionBlock(): string {
+  return `MULTIPLE-CHOICE QUESTIONS — use sparingly, never every turn.
+
+About once every 4–6 of your replies, instead of asking an open-ended question, emit a structured multiple-choice block. Use this for preference / identity / values questions about the HUMAN (not about their product idea). Examples of good MC topics:
+  - what frustrates them most day-to-day
+  - their ideal weekend
+  - which Solana project they admire most
+  - their preferred building pace (slow & polished vs ship daily)
+  - what they value in a co-founder
+
+For product-discovery follow-ups, stick to freeform text — MC is too restrictive there.
+
+Emit it INLINE in your reply, exactly in this shape:
+<mc_question id="<short_snake_case_id>">
+{
+  "text": "<the question, lowercase, one sentence>",
+  "options": [
+    {"id":"<short_id>","label":"<short option text>","trait":"<trait_name>","delta":<int 1-5>},
+    {"id":"<short_id>","label":"<short option text>","trait":"<trait_name>","delta":<int 1-5>},
+    {"id":"<short_id>","label":"<short option text>"},
+    {"id":"<short_id>","label":"<short option text>"}
+  ],
+  "save_as": "<short_snake_case_key>"
+}
+</mc_question>
+
+Rules:
+- ALWAYS exactly 4 options, never more, never fewer.
+- \`trait\` (when present) MUST be one of: curiosity, solanaKnowledge, codingSkill, creativity, founderMindset.
+- Set \`trait\` + \`delta\` on roughly 2 of the 4 options — not all four (the answer should feel like genuine preference, not a min-max test).
+- \`delta\` between 1 and 5. Higher = stronger signal.
+- \`save_as\` is a free-form key like "frustration" or "weekend_style" — used to store the answer on the user's profile.
+- Option labels: lowercase, under 60 chars, no emoji, no period at the end.
+- You may write 1-2 lines of plain prose BEFORE the block to set up the question — but NOT after the block in the same reply.
+- After the user picks, their selection arrives as a normal user message — respond naturally, never reference "you picked option 2".
+- If you just asked an MC question in the previous turn, do NOT ask another this turn.`
+}
+
 export function buildSystemPrompt(agent: ForgeAgent, memoryContext?: string): string {
   const stagePrompt = STAGE_CONFIG[agent.stage].systemPrompt
   const skillBlock = buildSkillBehaviorBlock(agent.traits)
   const discoveryBlock = buildProductDiscoveryBlock(agent.stage)
+  const mcBlock = buildMcQuestionBlock()
 
   const identity = `Your name: ${agent.name}
 Your personality: ${agent.personality}`
@@ -99,7 +143,9 @@ ${identity}
 
 ${skillBlock}
 
-${discoveryBlock}${memoryBlock}
+${discoveryBlock}
+
+${mcBlock}${memoryBlock}
 
 You are building toward deploying your first Solana project. Always stay in character as ${agent.name}.`
 }

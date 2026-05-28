@@ -1,7 +1,7 @@
 'use client'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { ForgeAgent, CreateAgentInput, AgentMessage, AgentSkills, AgentStage, ChainCheckpoint, Trainer, StakePosition, ProductVote } from './types'
+import type { ForgeAgent, CreateAgentInput, AgentMessage, AgentSkills, AgentStage, AgentPreference, ChainCheckpoint, Trainer, StakePosition, ProductVote } from './types'
 import { DEFAULT_SKILLS, STAGE_CONFIG, STAGE_ORDER, MAX_ENERGY, ENERGY_REGEN_PER_MIN } from './constants'
 import { nanoid } from './utils'
 
@@ -19,6 +19,8 @@ interface ForgeStore {
   updateAgentNFT: (agentId: string, mintAddress: string) => void
   setGeneratedProject: (agentId: string, project: ForgeAgent['generatedProject']) => void
   updateTraits: (agentId: string, traits: AgentSkills) => void
+  /** Captures a single-choice preference selection (MC question). De-dupes on key. */
+  recordPreference: (agentId: string, pref: Omit<AgentPreference, 'timestamp'>) => void
   unlockAchievement: (agentId: string, achievementId: string) => void
   updateStreak: (agentId: string, streak: number, bestStreak: number) => void
   incrementLongResponses: (agentId: string) => void
@@ -202,6 +204,20 @@ export const useForgeStore = create<ForgeStore>()(
           agents: state.agents.map((a) =>
             a.id === agentId ? { ...a, traits } : a
           ),
+        }))
+      },
+
+      recordPreference: (agentId, pref) => {
+        const stamped: AgentPreference = { ...pref, timestamp: Date.now() }
+        set((state) => ({
+          agents: state.agents.map((a) => {
+            if (a.id !== agentId) return a
+            const existing = a.preferences ?? []
+            // De-dupe on key: latest answer wins. Keeps the profile coherent
+            // if the LLM ever re-asks the same question.
+            const filtered = existing.filter((p) => p.key !== stamped.key)
+            return { ...a, preferences: [...filtered, stamped] }
+          }),
         }))
       },
 

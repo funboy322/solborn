@@ -152,6 +152,26 @@ export interface ForgeAgent {
   chainHistory?: ChainCheckpoint[]
   // Multi-trainer (phase 4)
   trainers?: Trainer[]         // contribution records, keyed by walletAddress
+  // Preference choices captured via MC questions (phase 5)
+  preferences?: AgentPreference[]
+}
+
+/**
+ * One captured preference choice from an MC question.
+ * Persisted on the agent so the Founder Profile can show "favorite stack" etc.,
+ * and so memory ingestion can use it as structured context.
+ */
+export interface AgentPreference {
+  /** Free-form key chosen by the LLM (e.g. "frustration", "weekend_style"). */
+  key: string
+  /** The label of the option the user tapped. */
+  value: string
+  /** Optional id from the MC option (for analytics / mapping). */
+  optionId?: string
+  /** Stage at which it was captured. */
+  stage: AgentStage
+  /** Captured timestamp. */
+  timestamp: number
 }
 
 export interface NFTMetadata {
