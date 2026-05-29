@@ -2,12 +2,15 @@
 
 import { Fragment, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Activity, ArrowLeft, Check, ExternalLink, Loader2, Lock, Rocket, Send, Share2, ShieldCheck, Sparkles } from 'lucide-react'
+import { Activity, ArrowLeft, Check, ExternalLink, Loader2, Lock, Pencil, Rocket, Send, Share2, ShieldCheck, Sparkles } from 'lucide-react'
 import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
 import { Button } from '@/components/ui/button'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { TipButton } from '@/components/agent/TipButton'
+import { EditProductModal } from '@/components/agent/EditProductModal'
 import { useForgeStore } from '@/lib/store'
+import { ownsAgent } from '@/lib/ownership'
+import { STAGE_CONFIG } from '@/lib/constants'
 import type { AgentStage, ForgeAgent, GeneratedProject } from '@/lib/types'
 
 const STAGE_JOURNEY: Array<{ stage: AgentStage; emoji: string }> = [
@@ -102,7 +105,11 @@ function ProductContent({
   const [useCase, setUseCase] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null)
+  const [editOpen, setEditOpen] = useState(false)
   const canSubmit = contact.trim().length >= 3 && useCase.trim().length >= 20
+  const walletAddress = publicKey?.toBase58() ?? null
+  const canEdit = ownsAgent(agent, walletAddress)
+  const accentColor = STAGE_CONFIG[agentStage]?.color ?? '#8b5cf6'
 
   const artworkUrl = useMemo(() => {
     const params = new URLSearchParams({
@@ -174,9 +181,20 @@ function ProductContent({
           <div className="inline-flex items-center px-3 py-1 rounded-full border border-emerald-300/25 bg-emerald-300/10 text-[11px] font-semibold text-emerald-200 mb-5">
             Agent-built product
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-100 mb-3">
-            {project.name}
-          </h2>
+          <div className="flex items-baseline gap-2 mb-3 flex-wrap">
+            <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-100">
+              {project.name}
+            </h2>
+            {project.customizedAt && (
+              <span
+                className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-zinc-500"
+                title={`Edited by creator on ${new Date(project.customizedAt).toLocaleDateString()}`}
+              >
+                <Pencil size={10} />
+                edited
+              </span>
+            )}
+          </div>
           {project.tagline && (
             <p className="text-lg sm:text-xl text-zinc-200 leading-snug max-w-3xl mb-4">
               {project.tagline}
@@ -186,12 +204,35 @@ function ProductContent({
             {project.description}
           </p>
           <div className="flex flex-wrap gap-2 mt-5">
-            <button
-              onClick={scrollToRequestAccess}
-              className="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-400 transition-colors"
-            >
-              Request beta access
-            </button>
+            {project.productUrl ? (
+              <a
+                href={project.productUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors"
+                style={{
+                  background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
+                }}
+                title={
+                  project.productUrlVerified
+                    ? 'Verified by Google Safe Browsing'
+                    : 'Link not verified — open at your own risk'
+                }
+              >
+                Visit product
+                <ExternalLink size={14} />
+                {project.productUrlVerified && (
+                  <ShieldCheck size={14} className="text-emerald-200" />
+                )}
+              </a>
+            ) : (
+              <button
+                onClick={scrollToRequestAccess}
+                className="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-400 transition-colors"
+              >
+                Request beta access
+              </button>
+            )}
             {project.txHash && (
               <a
                 href={`https://explorer.solana.com/tx/${project.txHash}?cluster=devnet`}
@@ -217,6 +258,16 @@ function ProductContent({
               projectId={project.id}
               projectName={project.name}
             />
+            {canEdit && (
+              <button
+                onClick={() => setEditOpen(true)}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-zinc-200 hover:bg-white/[0.06] transition-colors"
+                title="Edit name, tagline, brief, and product link"
+              >
+                <Pencil size={14} />
+                Edit page
+              </button>
+            )}
           </div>
           <div className="flex flex-wrap gap-2 mt-6">
             {project.techStack.map((tech) => (
@@ -411,6 +462,15 @@ function ProductContent({
           </div>
         </div>
       </section>
+
+      {editOpen && (
+        <EditProductModal
+          project={project}
+          agentId={agent.id}
+          onClose={() => setEditOpen(false)}
+          accentColor={accentColor}
+        />
+      )}
     </div>
   )
 }

@@ -70,6 +70,19 @@ export interface GeneratedProject {
   blink?: BlinkSpec
   /** Absolute Blink URL pointing to /api/blinks/[id]?... */
   blinkUrl?: string
+  /**
+   * Public-facing product link the creator added (waitlist, repo, app URL).
+   * Always validated via /api/scam-check before being saved.
+   */
+  productUrl?: string
+  /** True only after Safe Browsing returned clean for productUrl. */
+  productUrlVerified?: boolean
+  /** Last successful productUrl check timestamp (re-checked on subsequent edits). */
+  productUrlVerifiedAt?: number
+  /** When the creator last edited the page through the customize modal. */
+  customizedAt?: number
+  /** Track which top-level fields the creator has overridden, for the "edited" badge. */
+  customFields?: string[]
 }
 
 export interface Achievement {

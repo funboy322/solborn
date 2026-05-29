@@ -19,6 +19,13 @@ interface ForgeStore {
   updateAgentNFT: (agentId: string, mintAddress: string) => void
   setGeneratedProject: (agentId: string, project: ForgeAgent['generatedProject']) => void
   updateTraits: (agentId: string, traits: AgentSkills) => void
+  /**
+   * Patch-merges fields into the agent's generatedProject and stamps customizedAt.
+   * Tracks which fields the creator has overridden in `customFields`.
+   * Internal-only verification fields (productUrlVerified, productUrlVerifiedAt) are
+   * NOT counted as "customized" — they're system metadata.
+   */
+  updateGeneratedProject: (agentId: string, patch: Partial<ForgeAgent['generatedProject']>) => void
   /** Captures a single-choice preference selection (MC question). De-dupes on key. */
   recordPreference: (agentId: string, pref: Omit<AgentPreference, 'timestamp'>) => void
   unlockAchievement: (agentId: string, achievementId: string) => void
@@ -255,6 +262,37 @@ export const useForgeStore = create<ForgeStore>()(
           agents: state.agents.map((a) =>
             a.id === agentId ? { ...a, generatedProject: project } : a
           ),
+        }))
+      },
+
+      updateGeneratedProject: (agentId, patch) => {
+        if (!patch) return
+        // Internal metadata fields don't count as user customization.
+        const INTERNAL_KEYS: ReadonlySet<string> = new Set([
+          'productUrlVerified',
+          'productUrlVerifiedAt',
+          'customizedAt',
+          'customFields',
+        ])
+        const customFieldsFromPatch = Object.keys(patch).filter((k) => !INTERNAL_KEYS.has(k))
+        set((state) => ({
+          agents: state.agents.map((a) => {
+            if (a.id !== agentId) return a
+            const existing = a.generatedProject
+            if (!existing) return a
+            const mergedCustomFields = Array.from(
+              new Set([...(existing.customFields ?? []), ...customFieldsFromPatch])
+            )
+            return {
+              ...a,
+              generatedProject: {
+                ...existing,
+                ...patch,
+                customizedAt: Date.now(),
+                customFields: mergedCustomFields,
+              },
+            }
+          }),
         }))
       },
 
