@@ -35,19 +35,21 @@ export default function ForgePage() {
 
   return (
     <main className="min-h-screen p-6">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-8 pt-4">
           <Button variant="ghost" size="sm" onClick={() => router.push('/')} className="hidden sm:inline-flex">
             <ArrowLeft size={16} />
           </Button>
           <img src="/logo.png" alt="SolBorn" className="w-8 h-8 rounded-xl cursor-pointer shrink-0" onClick={() => router.push('/')} />
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 leading-tight">The Forge</h1>
-            <p className="text-xs sm:text-sm text-zinc-500">
+          <div className="flex-1 min-w-0 sm:min-w-[140px]">
+            <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 leading-tight whitespace-nowrap">
+              The Forge
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-500 truncate">
               {agents.length} agent{agents.length !== 1 ? 's' : ''}
               {connected && walletAddr && (
-                <span className="ml-2 text-emerald-400 text-[10px] sm:text-xs">
+                <span className="ml-2 text-emerald-400 text-[10px] sm:text-xs hidden md:inline">
                   · {walletAddr.slice(0, 6)}...{walletAddr.slice(-4)}
                 </span>
               )}
