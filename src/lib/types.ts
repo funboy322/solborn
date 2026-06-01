@@ -83,6 +83,64 @@ export interface GeneratedProject {
   customizedAt?: number
   /** Track which top-level fields the creator has overridden, for the "edited" badge. */
   customFields?: string[]
+  /**
+   * AI-generated full landing page (hero, features, how-it-works, FAQ, CTA).
+   * Produced by /api/landing/generate after a 0.05 SOL mainnet payment
+   * (one-shot, pay-per-generation — no subscription state). The
+   * tx signature is embedded in landingContent.txSignature as proof.
+   */
+  landingContent?: LandingContent
+}
+
+/** Single feature card on the generated landing page. */
+export interface LandingFeature {
+  /** Optional lucide-react icon name (e.g. "Sparkles", "Zap"). */
+  icon?: string
+  title: string
+  body: string
+}
+
+/** Single step in the how-it-works section. */
+export interface LandingStep {
+  stepNumber: number
+  title: string
+  body: string
+}
+
+/** Single Q+A in the FAQ section. */
+export interface LandingFaqItem {
+  question: string
+  answer: string
+}
+
+/**
+ * Full AI-generated landing page structure.
+ * Renders as Hero → Features → How it works → FAQ → CTA via <RenderedLanding>.
+ */
+export interface LandingContent {
+  hero: {
+    headline: string
+    subhead: string
+    ctaText: string
+    /** Optional CTA target; falls back to productUrl or scrollTo("request-access"). */
+    ctaHref?: string
+  }
+  /** Exactly 4 cards. */
+  features: LandingFeature[]
+  /** Exactly 4 steps. */
+  howItWorks: LandingStep[]
+  /** Exactly 4 Q+A items. */
+  faq: LandingFaqItem[]
+  cta: {
+    headline: string
+    subhead?: string
+    buttonText: string
+    href?: string
+  }
+  /** When this generation was produced. */
+  generatedAt: number
+  /** Mainnet tx signature proving the 0.05 SOL payment for this generation. */
+  txSignature: string
 }
 
 export interface Achievement {

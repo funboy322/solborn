@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { TipButton } from '@/components/agent/TipButton'
 import { EditProductModal } from '@/components/agent/EditProductModal'
+import { GenerateLandingModal } from '@/components/agent/GenerateLandingModal'
+import { RenderedLanding } from '@/components/agent/RenderedLanding'
 import { useForgeStore } from '@/lib/store'
 import { ownsAgent } from '@/lib/ownership'
 import { STAGE_CONFIG } from '@/lib/constants'
@@ -106,10 +108,13 @@ function ProductContent({
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null)
   const [editOpen, setEditOpen] = useState(false)
+  const [generateOpen, setGenerateOpen] = useState(false)
+  const updateGeneratedProject = useForgeStore((s) => s.updateGeneratedProject)
   const canSubmit = contact.trim().length >= 3 && useCase.trim().length >= 20
   const walletAddress = publicKey?.toBase58() ?? null
   const canEdit = ownsAgent(agent, walletAddress)
   const accentColor = STAGE_CONFIG[agentStage]?.color ?? '#8b5cf6'
+  const hasLanding = Boolean(project.landingContent)
 
   const artworkUrl = useMemo(() => {
     const params = new URLSearchParams({
@@ -268,6 +273,23 @@ function ProductContent({
                 Edit page
               </button>
             )}
+            {canEdit && (
+              <button
+                onClick={() => setGenerateOpen(true)}
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors"
+                style={{
+                  background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
+                }}
+                title={
+                  hasLanding
+                    ? 'Regenerate the full landing page (0.05 SOL)'
+                    : 'Generate a full landing page from your brief (0.05 SOL)'
+                }
+              >
+                <Sparkles size={14} />
+                {hasLanding ? 'Regenerate landing (0.05 SOL)' : 'Generate landing (0.05 SOL)'}
+              </button>
+            )}
           </div>
           <div className="flex flex-wrap gap-2 mt-6">
             {project.techStack.map((tech) => (
@@ -360,6 +382,10 @@ function ProductContent({
           )}
         </div>
       </section>
+
+      {project.landingContent && (
+        <RenderedLanding landing={project.landingContent} accentColor={accentColor} />
+      )}
 
       <section className="grid lg:grid-cols-[0.92fr_1.08fr] gap-5">
         <AgentIdCard agent={agent} />
@@ -469,6 +495,19 @@ function ProductContent({
           agentId={agent.id}
           onClose={() => setEditOpen(false)}
           accentColor={accentColor}
+        />
+      )}
+
+      {generateOpen && (
+        <GenerateLandingModal
+          agent={agent}
+          project={project}
+          accentColor={accentColor}
+          onClose={() => setGenerateOpen(false)}
+          onSuccess={(landing) => {
+            updateGeneratedProject(agent.id, { landingContent: landing })
+            setGenerateOpen(false)
+          }}
         />
       )}
     </div>
