@@ -11,7 +11,6 @@ import { EditProductModal } from '@/components/agent/EditProductModal'
 import { GenerateLandingModal } from '@/components/agent/GenerateLandingModal'
 import { RenderedLanding } from '@/components/agent/RenderedLanding'
 import { useForgeStore } from '@/lib/store'
-import { ownsAgent } from '@/lib/ownership'
 import { STAGE_CONFIG } from '@/lib/constants'
 import type { AgentStage, ForgeAgent, GeneratedProject } from '@/lib/types'
 
@@ -112,7 +111,13 @@ function ProductContent({
   const updateGeneratedProject = useForgeStore((s) => s.updateGeneratedProject)
   const canSubmit = contact.trim().length >= 3 && useCase.trim().length >= 20
   const walletAddress = publicKey?.toBase58() ?? null
-  const canEdit = ownsAgent(agent, walletAddress)
+  // Local-store ownership: this product page only renders when the project
+  // exists in THIS browser's zustand store. If we got here, the visitor is
+  // the local owner — wallet match is meaningful only for on-chain ops.
+  // Edits write to local storage; "Generate landing" needs a wallet because
+  // it pays 0.05 SOL on mainnet, but that gate lives below.
+  const canEdit = true
+  const walletConnected = Boolean(walletAddress)
   const accentColor = STAGE_CONFIG[agentStage]?.color ?? '#8b5cf6'
   const hasLanding = Boolean(project.landingContent)
 
@@ -276,14 +281,20 @@ function ProductContent({
             {canEdit && (
               <button
                 onClick={() => setGenerateOpen(true)}
-                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors"
+                disabled={!walletConnected}
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
+                  background: walletConnected
+                    ? `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`
+                    : 'rgba(255,255,255,0.05)',
+                  ...(walletConnected ? {} : { border: '1px solid rgba(255,255,255,0.1)' }),
                 }}
                 title={
-                  hasLanding
-                    ? 'Regenerate the full landing page (0.05 SOL)'
-                    : 'Generate a full landing page from your brief (0.05 SOL)'
+                  !walletConnected
+                    ? 'Connect a Solana wallet to pay 0.05 SOL and generate'
+                    : hasLanding
+                      ? 'Regenerate the full landing page (0.05 SOL)'
+                      : 'Generate a full landing page from your brief (0.05 SOL)'
                 }
               >
                 <Sparkles size={14} />
