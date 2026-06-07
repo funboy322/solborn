@@ -1,39 +1,27 @@
 /**
- * /api/landing/generate — Pro "generate landing page" endpoint.
+ * /api/landing/generate — "generate landing page" endpoint.
  *
- *   POST { agentId, projectId, txSignature, walletAddress }
+ *   POST { agentId, projectId, agent, project, walletAddress? }
  *   →    LandingContent JSON on success
- *   →    { error: 'replay' | 'tx-not-found' | 'tx-recipient' | 'tx-amount'
- *                | 'tx-sender' | 'tx-stale' | 'llm-failed' | 'shape-invalid'
- *                | 'rpc-error' | 'missing-key' | ... }
+ *   →    { error: 'rate-limited' | 'llm-failed' | 'llm-bad-json'
+ *                | 'shape-invalid' | 'missing-key' | ... }
+ *
+ * Free mode (v2): no on-chain payment required, no tx verification.
+ * Abuse is limited only by a simple per-agent rate limit (1 generation
+ * per 60 seconds). When we add paid generations back, the route will
+ * accept an optional txSignature and re-introduce the on-chain checks.
  *
  * Flow:
- *   1. Validate body shape + addresses.
- *   2. Anti-replay: in-memory LRU of used signatures (1000 cap). Marks the
- *      signature USED immediately to prevent races; on any subsequent
- *      verification failure we remove it so the user isn't punished for
- *      a flake (they can retry that same sig).
- *   3. Verify the tx on mainnet via @solana/web3.js getParsedTransaction:
- *      - confirmed/finalized status
- *      - recipient = LANDING_RECIPIENT (publisher wallet)
- *      - lamports transferred >= 0.05 SOL
- *      - sender = walletAddress
- *      - block timestamp within last 24h
- *   4. Build LLM prompt + call Groq llama-3.3-70b. One retry on JSON parse
- *      failure with a stricter reminder. After two failed parses → 502.
- *   5. Shape-validate (exactly 4 features / 4 steps / 4 FAQ; if model
- *      returned 3 or 5, slice/pad with neutral placeholders rather than
- *      throwing the user's 0.05 SOL away).
- *   6. Stamp generatedAt + txSignature, return.
- *
- * Anti-replay is in-memory only (resets on Lambda cold start). For v1 that
- * is acceptable: worst case an attacker re-uses one tx during a single
- * cold-start window, getting one extra generation. Durable replay
- * protection is a future Upstash Redis sprint.
+ *   1. Validate body.
+ *   2. Per-agent rate limit (in-memory Map, 60s cooldown).
+ *   3. Call Groq llama-3.3-70b. One retry on JSON parse failure with a
+ *      stricter reminder. After two failed parses → 502.
+ *   4. Shape-validate (exactly 4 features / 4 steps / 4 FAQ; if model
+ *      returned 3 or 5, slice/pad rather than throwing the request away).
+ *   5. Stamp generatedAt + an empty txSignature, return.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { Connection, PublicKey, clusterApiUrl, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { createGroq } from '@ai-sdk/groq'
 import { generateText } from 'ai'
 import { buildLandingPrompt } from '@/lib/ai/landing-prompt'
@@ -50,51 +38,39 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
 
-const LANDING_RECIPIENT = new PublicKey('AKpZ68kWBf6htCBE8Vz1WVJN1Kg5adXtuUwsoVidMDoj')
-const LANDING_PRICE_LAMPORTS = Math.floor(0.05 * LAMPORTS_PER_SOL)
-const MAX_TX_AGE_MS = 24 * 60 * 60 * 1000 // 24h
-
 const groq = createGroq({ apiKey: process.env.GROQ_API_KEY ?? '' })
 const PRIMARY_MODEL = 'llama-3.3-70b-versatile'
 
-// ── in-memory anti-replay (per Lambda instance) ─────────────────────────────
-const REPLAY_CAP = 1000
-const usedSignatures = new Set<string>()
-function markUsed(sig: string) {
-  if (usedSignatures.size >= REPLAY_CAP) {
-    // Drop oldest insertion (Set preserves insertion order).
-    const first = usedSignatures.values().next().value
-    if (typeof first === 'string') usedSignatures.delete(first)
+// ── in-memory per-agent rate limit (cooldown 60s) ──────────────────────────
+const COOLDOWN_MS = 60_000
+const lastGenerateAt = new Map<string, number>()
+function checkAndStampRateLimit(agentId: string): { ok: true } | { ok: false; retryInMs: number } {
+  const now = Date.now()
+  const previous = lastGenerateAt.get(agentId)
+  if (previous && now - previous < COOLDOWN_MS) {
+    return { ok: false, retryInMs: COOLDOWN_MS - (now - previous) }
   }
-  usedSignatures.add(sig)
-}
-
-function getMainnetConnection(): Connection {
-  // NEXT_PUBLIC_HELIUS_RPC_MAINNET overrides the public endpoint when set.
-  const rpc = process.env.NEXT_PUBLIC_HELIUS_RPC_MAINNET || clusterApiUrl('mainnet-beta')
-  return new Connection(rpc, 'confirmed')
+  lastGenerateAt.set(agentId, now)
+  // Lightweight pruning so the map doesn't grow forever.
+  if (lastGenerateAt.size > 5000) {
+    const cutoff = now - COOLDOWN_MS
+    for (const [k, t] of lastGenerateAt) {
+      if (t < cutoff) lastGenerateAt.delete(k)
+    }
+  }
+  return { ok: true }
 }
 
 interface Body {
   agentId: string
   projectId: string
-  txSignature: string
-  walletAddress: string
   agent: ForgeAgent
   project: GeneratedProject
+  walletAddress?: string | null
 }
 
-function badRequest(error: string, status = 400) {
-  return NextResponse.json({ error }, { status })
-}
-
-function isBase58Signature(s: string): boolean {
-  // Solana signatures are 64 bytes base58 → 86-88 chars typically.
-  return /^[1-9A-HJ-NP-Za-km-z]{80,100}$/.test(s)
-}
-
-function isBase58Pubkey(s: string): boolean {
-  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(s)
+function badRequest(error: string, status = 400, extra: Record<string, unknown> = {}) {
+  return NextResponse.json({ error, ...extra }, { status })
 }
 
 export async function POST(req: NextRequest) {
@@ -105,83 +81,18 @@ export async function POST(req: NextRequest) {
     return badRequest('invalid-json')
   }
 
-  const { agentId, projectId, txSignature, walletAddress, agent, project } = body
-  if (!agentId || !projectId || !txSignature || !walletAddress) return badRequest('missing-fields')
-  if (!isBase58Signature(txSignature)) return badRequest('invalid-tx-sig')
-  if (!isBase58Pubkey(walletAddress)) return badRequest('invalid-wallet')
+  const { agentId, projectId, agent, project } = body
+  if (!agentId || !projectId) return badRequest('missing-fields')
   if (!agent || !project) return badRequest('missing-context')
 
   if (!process.env.GROQ_API_KEY) {
     return badRequest('missing-key', 503)
   }
 
-  // ── Anti-replay (mark eagerly, free on later failure) ────────────────────
-  if (usedSignatures.has(txSignature)) {
-    return badRequest('replay', 409)
-  }
-  markUsed(txSignature)
-
-  // Helper to roll back the replay mark if we end up rejecting the tx — the
-  // user shouldn't lose retry capacity over a transient issue.
-  const release = () => {
-    usedSignatures.delete(txSignature)
-  }
-
-  // ── On-chain verification ────────────────────────────────────────────────
-  const conn = getMainnetConnection()
-  let parsed
-  try {
-    parsed = await conn.getParsedTransaction(txSignature, {
-      maxSupportedTransactionVersion: 0,
-      commitment: 'confirmed',
-    })
-  } catch (e) {
-    release()
-    console.error('[landing/generate] rpc error', e instanceof Error ? e.message : e)
-    return badRequest('rpc-error', 502)
-  }
-
-  if (!parsed) {
-    release()
-    return badRequest('tx-not-found', 404)
-  }
-  if (parsed.meta?.err) {
-    release()
-    return badRequest('tx-failed', 400)
-  }
-
-  // Block timestamp sanity
-  const ts = parsed.blockTime ? parsed.blockTime * 1000 : null
-  if (ts === null || Date.now() - ts > MAX_TX_AGE_MS) {
-    release()
-    return badRequest('tx-stale', 400)
-  }
-
-  // Inspect SystemProgram.transfer instructions for matching recipient/amount.
-  const instructions = parsed.transaction.message.instructions
-  let matched = false
-  for (const ix of instructions) {
-    if (!('parsed' in ix)) continue
-    const p = ix.parsed
-    if (!p || typeof p !== 'object') continue
-    const info = (p as { type?: string; info?: Record<string, unknown> })
-    if (info.type !== 'transfer') continue
-    const dest = info.info?.destination as string | undefined
-    const src = info.info?.source as string | undefined
-    const lamports = info.info?.lamports as number | undefined
-    if (
-      dest === LANDING_RECIPIENT.toBase58() &&
-      src === walletAddress &&
-      typeof lamports === 'number' &&
-      lamports >= LANDING_PRICE_LAMPORTS
-    ) {
-      matched = true
-      break
-    }
-  }
-  if (!matched) {
-    release()
-    return badRequest('tx-mismatch', 400)
+  // ── Rate limit (per agent, 60s cooldown) ─────────────────────────────────
+  const limit = checkAndStampRateLimit(agentId)
+  if (!limit.ok) {
+    return badRequest('rate-limited', 429, { retryInMs: limit.retryInMs })
   }
 
   // ── LLM call ─────────────────────────────────────────────────────────────
@@ -201,7 +112,6 @@ export async function POST(req: NextRequest) {
   try {
     raw = await runOnce()
   } catch (e) {
-    release()
     console.error('[landing/generate] llm failed', e instanceof Error ? e.message : e)
     return badRequest('llm-failed', 502)
   }
@@ -229,14 +139,13 @@ export async function POST(req: NextRequest) {
         .trim()
       parsedJson = JSON.parse(retryStripped)
     } catch {
-      release()
       return badRequest('llm-bad-json', 502)
     }
   }
 
-  const landing = normaliseLanding(parsedJson, txSignature)
+  // Free mode: no tx signature, use an empty marker so the type stays happy.
+  const landing = normaliseLanding(parsedJson, '')
   if (!landing) {
-    release()
     return badRequest('shape-invalid', 502)
   }
 

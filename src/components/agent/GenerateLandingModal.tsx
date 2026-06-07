@@ -1,18 +1,18 @@
 'use client'
 
 /**
- * Generate Landing Page modal — Pro feature payment + LLM call UI.
+ * Generate Landing Page modal — free-tier version.
  *
- * Flow:
- *   1. User opens modal → state 'idle'. Shows price + recipient + Pay button.
- *   2. Click Pay → 'signing' (wallet approval) → 'confirming' (network) →
- *      'generating' (server LLM) → 'done' (call onSuccess + close).
- *   3. Any failure → 'error' with a precise reason and Retry.
+ * Sends the agent + project to /api/landing/generate, waits ~10-15s for
+ * Groq to return a structured LandingContent JSON, and hands it to the
+ * parent on success.
  *
- * The mainnet tx is sent client-side using the existing useSolanaSigner +
- * useConnection — same plumbing as the rest of the app's signing flows.
- * After confirmation, /api/landing/generate re-verifies on-chain before
- * spending LLM tokens, so client trust is contained.
+ * No payment step in this build — the prior 0.05 SOL Solana Pay flow is
+ * disabled while we collect early-user signal. The server rate-limits
+ * one generation per agent per 60 seconds. We'll switch back to paid
+ * mode by re-introducing the GenerateLandingModal payment states + the
+ * tx verification in /api/landing/generate (the helpers in
+ * src/lib/solana-pay.ts are still exported, untouched).
  *
  * Parent is responsible for mounting only when open (so useState resets
  * cleanly on reopen — same pattern as EditProductModal).
@@ -20,16 +20,8 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Check, Copy, ExternalLink, Loader2, Sparkles, X } from 'lucide-react'
-import { Connection } from '@solana/web3.js'
+import { ExternalLink, Loader2, Sparkles, X } from 'lucide-react'
 import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
-import {
-  LANDING_PRICE_LAMPORTS,
-  LANDING_RECIPIENT,
-  buildPayTx,
-  getMainnetConnection,
-  waitForConfirmation,
-} from '@/lib/solana-pay'
 import type { ForgeAgent, GeneratedProject, LandingContent } from '@/lib/types'
 
 interface GenerateLandingModalProps {
@@ -42,30 +34,20 @@ interface GenerateLandingModalProps {
 
 type FlowState =
   | { kind: 'idle' }
-  | { kind: 'signing' }
-  | { kind: 'confirming'; signature: string }
-  | { kind: 'generating'; signature: string }
+  | { kind: 'generating' }
   | { kind: 'done' }
-  | { kind: 'error'; message: string; signature?: string }
+  | { kind: 'error'; message: string }
 
 const ERROR_MESSAGES: Record<string, string> = {
-  replay: 'This payment was already used for a generation. Pay again to retry.',
-  'tx-not-found': "We couldn't find your transaction on mainnet. Wait a few seconds and retry.",
-  'tx-stale': 'Payment is older than 24 hours. Pay a fresh 0.05 SOL to generate.',
-  'tx-mismatch': 'Payment did not match the expected recipient/amount. Retry.',
-  'tx-failed': 'On-chain transaction reverted. No charge — try again.',
-  'rpc-error': 'Mainnet RPC was busy. Try again in a moment.',
+  'rate-limited':
+    "We just generated a landing for this agent. Wait a minute and try again — we throttle to keep the LLM happy.",
   'missing-key': 'Server LLM is not configured. Try later.',
-  'llm-failed': 'Generator could not finish. Server cached your payment — retry without paying again.',
-  'llm-bad-json': 'AI produced unparseable output twice. Retry once more.',
-  'shape-invalid': 'AI returned an unusable shape. Retry once more.',
-  'invalid-tx-sig': 'Internal: invalid signature format. Reload and try again.',
-  'invalid-wallet': 'Internal: invalid wallet. Reconnect and try again.',
+  'llm-failed': 'Generator could not finish. Try again in a moment.',
+  'llm-bad-json': 'AI produced unparseable output twice. Try again.',
+  'shape-invalid': 'AI returned an unusable shape. Try again.',
   'missing-fields': 'Internal: missing context. Reload page.',
   'missing-context': 'Internal: missing context. Reload page.',
   'invalid-json': 'Internal: request payload broken. Reload page.',
-  'confirmation-timeout':
-    'Network did not confirm in 60s. Your tx may still go through — check Explorer, then retry.',
 }
 
 export function GenerateLandingModal({
@@ -77,58 +59,11 @@ export function GenerateLandingModal({
 }: GenerateLandingModalProps) {
   const signer = useSolanaSigner()
   const [state, setState] = useState<FlowState>({ kind: 'idle' })
-  const [copied, setCopied] = useState(false)
 
-  const inFlight =
-    state.kind === 'signing' ||
-    state.kind === 'confirming' ||
-    state.kind === 'generating'
+  const inFlight = state.kind === 'generating'
 
-  const handlePay = async () => {
-    if (!signer.publicKey || !signer.signTransaction || !signer.walletAddress) {
-      setState({ kind: 'error', message: 'Connect a Solana wallet first.' })
-      return
-    }
-
-    const connection: Connection = getMainnetConnection()
-    setState({ kind: 'signing' })
-
-    let signature: string
-    try {
-      const { blockhash } = await connection.getLatestBlockhash('confirmed')
-      const tx = buildPayTx({
-        sender: signer.publicKey,
-        recipient: LANDING_RECIPIENT,
-        lamports: LANDING_PRICE_LAMPORTS,
-        recentBlockhash: blockhash,
-      })
-      const signed = await signer.signTransaction(tx)
-      signature = await connection.sendRawTransaction(signed.serialize(), {
-        skipPreflight: false,
-        maxRetries: 3,
-      })
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Could not send transaction.'
-      setState({ kind: 'error', message: msg })
-      return
-    }
-
-    setState({ kind: 'confirming', signature })
-
-    const confirm = await waitForConfirmation(connection, signature, { timeoutMs: 60_000 })
-    if (!confirm.ok) {
-      setState({
-        kind: 'error',
-        message:
-          ERROR_MESSAGES[confirm.error ?? ''] ??
-          confirm.error ??
-          'Confirmation failed.',
-        signature,
-      })
-      return
-    }
-
-    setState({ kind: 'generating', signature })
+  const handleGenerate = async () => {
+    setState({ kind: 'generating' })
 
     try {
       const res = await fetch('/api/landing/generate', {
@@ -137,20 +72,20 @@ export function GenerateLandingModal({
         body: JSON.stringify({
           agentId: agent.id,
           projectId: project.id,
-          txSignature: signature,
           walletAddress: signer.walletAddress,
           agent,
           project,
         }),
       })
       if (!res.ok) {
-        const data = (await res.json().catch(() => ({}))) as { error?: string }
+        const data = (await res.json().catch(() => ({}))) as { error?: string; retryInMs?: number }
         const errorKey = data.error ?? `http-${res.status}`
-        setState({
-          kind: 'error',
-          message: ERROR_MESSAGES[errorKey] ?? `Generation failed (${errorKey}).`,
-          signature,
-        })
+        let message = ERROR_MESSAGES[errorKey] ?? `Generation failed (${errorKey}).`
+        if (errorKey === 'rate-limited' && data.retryInMs) {
+          const secs = Math.ceil(data.retryInMs / 1000)
+          message = `Cooldown: wait ${secs}s before generating again.`
+        }
+        setState({ kind: 'error', message })
         return
       }
       const landing = (await res.json()) as LandingContent
@@ -158,17 +93,7 @@ export function GenerateLandingModal({
       onSuccess(landing)
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Network error.'
-      setState({ kind: 'error', message: msg, signature })
-    }
-  }
-
-  const handleCopyRecipient = async () => {
-    try {
-      await navigator.clipboard.writeText(LANDING_RECIPIENT.toBase58())
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    } catch {
-      // No-op — clipboard may be unavailable in some browsers
+      setState({ kind: 'error', message: msg })
     }
   }
 
@@ -219,88 +144,37 @@ export function GenerateLandingModal({
 
         <div className="p-5 space-y-4">
           <p className="text-sm text-zinc-400 leading-relaxed">
-            Pay <span className="text-zinc-100 font-semibold">0.05 SOL</span> on Solana mainnet.
-            One payment = one fresh landing page (hero, features, how-it-works, FAQ, CTA) generated
-            by the AI from your brief. Pay again later to regenerate.
+            AI will write a full landing page from your brief — hero, four feature cards,
+            how-it-works steps, FAQ, and a closing CTA. Free during early access. Takes about 15
+            seconds.
           </p>
 
           <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-xs text-zinc-300 space-y-1.5">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-zinc-500">Network</span>
-              <span className="text-zinc-200">Solana mainnet</span>
+              <span className="text-zinc-500">Project</span>
+              <span className="text-zinc-200 truncate ml-3">{project.name}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-zinc-500">Amount</span>
-              <span className="text-zinc-200">0.05 SOL (~$7)</span>
+              <span className="text-zinc-500">Brief depth</span>
+              <span className="text-zinc-200">
+                {project.brief && Object.values(project.brief).filter(Boolean).length >= 4
+                  ? 'Detailed'
+                  : 'Light — result will be more general'}
+              </span>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-zinc-500">Recipient</span>
-              <button
-                onClick={handleCopyRecipient}
-                className="inline-flex items-center gap-1 font-mono text-[11px] text-zinc-200 hover:text-zinc-50 transition-colors"
-                title="Copy address"
-              >
-                {LANDING_RECIPIENT.toBase58().slice(0, 6)}…
-                {LANDING_RECIPIENT.toBase58().slice(-6)}
-                {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-              </button>
+              <span className="text-zinc-500">Cost</span>
+              <span className="text-emerald-300">Free (early access)</span>
             </div>
           </div>
-
-          {/* Progress */}
-          {state.kind !== 'idle' && state.kind !== 'error' && (
-            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-xs text-zinc-300 space-y-1.5">
-              <StepRow
-                done={
-                  state.kind === 'confirming' ||
-                  state.kind === 'generating' ||
-                  state.kind === 'done'
-                }
-                active={state.kind === 'signing'}
-                label="Sign transaction in wallet"
-              />
-              <StepRow
-                done={state.kind === 'generating' || state.kind === 'done'}
-                active={state.kind === 'confirming'}
-                label="Wait for mainnet confirmation"
-              />
-              <StepRow
-                done={state.kind === 'done'}
-                active={state.kind === 'generating'}
-                label="AI generates landing page"
-              />
-              {'signature' in state && state.signature && (
-                <a
-                  href={`https://explorer.solana.com/tx/${state.signature}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors pt-1"
-                >
-                  view tx on explorer
-                  <ExternalLink size={10} />
-                </a>
-              )}
-            </div>
-          )}
 
           {/* Error */}
           {state.kind === 'error' && (
             <div
               role="alert"
-              className="text-sm text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-lg px-3 py-2 space-y-1"
+              className="text-sm text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-lg px-3 py-2"
             >
-              <div>{state.message}</div>
-              {state.signature && (
-                <a
-                  href={`https://explorer.solana.com/tx/${state.signature}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[10px] text-rose-200/80 hover:text-rose-100 transition-colors"
-                >
-                  view tx
-                  <ExternalLink size={10} />
-                </a>
-              )}
+              {state.message}
             </div>
           )}
 
@@ -315,74 +189,38 @@ export function GenerateLandingModal({
             </button>
             <button
               type="button"
-              onClick={handlePay}
-              disabled={inFlight || !signer.connected}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              onClick={handleGenerate}
+              disabled={inFlight}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-50 transition-colors disabled:cursor-not-allowed"
               style={{
                 background: inFlight
                   ? 'rgba(139,92,246,0.6)'
                   : `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
               }}
             >
-              {state.kind === 'signing' && (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Sign in wallet…
-                </>
-              )}
-              {state.kind === 'confirming' && (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Confirming…
-                </>
-              )}
-              {state.kind === 'generating' && (
+              {state.kind === 'generating' ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Generating…
                 </>
-              )}
-              {(state.kind === 'idle' || state.kind === 'error' || state.kind === 'done') && (
+              ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  Pay 0.05 SOL & generate
+                  Generate
                 </>
               )}
             </button>
           </div>
 
-          {!signer.connected && (
-            <p className="text-[11px] text-zinc-500 text-right">
-              connect a wallet first
-            </p>
-          )}
+          <p className="text-[11px] text-zinc-600 pt-1 flex items-start gap-1.5">
+            <ExternalLink className="w-3 h-3 mt-0.5 flex-shrink-0" />
+            <span>
+              Free for early access. We&apos;ll switch to pay-per-generation (0.05 SOL) once the
+              feature stabilises.
+            </span>
+          </p>
         </div>
       </motion.div>
     </motion.div>
-  )
-}
-
-function StepRow({
-  done,
-  active,
-  label,
-}: {
-  done: boolean
-  active: boolean
-  label: string
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      {done ? (
-        <Check className="w-3.5 h-3.5 text-emerald-400" />
-      ) : active ? (
-        <Loader2 className="w-3.5 h-3.5 animate-spin text-violet-400" />
-      ) : (
-        <span className="w-3.5 h-3.5 rounded-full border border-white/15 inline-block" />
-      )}
-      <span className={done ? 'text-zinc-200' : active ? 'text-zinc-100' : 'text-zinc-500'}>
-        {label}
-      </span>
-    </div>
   )
 }

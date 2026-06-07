@@ -281,24 +281,18 @@ function ProductContent({
             {canEdit && (
               <button
                 onClick={() => setGenerateOpen(true)}
-                disabled={!walletConnected}
-                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors"
                 style={{
-                  background: walletConnected
-                    ? `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`
-                    : 'rgba(255,255,255,0.05)',
-                  ...(walletConnected ? {} : { border: '1px solid rgba(255,255,255,0.1)' }),
+                  background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
                 }}
                 title={
-                  !walletConnected
-                    ? 'Connect a Solana wallet to pay 0.05 SOL and generate'
-                    : hasLanding
-                      ? 'Regenerate the full landing page (0.05 SOL)'
-                      : 'Generate a full landing page from your brief (0.05 SOL)'
+                  hasLanding
+                    ? 'Regenerate the full landing page'
+                    : 'Generate a full landing page from your brief'
                 }
               >
                 <Sparkles size={14} />
-                {hasLanding ? 'Regenerate landing (0.05 SOL)' : 'Generate landing (0.05 SOL)'}
+                {hasLanding ? 'Regenerate landing' : 'Generate landing'}
               </button>
             )}
           </div>
