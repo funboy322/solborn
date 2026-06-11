@@ -16,16 +16,37 @@
 
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
-import { Check, ExternalLink, Loader2, ShieldCheck, X } from 'lucide-react'
+import { Check, ExternalLink, Globe, Loader2, ShieldCheck, X } from 'lucide-react'
 import { useForgeStore } from '@/lib/store'
-import type { GeneratedProject, ProductBrief } from '@/lib/types'
+import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
+import type { ForgeAgent, GeneratedProject, ProductBrief } from '@/lib/types'
 
 interface EditProductModalProps {
   project: GeneratedProject
+  agent: ForgeAgent
   agentId: string
   onClose: () => void
   /** Hex/rgb accent for borders + buttons — matches the page's stage colour. */
   accentColor?: string
+}
+
+const SUBDOMAIN_RE = /^[a-z0-9](?:[a-z0-9-]{1,30}[a-z0-9])?$/
+
+const SUBDOMAIN_ERROR_MESSAGES: Record<string, string> = {
+  taken: 'That subdomain is already taken. Pick another.',
+  'invalid-format':
+    'Use lowercase letters, numbers, and hyphens only. Must start and end with a letter or number.',
+  'too-short': 'Subdomain must be at least 3 characters.',
+  'too-long': 'Subdomain must be at most 32 characters.',
+  reserved: 'That word is reserved. Pick another.',
+  'missing-fields': 'Internal: missing required fields.',
+  'invalid-wallet': 'Connect a wallet to claim a subdomain.',
+  'invalid-mirror': 'Internal: invalid project data.',
+  'mirror-write-failed': 'Subdomain claimed but mirror could not be saved. Try Republish.',
+  'redis-unavailable': 'Subdomains are not configured yet on the server.',
+  'redis-error': 'Storage error. Try again in a moment.',
+  'not-found': 'Subdomain not found on the server. Re-claim it.',
+  'not-owner': 'You are not the owner of this subdomain.',
 }
 
 interface FormState {
@@ -59,11 +80,13 @@ const BRIEF_FIELD_MAX = 280
 
 export function EditProductModal({
   project,
+  agent,
   agentId,
   onClose,
   accentColor = '#8b5cf6',
 }: EditProductModalProps) {
   const updateGeneratedProject = useForgeStore((s) => s.updateGeneratedProject)
+  const signer = useSolanaSigner()
 
   // Component is mounted only while the dialog is open (parent guards with
   // `{open && <EditProductModal ... />}`), so useState initialises fresh each
@@ -73,6 +96,116 @@ export function EditProductModal({
   const [scamErrorDetails, setScamErrorDetails] = useState<string[] | null>(null)
   const [saving, setSaving] = useState(false)
   const [urlChecking, setUrlChecking] = useState(false)
+
+  // ── Subdomain publishing (independent of the field-edit save flow) ───────
+  const [subdomainInput, setSubdomainInput] = useState(project.subdomain ?? '')
+  const [publishing, setPublishing] = useState(false)
+  const [publishError, setPublishError] = useState<string | null>(null)
+  const [publishMessage, setPublishMessage] = useState<string | null>(null)
+
+  const buildMirror = () => ({
+    syncedAt: Date.now(),
+    agent: {
+      id: agent.id,
+      name: agent.name,
+      emoji: agent.emoji,
+      stage: agent.stage,
+      xp: agent.xp,
+      personality: agent.personality,
+      traits: agent.traits,
+      totalInteractions: agent.totalInteractions,
+      createdAt: agent.createdAt,
+      walletAddress: agent.walletAddress,
+    },
+    project,
+  })
+
+  const handleClaim = async () => {
+    setPublishError(null)
+    setPublishMessage(null)
+    const slug = subdomainInput.trim().toLowerCase()
+    if (!slug) {
+      setPublishError('Enter a subdomain.')
+      return
+    }
+    if (!SUBDOMAIN_RE.test(slug) || slug.length < 3 || slug.length > 32) {
+      setPublishError(SUBDOMAIN_ERROR_MESSAGES['invalid-format'])
+      return
+    }
+    if (!signer.walletAddress) {
+      setPublishError(SUBDOMAIN_ERROR_MESSAGES['invalid-wallet'])
+      return
+    }
+    setPublishing(true)
+    try {
+      const res = await fetch('/api/subdomain/claim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subdomain: slug,
+          ownerWallet: signer.walletAddress,
+          mirror: buildMirror(),
+        }),
+      })
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+      if (!data.ok) {
+        const key = data.error ?? `http-${res.status}`
+        setPublishError(SUBDOMAIN_ERROR_MESSAGES[key] ?? `Claim failed (${key}).`)
+        setPublishing(false)
+        return
+      }
+      const now = Date.now()
+      updateGeneratedProject(agentId, {
+        subdomain: slug,
+        subdomainClaimedAt: now,
+        subdomainLastSyncedAt: now,
+      })
+      setPublishMessage(`Live at ${slug}.solborn.xyz`)
+    } catch (err) {
+      setPublishError(err instanceof Error ? err.message : 'Network error.')
+    } finally {
+      setPublishing(false)
+    }
+  }
+
+  const handleSync = async () => {
+    setPublishError(null)
+    setPublishMessage(null)
+    const slug = project.subdomain
+    if (!slug) {
+      setPublishError('No subdomain claimed yet.')
+      return
+    }
+    if (!signer.walletAddress) {
+      setPublishError(SUBDOMAIN_ERROR_MESSAGES['invalid-wallet'])
+      return
+    }
+    setPublishing(true)
+    try {
+      const res = await fetch('/api/subdomain/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subdomain: slug,
+          ownerWallet: signer.walletAddress,
+          mirror: buildMirror(),
+        }),
+      })
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+      if (!data.ok) {
+        const key = data.error ?? `http-${res.status}`
+        setPublishError(SUBDOMAIN_ERROR_MESSAGES[key] ?? `Republish failed (${key}).`)
+        setPublishing(false)
+        return
+      }
+      updateGeneratedProject(agentId, { subdomainLastSyncedAt: Date.now() })
+      setPublishMessage(`Refreshed ${slug}.solborn.xyz`)
+    } catch (err) {
+      setPublishError(err instanceof Error ? err.message : 'Network error.')
+    } finally {
+      setPublishing(false)
+    }
+  }
 
   // Lock body scroll while the modal is mounted (mobile UX).
   useEffect(() => {
@@ -321,6 +454,116 @@ export function EditProductModal({
                   maxLength={BRIEF_FIELD_MAX}
                   multiline
                 />
+              </fieldset>
+
+              {/* Subdomain publishing — independent of the field save. */}
+              <fieldset className="space-y-3 pt-2 border-t border-white/5">
+                <legend className="text-xs uppercase tracking-wider text-zinc-500 pt-3 flex items-center gap-1.5">
+                  <Globe className="w-3 h-3" />
+                  Publish to a subdomain
+                </legend>
+                {project.subdomain ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2.5">
+                      <div className="min-w-0">
+                        <div className="text-[10px] uppercase tracking-wider text-zinc-500">
+                          Live at
+                        </div>
+                        <a
+                          href={`https://${project.subdomain}.solborn.xyz/`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-zinc-100 hover:text-violet-300 transition-colors inline-flex items-center gap-1.5 truncate"
+                        >
+                          {project.subdomain}.solborn.xyz
+                          <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                        </a>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleSync}
+                        disabled={publishing}
+                        className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex-shrink-0"
+                        style={{
+                          background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
+                        }}
+                      >
+                        {publishing ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            Republishing…
+                          </>
+                        ) : (
+                          <>Republish</>
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-zinc-600">
+                      Republish pushes the latest fields above to the public mirror. Visitors see
+                      the new copy within a minute.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={subdomainInput}
+                        onChange={(e) =>
+                          setSubdomainInput(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
+                        }
+                        placeholder="harmonia"
+                        maxLength={32}
+                        autoComplete="off"
+                        spellCheck={false}
+                        className="flex-1 min-w-0 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                        style={{
+                          background: 'rgba(255,255,255,0.04)',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                        }}
+                      />
+                      <span className="text-sm text-zinc-500 whitespace-nowrap">.solborn.xyz</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleClaim}
+                      disabled={publishing || !subdomainInput.trim()}
+                      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      style={{
+                        background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
+                      }}
+                    >
+                      {publishing ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          Claiming…
+                        </>
+                      ) : (
+                        <>Claim subdomain</>
+                      )}
+                    </button>
+                    <p className="text-[11px] text-zinc-600">
+                      Your product page will be reachable at{' '}
+                      <span className="text-zinc-400">
+                        {subdomainInput.trim() || 'yourname'}.solborn.xyz
+                      </span>
+                      . Lowercase letters, numbers, and hyphens. 3-32 chars.
+                    </p>
+                  </div>
+                )}
+                {publishError && (
+                  <div
+                    role="alert"
+                    className="text-xs text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-lg px-2.5 py-1.5"
+                  >
+                    {publishError}
+                  </div>
+                )}
+                {publishMessage && (
+                  <div className="text-xs text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-lg px-2.5 py-1.5">
+                    {publishMessage}
+                  </div>
+                )}
               </fieldset>
 
               {error && (

@@ -497,6 +497,7 @@ function ProductContent({
       {editOpen && (
         <EditProductModal
           project={project}
+          agent={agent}
           agentId={agent.id}
           onClose={() => setEditOpen(false)}
           accentColor={accentColor}

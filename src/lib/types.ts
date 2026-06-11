@@ -90,6 +90,16 @@ export interface GeneratedProject {
    * tx signature is embedded in landingContent.txSignature as proof.
    */
   landingContent?: LandingContent
+  /**
+   * Claimed subdomain slug, e.g. "harmonia" → harmonia.solborn.xyz.
+   * Lowercase alphanumeric + hyphens, 3-32 chars, unique across all
+   * projects (validated server-side via Upstash Redis SETNX).
+   */
+  subdomain?: string
+  /** When the subdomain was first claimed. */
+  subdomainClaimedAt?: number
+  /** When the public Upstash mirror was last updated for this project. */
+  subdomainLastSyncedAt?: number
 }
 
 /** Single feature card on the generated landing page. */
