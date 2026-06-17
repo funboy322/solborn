@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Plus, ArrowLeft, Wallet, Lock, Trophy } from 'lucide-react'
+import { Plus, ArrowLeft, Wallet, Lock, Trophy, Compass } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { AgentCard } from '@/components/agent/AgentCard'
@@ -56,6 +56,10 @@ export default function ForgePage() {
             </p>
           </div>
           <WalletButton />
+          <Button variant="secondary" size="sm" onClick={() => router.push('/discover')} className="hidden sm:inline-flex">
+            <Compass size={14} />
+            Discover
+          </Button>
           <Button variant="secondary" size="sm" onClick={() => router.push('/products')} className="hidden sm:inline-flex">
             <Trophy size={14} />
             Arena

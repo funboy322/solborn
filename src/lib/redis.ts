@@ -115,6 +115,18 @@ const ownerKey = (slug: string) => `subdomain:owner:${slug}`
 const mirrorKey = (slug: string) => `subdomain:mirror:${slug}`
 
 /**
+ * Sorted set indexing every claimed slug by its claim timestamp.
+ * Score = claimedAt ms, Member = slug.
+ *
+ * Used by /discover to list recently-claimed subdomains without scanning
+ * every key. The score never changes after the initial claim, so the
+ * order is "newest claims first" — not "newest edits first". That's
+ * deliberate: a creator tweaking copy daily shouldn't keep monopolising
+ * the top of the feed.
+ */
+export const SUBDOMAINS_INDEX_KEY = 'subdomains:index'
+
+/**
  * Read the public mirror by subdomain. Returns null if no claim exists or
  * the mirror was deleted.
  */
@@ -141,12 +153,24 @@ export async function getProductMirror(slug: string): Promise<ProductMirror | nu
  * mirror itself is written separately by setProductMirror so the two
  * operations stay independent — a claim without a synced mirror still
  * resolves but renders an "in progress" placeholder.
+ *
+ * On successful claim we also ZADD the slug to the recency index so
+ * /discover picks it up. The order of operations matters: SETNX first
+ * (atomic claim), then ZADD (best-effort index update). If ZADD fails
+ * the slug is still claimed, just won't show in /discover until an ops
+ * script rebuilds the index.
  */
 export async function claimSubdomain(slug: string, ownerWallet: string): Promise<boolean> {
   const redis = getRedis()
   // SET with NX = only set if key doesn't exist. Returns "OK" on success, null otherwise.
   const result = await redis.set(ownerKey(slug), ownerWallet, { nx: true })
-  return result === 'OK'
+  if (result !== 'OK') return false
+  try {
+    await redis.zadd(SUBDOMAINS_INDEX_KEY, { score: Date.now(), member: slug })
+  } catch (e) {
+    console.warn('[redis] zadd to subdomain index failed', e instanceof Error ? e.message : e)
+  }
+  return true
 }
 
 /**
@@ -173,4 +197,69 @@ export async function setProductMirror(slug: string, mirror: ProductMirror): Pro
 export async function releaseSubdomain(slug: string): Promise<void> {
   const redis = getRedis()
   await redis.del(ownerKey(slug), mirrorKey(slug))
+  try {
+    await redis.zrem(SUBDOMAINS_INDEX_KEY, slug)
+  } catch (e) {
+    console.warn('[redis] zrem from subdomain index failed', e instanceof Error ? e.message : e)
+  }
+}
+
+/**
+ * Return up to `limit` most-recently-claimed subdomain slugs starting at
+ * `offset` (oldest of the page). Used by /discover for paginated listing.
+ *
+ * ZREVRANGE returns highest-score members first, so we get newest claims
+ * at the top with no extra sorting work on the page side.
+ */
+export async function listRecentSubdomains(
+  limit: number,
+  offset = 0
+): Promise<string[]> {
+  const redis = getRedis()
+  // upstash @1.x returns string[] for zrange with rev=true
+  const items = await redis.zrange<string[]>(
+    SUBDOMAINS_INDEX_KEY,
+    offset,
+    offset + limit - 1,
+    { rev: true }
+  )
+  return Array.isArray(items) ? items : []
+}
+
+/**
+ * Total number of claimed subdomains. Cached at the call site if needed —
+ * we keep the helper itself simple (one Redis round-trip).
+ */
+export async function countSubdomains(): Promise<number> {
+  const redis = getRedis()
+  return redis.zcard(SUBDOMAINS_INDEX_KEY)
+}
+
+/**
+ * Batch-fetch mirrors for a list of slugs. Used after listRecentSubdomains
+ * to populate the /discover grid in a single round-trip.
+ *
+ * Returns mirrors aligned to the input order — missing entries (the slug
+ * was released between index read and mirror read) map to null and the
+ * caller filters them out.
+ */
+export async function getProductMirrorsBatch(
+  slugs: string[]
+): Promise<(ProductMirror | null)[]> {
+  if (slugs.length === 0) return []
+  const redis = getRedis()
+  const pipeline = redis.pipeline()
+  for (const slug of slugs) pipeline.get<ProductMirror | string>(mirrorKey(slug))
+  const results = await pipeline.exec<(ProductMirror | string | null)[]>()
+  return results.map((raw) => {
+    if (!raw) return null
+    if (typeof raw === 'string') {
+      try {
+        return JSON.parse(raw) as ProductMirror
+      } catch {
+        return null
+      }
+    }
+    return raw
+  })
 }
