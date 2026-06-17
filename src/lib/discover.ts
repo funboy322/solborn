@@ -30,10 +30,17 @@ export interface DiscoverCard {
   hasLanding: boolean
   /** First three tech-stack entries — kept short to fit cards. */
   techStack: string[]
+  /** Owner held ≥ SBORN_HOLDER_MIN_TOKENS at last sync time. */
+  ownerIsHolder: boolean
 }
 
 export interface DiscoverPage {
+  /** All items on this page, holders first, then non-holders, then by recency. */
   items: DiscoverCard[]
+  /** Subset of items where ownerIsHolder=true. Convenience for "Featured" row. */
+  featured: DiscoverCard[]
+  /** Subset of items where ownerIsHolder=false. */
+  regular: DiscoverCard[]
   nextCursor: number | null
   total: number
   /** True iff Redis isn't configured — caller renders a graceful placeholder. */
@@ -51,7 +58,7 @@ export async function getDiscoverPage(
   limit = DEFAULT_PAGE_SIZE
 ): Promise<DiscoverPage> {
   if (!isRedisConfigured()) {
-    return { items: [], nextCursor: null, total: 0, unavailable: true }
+    return { items: [], featured: [], regular: [], nextCursor: null, total: 0, unavailable: true }
   }
   const safeLimit = Math.max(1, Math.min(MAX_PAGE_SIZE, Math.floor(limit)))
   const safeCursor = Math.max(0, Math.floor(cursor))
@@ -65,13 +72,13 @@ export async function getDiscoverPage(
 
   const mirrors = await getProductMirrorsBatch(visibleSlugs)
 
-  const items: DiscoverCard[] = []
+  const rawItems: DiscoverCard[] = []
   for (let i = 0; i < visibleSlugs.length; i++) {
     const slug = visibleSlugs[i]
     const mirror = mirrors[i]
     if (!mirror) continue
     const { agent, project } = mirror
-    items.push({
+    rawItems.push({
       subdomain: slug,
       projectName: project.name,
       tagline: project.tagline ?? null,
@@ -83,11 +90,21 @@ export async function getDiscoverPage(
       productUrlVerified: project.productUrlVerified,
       hasLanding: Boolean(project.landingContent),
       techStack: project.techStack.slice(0, 3),
+      ownerIsHolder: Boolean(mirror.ownerIsHolder),
     })
   }
 
+  // Holders bubble to the top while preserving the underlying recency order
+  // within each group. Recency comes from listRecentSubdomains (ZREVRANGE),
+  // so we don't need an explicit secondary sort.
+  const featured = rawItems.filter((it) => it.ownerIsHolder)
+  const regular = rawItems.filter((it) => !it.ownerIsHolder)
+  const items = [...featured, ...regular]
+
   return {
     items,
+    featured,
+    regular,
     nextCursor: hasMore ? safeCursor + safeLimit : null,
     total,
   }

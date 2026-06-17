@@ -19,6 +19,8 @@ import {
   validateSubdomain,
   type ProductMirror,
 } from '@/lib/redis'
+import { getSbornBalance } from '@/lib/sborn-balance'
+import { isSbornHolder } from '@/lib/staking'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -61,10 +63,22 @@ export async function POST(req: NextRequest) {
   if (!owner) return bad('not-found', 404)
   if (owner !== ownerWallet) return bad('not-owner', 403)
 
+  // Refresh holder status on every republish — the owner might have bought
+  // or sold tokens since their last sync, and the featured-row signal should
+  // reflect "is a holder right now", not "was a holder at first claim".
+  let ownerIsHolder = false
+  try {
+    const balance = await getSbornBalance(ownerWallet)
+    ownerIsHolder = isSbornHolder(balance)
+  } catch {
+    // Non-fatal: default to non-holder.
+  }
+
   try {
     await setProductMirror(slug, {
       ...mirror,
       syncedAt: Date.now(),
+      ownerIsHolder,
     })
   } catch (e) {
     console.error('[subdomain/sync] mirror write failed', e instanceof Error ? e.message : e)

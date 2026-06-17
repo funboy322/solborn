@@ -12,7 +12,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowLeft, ArrowRight, Compass, Sparkles } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Compass, Crown, Sparkles } from 'lucide-react'
 import { DiscoverCard } from '@/components/discover/DiscoverCard'
 import { DEFAULT_PAGE_SIZE, getDiscoverPage } from '@/lib/discover'
 
@@ -94,11 +94,48 @@ export default async function DiscoverPage({ searchParams }: Props) {
           />
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {page.items.map((card, i) => (
-                <DiscoverCard key={card.subdomain} card={card} index={i} />
-              ))}
-            </div>
+            {page.featured.length > 0 && (
+              <section className="mb-8">
+                <div className="flex items-center gap-2 mb-3">
+                  <Crown size={14} className="text-amber-300" />
+                  <h3 className="text-xs uppercase tracking-wider text-zinc-400">
+                    Featured · $SBORN holders
+                  </h3>
+                  <Link
+                    href="/staking"
+                    className="text-[11px] text-zinc-600 hover:text-zinc-300 transition-colors ml-auto"
+                  >
+                    how to get here ↗
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {page.featured.map((card, i) => (
+                    <DiscoverCard key={card.subdomain} card={card} index={i} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {page.regular.length > 0 && (
+              <section>
+                {page.featured.length > 0 && (
+                  <div className="flex items-center gap-2 mb-3">
+                    <h3 className="text-xs uppercase tracking-wider text-zinc-500">
+                      All projects
+                    </h3>
+                  </div>
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {page.regular.map((card, i) => (
+                    <DiscoverCard
+                      key={card.subdomain}
+                      card={card}
+                      index={i + page.featured.length}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
 
             <nav className="flex items-center justify-between gap-3 mt-8">
               <div>

@@ -24,6 +24,8 @@ import {
   validateSubdomain,
   type ProductMirror,
 } from '@/lib/redis'
+import { getSbornBalance } from '@/lib/sborn-balance'
+import { isSbornHolder } from '@/lib/staking'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -73,10 +75,20 @@ export async function POST(req: NextRequest) {
   }
   if (!claimed) return bad('taken', 409)
 
+  // Snapshot holder status at claim time — used by /discover featured row.
+  let ownerIsHolder = false
+  try {
+    const balance = await getSbornBalance(ownerWallet)
+    ownerIsHolder = isSbornHolder(balance)
+  } catch {
+    // Non-fatal: default to non-holder, owner can Republish later to refresh.
+  }
+
   try {
     await setProductMirror(slug, {
       ...mirror,
       syncedAt: Date.now(),
+      ownerIsHolder,
     })
   } catch (e) {
     // Ownership recorded but mirror write failed — surface the error so the

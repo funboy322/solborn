@@ -10,7 +10,7 @@
  */
 
 import { motion } from 'framer-motion'
-import { ExternalLink, Globe, Sparkles } from 'lucide-react'
+import { Crown, ExternalLink, Globe, Sparkles } from 'lucide-react'
 import { STAGE_CONFIG } from '@/lib/constants'
 import type { DiscoverCard as DiscoverCardData } from '@/lib/discover'
 
@@ -30,6 +30,10 @@ export function DiscoverCard({ card, index = 0 }: DiscoverCardProps) {
   const stage = STAGE_CONFIG[card.agentStage]
   const accentColor = stage?.color ?? '#8b5cf6'
   const href = `https://${card.subdomain}.solborn.xyz/`
+  // Holder cards get a gold accent treatment so they read as "featured" at a
+  // glance, but the rest of the layout stays identical — we don't want two
+  // visually different card variants to maintain.
+  const holderGold = '#f5c54f'
 
   return (
     <motion.a
@@ -42,8 +46,10 @@ export function DiscoverCard({ card, index = 0 }: DiscoverCardProps) {
       whileHover={{ scale: 1.01, y: -2 }}
       className="group relative flex flex-col gap-3 rounded-2xl p-5 border transition-shadow"
       style={{
-        background: 'rgba(255,255,255,0.02)',
-        borderColor: 'rgba(255,255,255,0.08)',
+        background: card.ownerIsHolder
+          ? `linear-gradient(135deg, ${holderGold}10 0%, rgba(255,255,255,0.02) 60%)`
+          : 'rgba(255,255,255,0.02)',
+        borderColor: card.ownerIsHolder ? `${holderGold}50` : 'rgba(255,255,255,0.08)',
         boxShadow: 'transparent',
       }}
     >
@@ -74,20 +80,36 @@ export function DiscoverCard({ card, index = 0 }: DiscoverCardProps) {
             {STAGE_BADGE_LABEL[card.agentStage]}
           </div>
         </div>
-        {card.hasLanding && (
-          <span
-            className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border whitespace-nowrap"
-            style={{
-              background: `${accentColor}14`,
-              borderColor: `${accentColor}38`,
-              color: accentColor,
-            }}
-            title="AI landing page generated"
-          >
-            <Sparkles size={9} />
-            ai
-          </span>
-        )}
+        <div className="flex flex-col items-end gap-1">
+          {card.ownerIsHolder && (
+            <span
+              className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border whitespace-nowrap font-medium"
+              style={{
+                background: `${holderGold}1c`,
+                borderColor: `${holderGold}66`,
+                color: holderGold,
+              }}
+              title="$SBORN holder — featured on /discover"
+            >
+              <Crown size={9} />
+              holder
+            </span>
+          )}
+          {card.hasLanding && (
+            <span
+              className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border whitespace-nowrap"
+              style={{
+                background: `${accentColor}14`,
+                borderColor: `${accentColor}38`,
+                color: accentColor,
+              }}
+              title="AI landing page generated"
+            >
+              <Sparkles size={9} />
+              ai
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Project name + tagline */}

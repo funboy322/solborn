@@ -1,274 +1,277 @@
 'use client'
 
-import { useMemo, useState, type ReactNode } from 'react'
+/**
+ * /staking — Hold $SBORN to unlock perks.
+ *
+ * Pivot from the older "stake amount with 7-day lock" simulation to a
+ * token-gated holder tier. No actual locks anywhere — we just read the
+ * connected wallet's $SBORN balance live and surface what's unlocked.
+ *
+ * The legacy createStakePosition / closeStakePosition zustand actions
+ * are still in the store for now (no breaking change to other code) but
+ * are deliberately not called from this page anymore.
+ */
+
+import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Check, Coins, ExternalLink, Lock, ShieldCheck, Trophy, Unlock, Vote } from 'lucide-react'
-import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
+import {
+  ArrowLeft,
+  Compass,
+  Crown,
+  ExternalLink,
+  Loader2,
+  Sparkles,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { WalletButton } from '@/components/wallet/WalletButton'
-import { useForgeStore } from '@/lib/store'
+import { useSbornHolder } from '@/lib/hooks/useSbornHolder'
 import {
-  estimateStakeUsd,
-  formatSborn,
-  getActiveStakeForWallet,
-  getStakeVoteWeight,
+  SBORN_HOLDER_MIN_TOKENS,
   SBORN_TOKEN_ADDRESS,
-  STAKING_MIN_SBORN,
-  STAKING_MIN_USD,
+  estimateStakeUsd,
+  formatSbornCompact,
 } from '@/lib/staking'
 
-const LOCK_DAYS = 7
-
-function shortWallet(wallet: string): string {
-  return `${wallet.slice(0, 6)}...${wallet.slice(-4)}`
-}
+const HOLDER_GOLD = '#f5c54f'
 
 export default function StakingPage() {
   const router = useRouter()
-  const { publicKey, connected } = useSolanaSigner()
-  const walletAddress = publicKey?.toBase58() ?? null
-  const agents = useForgeStore((s) => s.agents)
-  const stakePositions = useForgeStore((s) => s.stakePositions)
-  const [amount, setAmount] = useState(String(STAKING_MIN_SBORN))
+  const { balance, isHolder, loading } = useSbornHolder()
 
-  const numericAmount = Number(amount.replace(/,/g, ''))
-  const activeStake = getActiveStakeForWallet(stakePositions, walletAddress)
-  const activeStakeUsd = estimateStakeUsd(activeStake)
-  const voteWeight = getStakeVoteWeight(activeStake)
-  const ownedPassport = useMemo(() => {
-    if (!walletAddress) return null
-    return agents.find(
-      (agent) =>
-        agent.mintAddress &&
-        (agent.walletAddress === walletAddress || agent.mintAddress === walletAddress),
-    )
-  }, [agents, walletAddress])
-  const activePositions = walletAddress
-    ? stakePositions.filter((position) => position.walletAddress === walletAddress && position.status === 'active')
-    : []
-  const hasAccess = Boolean(ownedPassport && activeStake >= STAKING_MIN_SBORN)
+  const progressPct = useMemo(() => {
+    if (isHolder) return 100
+    return Math.min(100, Math.round((balance / SBORN_HOLDER_MIN_TOKENS) * 100))
+  }, [balance, isHolder])
+
+  const thresholdUsd = estimateStakeUsd(SBORN_HOLDER_MIN_TOKENS)
+  const balanceUsd = estimateStakeUsd(balance)
 
   return (
     <main className="min-h-screen px-6 py-6">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-3xl mx-auto">
+        {/* Header */}
         <div className="flex items-center gap-3 mb-8 flex-wrap">
           <Button variant="ghost" size="sm" onClick={() => router.push('/')}>
             <ArrowLeft size={16} />
           </Button>
-          <img src="/logo.png" alt="SolBorn" className="w-8 h-8 rounded-xl cursor-pointer" onClick={() => router.push('/')} />
-          <div className="flex-1 min-w-40">
-            <h1 className="text-2xl font-bold text-zinc-100">$SBORN Staking</h1>
-            <p className="text-sm text-zinc-500">Stake-to-unlock utility v1</p>
-          </div>
+          <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 leading-tight">
+            Hold $SBORN
+          </h1>
+          <div className="flex-1" />
           <WalletButton />
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => router.push('/discover')}
+            className="hidden sm:inline-flex"
+          >
+            <Compass size={14} />
+            Discover
+          </Button>
         </div>
 
-        <section className="grid lg:grid-cols-[1.05fr_0.95fr] gap-5 items-stretch mb-6">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="glass p-7 border border-amber-300/15 relative overflow-hidden"
+        {/* Hero */}
+        <section
+          className="glass relative overflow-hidden rounded-2xl p-7 sm:p-9 border border-white/10 mb-5"
+          style={{
+            background: `radial-gradient(ellipse at top, ${HOLDER_GOLD}14 0%, rgba(15,15,20,0) 60%), rgba(15,15,20,0.45)`,
+          }}
+        >
+          <div
+            className="absolute inset-x-0 top-0 h-px"
+            style={{
+              background: `linear-gradient(90deg, transparent, ${HOLDER_GOLD}66, transparent)`,
+            }}
+          />
+          <div
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full mb-5 border text-[11px] font-semibold"
+            style={{
+              background: `${HOLDER_GOLD}14`,
+              borderColor: `${HOLDER_GOLD}50`,
+              color: HOLDER_GOLD,
+            }}
           >
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/50 to-transparent" />
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-zinc-500/30 bg-zinc-500/10 text-[11px] font-semibold uppercase tracking-wider text-zinc-300 mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-              Soon
-            </div>
-            <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-100 mb-4">
-              Stake to unlock votes, boosts, and build access
-            </h2>
-            <p className="text-zinc-500 leading-relaxed max-w-2xl">
-              The staking layer prepares the SolBorn voting economy. Passport holders will stake at
-              least ${STAKING_MIN_USD} worth of $SBORN to join product votes, leaderboard seasons,
-              and contributor reward rounds.
-            </p>
-            <p className="text-xs text-zinc-600 leading-relaxed mt-5 border-l border-zinc-500/30 pl-3">
-              Live with mainnet launch. The real SPL lock program is being built and audited — this
-              page is a preview of how access will work.
-            </p>
-          </motion.div>
+            <Crown size={11} />
+            Token-gated, no lock
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-50 mb-3 leading-tight">
+            Hold {formatSbornCompact(SBORN_HOLDER_MIN_TOKENS)} $SBORN
+            <br />
+            to unlock SolBorn perks
+          </h2>
+          <p className="text-base text-zinc-300 leading-relaxed max-w-2xl">
+            No staking contract, no lock-up. Buy {formatSbornCompact(SBORN_HOLDER_MIN_TOKENS)} $SBORN
+            (≈ ${thresholdUsd.toFixed(2)} at current estimate) and keep it in your wallet — we
+            check the balance live and unlock perks across the product.
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08 }}
-            className="glass p-6 border border-white/10"
-          >
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <p className="text-xs text-zinc-600 uppercase tracking-wider">Your access</p>
-                <h3 className="text-xl font-bold text-zinc-100 mt-1">
-                  {hasAccess ? 'Voting ready' : 'Locked'}
-                </h3>
+          {/* Live status */}
+          <div className="mt-7 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <div className="flex items-center justify-between gap-3 mb-2.5">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xs uppercase tracking-wider text-zinc-500">Your wallet</span>
+                {loading && <Loader2 size={11} className="animate-spin text-zinc-500" />}
               </div>
               <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                style={{ background: hasAccess ? 'rgba(52,211,153,0.12)' : 'rgba(245,158,11,0.12)' }}
+                className="text-[10px] uppercase tracking-wider font-semibold"
+                style={{ color: isHolder ? HOLDER_GOLD : 'rgb(113,113,122)' }}
               >
-                {hasAccess ? <ShieldCheck size={22} className="text-emerald-300" /> : <Lock size={22} className="text-amber-300" />}
+                {isHolder ? 'Holder ✓' : 'Not yet'}
               </div>
             </div>
 
-            <div className="space-y-3">
-              <StatusRow done={connected} label="Wallet connected" detail={walletAddress ? shortWallet(walletAddress) : 'Connect wallet'} />
-              <StatusRow done={Boolean(ownedPassport)} label="Agent Passport minted" detail={ownedPassport?.name ?? 'Mint Passport first'} />
-              <StatusRow
-                done={activeStake >= STAKING_MIN_SBORN}
-                label={`Stake target $${STAKING_MIN_USD}+`}
-                detail={`${formatSborn(activeStake)} SBORN active`}
+            <div className="flex items-baseline justify-between gap-3">
+              <div>
+                <span className="text-2xl font-bold text-zinc-50 tabular-nums">
+                  {formatSbornCompact(balance)}
+                </span>
+                <span className="text-sm text-zinc-500 ml-1.5">$SBORN</span>
+              </div>
+              <div className="text-sm text-zinc-400 tabular-nums">
+                ≈ ${balanceUsd.toFixed(2)}
+              </div>
+            </div>
+
+            <div className="mt-3 h-1.5 rounded-full bg-white/5 overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPct}%` }}
+                transition={{ duration: 0.4, ease: 'easeOut' }}
+                className="h-full"
+                style={{
+                  background: isHolder
+                    ? HOLDER_GOLD
+                    : `linear-gradient(90deg, rgba(245,197,79,0.35), ${HOLDER_GOLD})`,
+                }}
               />
             </div>
+            {!isHolder && (
+              <p className="mt-2 text-[11px] text-zinc-600">
+                {formatSbornCompact(SBORN_HOLDER_MIN_TOKENS - balance)} $SBORN to go
+              </p>
+            )}
+          </div>
 
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <Metric label="Estimated stake" value={`$${activeStakeUsd.toFixed(2)}`} />
-              <Metric label="Vote weight" value={voteWeight ? `${voteWeight}x` : '0x'} />
-            </div>
-          </motion.div>
-        </section>
-
-        <section className="grid lg:grid-cols-[0.95fr_1.05fr] gap-5">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12 }}
-            className="glass p-6 border border-white/10"
-          >
-            <div className="flex items-center gap-2 mb-5">
-              <Coins size={17} className="text-amber-300" />
-              <h2 className="text-sm font-semibold text-zinc-100">Create stake intent</h2>
-            </div>
-
-            <label className="block text-xs text-zinc-600 mb-2">Amount</label>
-            <div className="flex items-center gap-2 rounded-2xl px-4 py-3 border border-white/10 bg-white/[0.03]">
-              <input
-                value={amount}
-                onChange={(event) => setAmount(event.target.value.replace(/[^\d.]/g, ''))}
-                className="min-w-0 flex-1 bg-transparent text-zinc-100 text-lg font-mono focus:outline-none"
-                inputMode="decimal"
-              />
-              <span className="text-xs text-zinc-500 font-semibold">SBORN</span>
-            </div>
-            <div className="flex items-center justify-between mt-2 text-xs text-zinc-600">
-              <span>Minimum: {formatSborn(STAKING_MIN_SBORN)} SBORN</span>
-              <span>~${estimateStakeUsd(numericAmount || 0).toFixed(2)}</span>
-            </div>
-
-            <Button
-              disabled
-              aria-disabled="true"
-              className="w-full mt-5 bg-zinc-700 text-zinc-400 cursor-not-allowed opacity-70"
+          {/* Buy / get tokens */}
+          <div className="mt-5 flex flex-wrap gap-2">
+            <a
+              href={`https://pump.fun/coin/${SBORN_TOKEN_ADDRESS}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-zinc-900 transition-transform hover:scale-[1.02]"
+              style={{ background: HOLDER_GOLD }}
             >
-              <Lock size={15} />
-              Stake — available with mainnet
-            </Button>
-
-            <p className="text-xs text-zinc-600 mt-3">
-              Real SPL token locks ship with mainnet launch. Numbers above are a preview of the parameters.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.16 }}
-            className="glass p-6 border border-white/10"
-          >
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2">
-                <Vote size={17} className="text-emerald-300" />
-                <h2 className="text-sm font-semibold text-zinc-100">What staking unlocks</h2>
-              </div>
-              <a
-                href={`https://pump.fun/coin/${SBORN_TOKEN_ADDRESS}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-amber-300 hover:text-amber-200 inline-flex items-center gap-1"
-              >
-                Token
-                <ExternalLink size={12} />
-              </a>
-            </div>
-
-            <div className="grid sm:grid-cols-3 gap-3 mb-5">
-              <UnlockCard icon={<Vote size={16} />} title="Vote" body="Back the best founder agents and their startup ideas." />
-              <UnlockCard icon={<Trophy size={16} />} title="Leaderboard" body="Qualify for build seasons and rankings." />
-              <UnlockCard icon={<ShieldCheck size={16} />} title="Access" body="Open future boosts, roles, and reward rounds." />
-            </div>
-
-            <div className="space-y-2">
-              {activePositions.length === 0 ? (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-zinc-500">
-                  No active stake positions yet.
-                </div>
-              ) : (
-                activePositions.map((position) => (
-                  <div
-                    key={position.id}
-                    className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 flex items-center gap-3"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-emerald-400/10 flex items-center justify-center">
-                      <Lock size={16} className="text-emerald-300" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-zinc-100">{formatSborn(position.amount)} SBORN</p>
-                      <p className="text-xs text-zinc-600">
-                        Unlocks {position.unlockAt ? new Date(position.unlockAt).toLocaleDateString() : 'soon'} · local v1
-                      </p>
-                    </div>
-                    <button
-                      disabled
-                      aria-disabled="true"
-                      className="text-xs text-zinc-700 inline-flex items-center gap-1 cursor-not-allowed"
-                    >
-                      <Unlock size={12} />
-                      unstake — soon
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-          </motion.div>
+              Buy on pump.fun
+              <ExternalLink size={14} />
+            </a>
+            <a
+              href={`https://jup.ag/swap/SOL-${SBORN_TOKEN_ADDRESS}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-zinc-200 hover:bg-white/[0.06] transition-colors"
+            >
+              Trade on Jupiter
+              <ExternalLink size={14} />
+            </a>
+            <a
+              href={`https://solscan.io/token/${SBORN_TOKEN_ADDRESS}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-zinc-400 hover:bg-white/[0.06] transition-colors"
+            >
+              token info
+              <ExternalLink size={12} />
+            </a>
+          </div>
         </section>
+
+        {/* Perks */}
+        <section className="space-y-3">
+          <h3 className="text-xs uppercase tracking-wider text-zinc-500 mb-3">Perks unlocked</h3>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <PerkCard
+              icon={<Crown size={14} />}
+              title="Featured on /discover"
+              body="Your products appear in the holder section at the top of the marketplace. Live now."
+              active={isHolder}
+            />
+            <PerkCard
+              icon={<Sparkles size={14} />}
+              title="$SBORN holder badge"
+              body="A golden holder pill on every product card you publish. Visible to anyone browsing."
+              active={isHolder}
+            />
+            <PerkCard
+              icon={<Sparkles size={14} />}
+              title="Free landing regens"
+              body="When the AI landing generator returns to paid mode, holders keep regenerating free."
+              active={false}
+              comingSoon
+            />
+            <PerkCard
+              icon={<Sparkles size={14} />}
+              title="Premium subdomain slugs"
+              body="3-letter and dictionary slugs reserved for holders. Coming next sprint."
+              active={false}
+              comingSoon
+            />
+          </div>
+        </section>
+
+        <p className="text-[11px] text-zinc-600 text-center mt-8 leading-relaxed max-w-md mx-auto">
+          USD estimate based on visible pump.fun reference price. Treat it as ballpark — actual
+          buy price depends on liquidity at the moment you trade.
+        </p>
       </div>
     </main>
   )
 }
 
-function StatusRow({ done, label, detail }: { done: boolean; label: string; detail: string }) {
+function PerkCard({
+  icon,
+  title,
+  body,
+  active,
+  comingSoon = false,
+}: {
+  icon: React.ReactNode
+  title: string
+  body: string
+  active: boolean
+  comingSoon?: boolean
+}) {
+  const goldBorder = active ? `${HOLDER_GOLD}55` : 'rgba(255,255,255,0.08)'
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-white/[0.03] border border-white/10 p-3">
-      <span
-        className="w-6 h-6 rounded-lg flex items-center justify-center"
-        style={{ background: done ? 'rgba(52,211,153,0.12)' : 'rgba(113,113,122,0.1)' }}
-      >
-        {done ? <Check size={13} className="text-emerald-300" /> : <Lock size={13} className="text-zinc-500" />}
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm text-zinc-200">{label}</p>
-        <p className="text-xs text-zinc-600 truncate">{detail}</p>
+    <div
+      className="rounded-xl border p-4 transition-colors"
+      style={{
+        background: active
+          ? `linear-gradient(135deg, ${HOLDER_GOLD}10 0%, rgba(255,255,255,0.02) 60%)`
+          : 'rgba(255,255,255,0.02)',
+        borderColor: goldBorder,
+      }}
+    >
+      <div className="flex items-center justify-between gap-2 mb-1.5">
+        <div
+          className="flex items-center gap-1.5 text-sm font-semibold"
+          style={{ color: active ? HOLDER_GOLD : '#e4e4e7' }}
+        >
+          {icon}
+          {title}
+        </div>
+        {comingSoon ? (
+          <span className="text-[10px] uppercase tracking-wider text-zinc-500">soon</span>
+        ) : (
+          <span
+            className="text-[10px] uppercase tracking-wider font-semibold"
+            style={{ color: active ? HOLDER_GOLD : '#71717a' }}
+          >
+            {active ? 'active' : 'locked'}
+          </span>
+        )}
       </div>
-    </div>
-  )
-}
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl bg-white/[0.03] border border-white/10 p-3">
-      <p className="text-[10px] text-zinc-600 uppercase tracking-wider">{label}</p>
-      <p className="text-lg font-bold text-zinc-100 mt-1">{value}</p>
-    </div>
-  )
-}
-
-function UnlockCard({ icon, title, body }: { icon: ReactNode; title: string; body: string }) {
-  return (
-    <div className="rounded-2xl bg-white/[0.03] border border-white/10 p-4">
-      <div className="w-9 h-9 rounded-xl bg-emerald-400/10 text-emerald-300 flex items-center justify-center mb-3">
-        {icon}
-      </div>
-      <h3 className="text-sm font-semibold text-zinc-100 mb-1">{title}</h3>
-      <p className="text-xs text-zinc-600 leading-relaxed">{body}</p>
+      <p className="text-xs text-zinc-400 leading-relaxed">{body}</p>
     </div>
   )
 }

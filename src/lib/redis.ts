@@ -87,6 +87,13 @@ export interface ProductMirror {
   }
   /** Project snapshot — same shape as GeneratedProject minus owner-only bits. */
   project: GeneratedProject
+  /**
+   * Was the owner wallet holding ≥ SBORN_HOLDER_MIN_TOKENS at claim/sync time?
+   * Cached on the mirror so /discover doesn't hit the SBORN RPC for every card.
+   * Refreshed whenever the owner Republishes — slightly stale between syncs,
+   * which is fine for a featured-row signal (and re-tightens on next edit).
+   */
+  ownerIsHolder?: boolean
 }
 
 let cached: Redis | null = null
