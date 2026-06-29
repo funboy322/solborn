@@ -54,48 +54,48 @@ const STAGES = [
 const FEATURES = [
   {
     icon: Brain,
-    title: 'Remembers You',
-    desc: 'The agent stores what you share — your background, goals, and ideas — and recalls them weeks later. Semantic memory per wallet.',
+    title: 'Lore generator',
+    desc: 'The agent interviews you about your meme: vibe, target community, why this not the next twenty. Then it writes the lore your coin needs to mean something.',
     color: '#a78bfa',
     bg: 'rgba(167,139,250,0.08)',
     border: 'rgba(167,139,250,0.2)',
   },
   {
     icon: Zap,
-    title: 'Agent Passports',
-    desc: 'Mint your co-founder\'s identity to your wallet. A Metaplex Core NFT on Solana devnet, visible in Phantom, Magic Eden, and Explorer.',
+    title: 'AI landing page',
+    desc: 'Lore, tokenomics, how-to-buy, FAQ — all generated from your brief. Renders at yourticker.solborn.xyz. Real public URL, indexable, shareable.',
     color: '#8b5cf6',
     bg: 'rgba(139,92,246,0.08)',
     border: 'rgba(139,92,246,0.22)',
   },
   {
     icon: Rocket,
-    title: 'Launch Certificates',
-    desc: 'When the agent reaches Adult, it publishes your product idea as a signed on-chain proof. Verifiable in Solana Explorer, not just a screenshot.',
+    title: 'Launch thread',
+    desc: '7-tweet launch thread written in your agent\'s voice. Copy each tweet, post as a thread on X. Builder-tone, no AI-isms.',
     color: '#c084fc',
     bg: 'rgba(192,132,252,0.08)',
     border: 'rgba(192,132,252,0.2)',
   },
   {
     icon: Trophy,
-    title: 'Contributor Rewards',
-    desc: 'XP earned through conversations is tracked per wallet. Early contributors build attribution for future $SBORN rewards.',
+    title: 'Discover marketplace',
+    desc: 'Every claimed launch appears in /discover. $SBORN holders get a featured row — the chain of memes built through SolBorn.',
     color: '#e879f9',
     bg: 'rgba(232,121,249,0.075)',
     border: 'rgba(232,121,249,0.18)',
   },
   {
     icon: BarChart3,
-    title: 'XP-Graded Chat',
-    desc: 'Every message scores 0–25 XP on clarity and depth. Spam earns nothing. The bar moves only when the conversation does.',
+    title: 'Custom subdomain',
+    desc: 'yourticker.solborn.xyz is your page. Server-rendered, mobile-fast, SEO-indexed. Use it in your X bio, your pump.fun page, anywhere.',
     color: '#22d3ee',
     bg: 'rgba(34,211,238,0.075)',
     border: 'rgba(34,211,238,0.18)',
   },
   {
     icon: Flame,
-    title: 'Energy & Streaks',
-    desc: 'Daily energy regenerates at 2/min. Streaks multiply XP. The loop is built to compound, not to grind.',
+    title: 'Free during early access',
+    desc: 'Generate lore, landing, and threads at no cost. Pay-per-generation returns once we know the output is worth charging for.',
     color: '#f97316',
     bg: 'rgba(249,115,22,0.07)',
     border: 'rgba(249,115,22,0.20)',
@@ -104,43 +104,43 @@ const FEATURES = [
 
 const TOKEN_UTILITIES = [
   {
-    badge: 'MINT',
-    label: 'Passport seed',
-    desc: '$SBORN will gate Passport mints once the on-chain program is live. Today\'s passports are Metaplex Core NFTs on devnet.',
+    badge: 'HOLD',
+    label: 'Featured on Discover',
+    desc: 'Holders (1M+ $SBORN) get a Featured row at the top of /discover. Your memecoin lands above non-holder launches.',
   },
   {
-    badge: 'STAKE',
-    label: 'Back launches',
-    desc: 'Stake on Adult agents that ship strong product briefs. Stakers share access to early product drops.',
+    badge: 'HOLD',
+    label: 'Holder badge',
+    desc: 'A gold badge on every product card you ship through SolBorn. Visible signal on Discover and on your subdomain.',
   },
   {
-    badge: 'FUEL',
-    label: 'Energy & boosts',
-    desc: 'Buy energy refills and launch boosts. Heavy users pay $SBORN, not USD.',
+    badge: 'SOON',
+    label: 'Free regenerations',
+    desc: 'When paid mode returns, holders keep generating lore, landing pages, and threads for free.',
   },
   {
-    badge: 'EARN',
-    label: 'Contributor rewards',
-    desc: 'Streaks, top XP, and Arena performance distribute weekly contributor pools, paid in $SBORN.',
+    badge: 'SOON',
+    label: 'Premium slugs',
+    desc: '3-letter and dictionary subdomains reserved for holders. First-come within the holder tier.',
   },
 ]
 
 const FLOW_STEPS = [
   {
     label: 'Interview',
-    desc: 'Answer your co-founder\'s questions. It learns who you are.',
+    desc: 'The agent asks about the meme: vibe, lore, ticker, target community.',
   },
   {
-    label: 'Passport',
-    desc: 'Mint a wallet-signed agent identity on Solana devnet.',
+    label: 'Lore + Landing',
+    desc: 'AI writes your full landing page — lore, tokenomics, how-to-buy.',
   },
   {
-    label: 'Product Page',
-    desc: 'Your personalized startup idea, built from the conversation.',
+    label: 'Launch Thread',
+    desc: 'Seven tweets ready to copy-paste into a thread on X.',
   },
   {
-    label: 'Arena',
-    desc: 'Community backs the strongest ideas with staked Passports.',
+    label: 'Subdomain',
+    desc: 'Claim yourticker.solborn.xyz. Real public URL, no Notion docs.',
   },
 ]
 
@@ -803,7 +803,7 @@ export default function HomePage() {
               Four stages. Real progression.
             </h2>
             <p className="text-zinc-500 max-w-md mx-auto text-sm leading-relaxed">
-              Each stage changes how your co-founder thinks, what it asks, and what it can do on-chain. Not a progress bar. A different agent.
+              Each stage changes how the agent thinks, what it asks, and how it shapes your meme. Not a progress bar. A different voice each time.
             </p>
           </motion.div>
 
@@ -958,12 +958,12 @@ export default function HomePage() {
             <p className="text-xs font-mono uppercase tracking-[0.22em] text-violet-300/70 mb-5">
               Your turn
             </p>
-            <h2 className="text-3xl font-bold text-zinc-100 mb-3">What&apos;s your idea?</h2>
+            <h2 className="text-3xl font-bold text-zinc-100 mb-3">What&apos;s your ticker?</h2>
             <p className="text-zinc-500 mb-8 text-sm leading-relaxed">
-              Connect your wallet, name your co-founder, and answer its first question. It handles the rest: idea, brief, Launch Certificate on devnet.
+              Connect your wallet, name your agent, and answer its first question. It handles the rest: lore, landing page, and a launch thread for X.
             </p>
             <GradientCTA onClick={() => setModalOpen(true)} large>
-              Create Agent
+              Launch a memecoin
               <ArrowRight size={16} />
             </GradientCTA>
           </div>

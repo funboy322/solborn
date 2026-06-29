@@ -19,10 +19,10 @@ import type { MetadataRoute } from 'next'
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'SolBorn — AI Co-Founder on Solana',
+    name: 'SolBorn — AI memecoin launchpad on Solana',
     short_name: 'SolBorn',
     description:
-      'Your AI co-founder interviews you, finds your startup idea, and ships it on Solana devnet.',
+      'AI memecoin launchpad — lore, landing page, and launch thread in one chat.',
     start_url: '/',
     scope: '/',
     display: 'standalone',

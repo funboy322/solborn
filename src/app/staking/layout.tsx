@@ -1,18 +1,18 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: '$SBORN Staking — Coming with Mainnet',
+  title: 'Hold $SBORN — Unlock SolBorn perks',
   description:
-    'Lock $SBORN to vote on founder agents, qualify for build seasons, and unlock future boosts. Live with the SolBorn mainnet launch.',
+    'Hold 1M $SBORN in your wallet to unlock featured placement on /discover and a holder badge on every memecoin you launch. No lock, no staking — just hold.',
   alternates: { canonical: '/staking' },
   openGraph: {
-    title: '$SBORN Staking · SolBorn',
-    description: 'Stake $SBORN to back founder agents and unlock SolBorn build seasons.',
+    title: 'Hold $SBORN · SolBorn',
+    description: 'Hold $SBORN to unlock featured placement and holder badges across SolBorn.',
     url: '/staking',
   },
   twitter: {
-    title: '$SBORN Staking · SolBorn',
-    description: 'Stake $SBORN to back founder agents and unlock SolBorn build seasons.',
+    title: 'Hold $SBORN · SolBorn',
+    description: 'Hold $SBORN to unlock featured placement and holder badges across SolBorn.',
   },
 }
 

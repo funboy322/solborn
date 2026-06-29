@@ -1,18 +1,18 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'The Forge — Talk to your AI Co-Founder',
+  title: 'The Forge — Launch your memecoin',
   description:
-    'Open the Forge to chat with your SolBorn agent. Answer its questions, watch it level up Baby → Adult, and let it generate your personal Solana startup.',
+    'Open the Forge to chat with your SolBorn agent. Answer its questions about your meme, watch it shape the lore, then ship a landing page and a 7-tweet launch thread.',
   alternates: { canonical: '/forge' },
   openGraph: {
     title: 'The Forge · SolBorn',
-    description: 'Chat with your AI co-founder. It interviews you, then ships your startup.',
+    description: 'Chat with the agent. Ship a memecoin: lore, landing page, launch thread.',
     url: '/forge',
   },
   twitter: {
     title: 'The Forge · SolBorn',
-    description: 'Chat with your AI co-founder. It interviews you, then ships your startup.',
+    description: 'Chat with the agent. Ship a memecoin: lore, landing page, launch thread.',
   },
 }
 

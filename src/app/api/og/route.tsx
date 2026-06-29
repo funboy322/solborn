@@ -22,9 +22,9 @@ const STAGE_DOTS: { emoji: string; color: string }[] = [
 
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams
-  const headline = (q.get('t') ?? 'Your Solana startup, found in 5 minutes of chat.').slice(0, 96)
+  const headline = (q.get('t') ?? 'Launch your Solana memecoin, one chat away.').slice(0, 96)
   const subline = (
-    q.get('s') ?? 'AI co-founder interviews you. Mints a Passport NFT. Ships a Launch Certificate on devnet.'
+    q.get('s') ?? 'AI writes the lore, the landing page, and a 7-tweet launch thread. Free during early access.'
   ).slice(0, 140)
 
   return new ImageResponse(
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ fontSize: 32, fontWeight: 700, letterSpacing: -0.3 }}>SolBorn</div>
             <div style={{ fontSize: 18, color: '#a78bfa', letterSpacing: 4, textTransform: 'uppercase', marginTop: 2 }}>
-              AI co-founder · Solana
+              AI memecoin launchpad · Solana
             </div>
           </div>
         </div>

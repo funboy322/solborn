@@ -4,33 +4,39 @@
 
 # SolBorn
 
-### Your AI co-founder on Solana.
+### AI memecoin launchpad on Solana.
 
-**Tell it who you are. It finds your startup idea.**
-**Mint an Agent Passport. Grow it to Adult. Publish a signed Launch Certificate.**
+**Tell the agent your meme. It writes the lore, landing page, and a 7-tweet launch thread.**
+**Claim `yourticker.solborn.xyz`. Share the URL. Ship the launch.**
 
-[![Solana](https://img.shields.io/badge/Solana-devnet-9945FF?style=for-the-badge&logo=solana&logoColor=white)](https://solana.com)
+[![Solana](https://img.shields.io/badge/Solana-mainnet-9945FF?style=for-the-badge&logo=solana&logoColor=white)](https://solana.com)
 [![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/badge/license-MIT-10B981?style=for-the-badge)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/funboy322/solborn?style=for-the-badge&color=F59E0B)](https://github.com/funboy322/solborn/stargazers)
 
-### 🌐 [**solborn.xyz**](https://solborn.xyz) — live now on devnet
+### 🌐 [**solborn.xyz**](https://solborn.xyz) — live now
 
-[**🚀 Live Site**](https://solborn.xyz) · [**🎮 Demo Path**](https://solborn.xyz/demo) · [**📹 60s Video**](#)
+[**🚀 Live Site**](https://solborn.xyz) · [**🔭 Discover**](https://solborn.xyz/discover) · [**🎮 Demo Path**](https://solborn.xyz/demo)
 
 ---
 
 </div>
 
-> **Colosseum Frontier Hackathon 2026 submission.**
-> A working on-chain product where your AI co-founder interviews you, builds your personalized startup idea, and every milestone is verifiable on Solana devnet.
+> **AI memecoin launchpad on Solana.**
+> Chat with an AI agent about your meme: ticker, lore, vibe, target community. It writes a full landing page (lore + tokenomics + how-to-buy + FAQ) and a 7-tweet launch thread for X. Claim `yourticker.solborn.xyz` and share the public URL.
+
+<br />
+
+## 🔄 Pivot note (2026-06)
+
+Originally built as an AI co-founder for Solana startups (Colosseum Frontier hackathon submission). After the hackathon, SolBorn pivoted to an **AI memecoin launchpad** — same agent engine, same Solana wallet stack, same semantic memory, but the agent now interviews you about your meme and ships a landing page + launch thread instead of a startup brief. Older sections of this README still describe the founder-flow architecture; the technology layer is unchanged, only the output is different.
 
 <br />
 
 ## ✨ The pitch in one paragraph
 
-Most "AI agent" projects hand you a blank text box and say *"start prompting!"*. SolBorn flips it. You don't teach the agent. **It interviews you.** It asks about your skills and what problems you see in the market. Based on your answers, it builds a personalized Solana startup idea around who you are. As the conversation grows, the agent earns XP and evolves through stages. It remembers you across sessions via **semantic vector memory** and mints an **Agent Passport** as a signed on-chain proof of its origin. When it reaches Adult, it ships a full product brief, public product page, and **Launch Certificate** on Solana devnet. You don't end up with a chatbot. You end up with a co-founder that knows you.
+Most memecoin launches die at the blank page: no lore, no landing, no thread. SolBorn flips it. The AI agent interviews you about your meme — ticker, vibe, lore, target community — and from those answers writes the landing page (lore paragraphs + tokenomics + how-to-buy + FAQ) and a 7-tweet launch thread in the agent's voice. You claim `yourticker.solborn.xyz`, share the URL on X, post the thread as replies. The agent still has semantic memory and still mints a Passport on-chain — that machinery is now the engine for memecoin lore instead of startup briefs.
 
 <br />
 

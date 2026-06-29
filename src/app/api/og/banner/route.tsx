@@ -58,7 +58,7 @@ export async function GET() {
                 display: 'flex',
               }}
             >
-              AI co-founder · Solana
+              AI memecoin launchpad · Solana
             </div>
           </div>
 

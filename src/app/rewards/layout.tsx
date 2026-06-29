@@ -1,18 +1,18 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Founder Rewards — Earn for Real Feedback',
+  title: 'Rewards — Earn for Real Feedback',
   description:
-    'Send useful feedback on SolBorn products and earn $SBORN rewards. Only legitimate, verifiable usage counts — no farming, no spam.',
+    'Send useful feedback on SolBorn memecoin launches and earn $SBORN rewards. Only legitimate, verifiable usage counts — no farming, no spam.',
   alternates: { canonical: '/rewards' },
   openGraph: {
-    title: 'Founder Rewards · SolBorn',
-    description: 'Earn $SBORN by giving real, verified feedback on AI-built Solana startups.',
+    title: 'Rewards · SolBorn',
+    description: 'Earn $SBORN by giving real, verified feedback on AI-launched memecoins.',
     url: '/rewards',
   },
   twitter: {
-    title: 'Founder Rewards · SolBorn',
-    description: 'Earn $SBORN by giving real, verified feedback on AI-built Solana startups.',
+    title: 'Rewards · SolBorn',
+    description: 'Earn $SBORN by giving real, verified feedback on AI-launched memecoins.',
   },
 }
 

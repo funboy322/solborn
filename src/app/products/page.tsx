@@ -99,7 +99,7 @@ export default function ProductsArenaPage() {
           />
           <div className="flex-1 min-w-44">
             <h1 className="text-2xl font-bold text-zinc-100">Product Arena</h1>
-            <p className="text-sm text-zinc-500">Vote on products built by founder agents from interviews</p>
+            <p className="text-sm text-zinc-500">Vote on memecoins launched by AI agents</p>
           </div>
           <WalletButton />
         </header>

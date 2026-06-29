@@ -189,6 +189,46 @@ export default async function PublicSubdomainPage({ params }: Props) {
             <RenderedLanding landing={project.landingContent} accentColor={accentColor} />
           )}
 
+          {/* Launch thread */}
+          {project.launchThread && project.launchThread.tweets.length > 0 && (
+            <section className="glass rounded-2xl p-6 border border-white/10 space-y-4">
+              <div className="flex items-center gap-2">
+                <h2 className="text-xs uppercase tracking-wider text-zinc-500">Launch thread</h2>
+                {project.launchThread.hashtags?.length > 0 && (
+                  <span className="text-[11px] text-zinc-600">
+                    {project.launchThread.hashtags.map((h) => `#${h}`).join(' ')}
+                  </span>
+                )}
+              </div>
+              <ol className="space-y-2.5">
+                {project.launchThread.tweets.map((tweet, idx) => (
+                  <li
+                    key={idx}
+                    className="rounded-xl border border-white/10 bg-white/[0.02] p-3.5 space-y-2"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
+                        {idx + 1} / {project.launchThread!.tweets.length}
+                      </span>
+                      <a
+                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11px] text-zinc-500 hover:text-zinc-200 transition-colors inline-flex items-center gap-1"
+                      >
+                        Open in X
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                    <p className="text-sm text-zinc-100 leading-relaxed whitespace-pre-wrap">
+                      {tweet}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
+
           {/* Brief */}
           {project.brief && (
             <section className="glass rounded-2xl p-6 border border-white/10 space-y-5">
@@ -237,7 +277,7 @@ export default async function PublicSubdomainPage({ params }: Props) {
               rel="noopener"
             >
               <Rocket size={12} />
-              Built with solborn.xyz · the AI co-founder for Solana builders
+              Built with solborn.xyz · the AI memecoin launchpad on Solana
             </Link>
           </footer>
         </div>

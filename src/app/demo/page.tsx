@@ -8,64 +8,64 @@ import { useForgeStore } from '@/lib/store'
 
 const STEPS = [
   {
-    title: 'Create a founder agent',
+    title: 'Open the Forge',
     time: '20 sec',
-    body: 'Open the Forge, name the agent, connect Phantom on devnet, and start with any product idea.',
+    body: 'Name your agent, connect Phantom or sign in with Privy, and start the memecoin interview.',
     action: 'Open Forge',
     href: '/forge?demo=1',
   },
   {
-    title: 'Mint Agent Passport',
-    time: '30 sec',
-    body: 'The Passport is a real signed Solana devnet memo that proves the agent identity.',
-    action: 'Mint in Forge',
+    title: 'Tell the agent your meme',
+    time: '60 sec',
+    body: 'Answer questions about your ticker, vibe, lore, and target community. The agent learns from each answer.',
+    action: 'Talk to agent',
     href: '/forge?demo=1',
   },
   {
-    title: 'Teach it to Adult',
+    title: 'Level up to Adult',
     time: '60 sec',
-    body: 'Use demo mode to gain XP fast. Explain the product, users, Solana angle, and first MVP.',
+    body: 'In demo mode, XP scales fast. Reach Adult to unlock landing-page and launch-thread generation.',
     action: 'Train agent',
     href: '/forge?demo=1',
   },
   {
-    title: 'Generate Product Page',
+    title: 'Generate landing page',
     time: '30 sec',
-    body: 'Adult agents generate a product brief, membership pass, launch plan, and public page.',
+    body: 'AI writes the full landing: lore, tokenomics, how-to-buy, FAQ. Renders on your product page.',
     action: 'Generate',
     href: '/forge?demo=1',
   },
   {
-    title: 'Publish Launch Certificate',
+    title: 'Generate launch thread',
     time: '30 sec',
-    body: 'The Launch Certificate writes a signed project proof to Solana devnet.',
-    action: 'Publish proof',
+    body: 'AI writes 7 tweets in the agent\'s voice. Copy each, post as a thread on X.',
+    action: 'Generate thread',
     href: '/forge?demo=1',
   },
   {
-    title: 'Back products in Arena',
+    title: 'Claim your subdomain',
     time: '30 sec',
-    body: 'Passport holders with staked $SBORN can back the strongest agent-built products.',
-    action: 'Open Arena',
-    href: '/products',
+    body: 'Pick yourticker.solborn.xyz, edit to publish. Server-rendered, mobile-fast, real public URL.',
+    action: 'See Discover',
+    href: '/discover',
   },
 ]
 
 const PROOF = [
   {
     icon: ShieldCheck,
-    title: 'Real devnet proof',
-    body: 'Agent Passports and Launch Certificates are signed Solana Memo transactions.',
+    title: 'Real public URL',
+    body: 'Each launch lands on a {ticker}.solborn.xyz subdomain — server-rendered, SEO-indexed, mobile-fast.',
   },
   {
     icon: Trophy,
-    title: 'Launchpad loop',
-    body: 'Training becomes a Product Page, access request, and Arena entry.',
+    title: 'AI does the writing',
+    body: 'Lore, landing copy, and 7-tweet thread all generated from your brief. No blank-page paralysis.',
   },
   {
     icon: Lock,
-    title: 'Utility v1',
-    body: 'Staking, backing, and access are simulation layers while the SPL lock program is developed.',
+    title: '$SBORN holder perks',
+    body: 'Hold 1M $SBORN to unlock featured placement on /discover and a holder badge on every launch.',
   },
 ]
 
@@ -105,12 +105,12 @@ export default function DemoPage() {
               Judge mode
             </div>
             <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-100 mb-4">
-              Tell the agent who you are. Ship a Solana startup.
+              Tell the agent your meme. Ship a Solana memecoin.
             </h2>
             <p className="text-zinc-500 leading-relaxed max-w-3xl">
-              This path shows the full SolBorn loop: an AI co-founder interviews you, mints a
-              Passport NFT, generates a product page, and publishes a Launch Certificate on Solana
-              devnet — all backed by $SBORN utility.
+              This path shows the full SolBorn loop: the AI agent interviews you about your meme,
+              writes the lore, generates a landing page, and a 7-tweet launch thread for X — all
+              with $SBORN holder perks unlockable at any time.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 mt-6">
               <Button onClick={() => router.push('/forge?demo=1')} className="bg-violet-400 text-zinc-950 hover:bg-violet-300">

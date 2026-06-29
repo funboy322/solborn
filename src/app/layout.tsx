@@ -6,11 +6,11 @@ import { GitHubStarChip } from '@/components/GitHubStarChip'
 import { PWARegister } from '@/components/PWARegister'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://solborn.xyz'
-const TITLE = 'SolBorn — AI Co-Founder on Solana'
+const TITLE = 'SolBorn — AI memecoin launchpad on Solana'
 const DESCRIPTION =
-  'Tell SolBorn’s AI agent who you are. It interviews you, generates a personal Solana startup idea, and ships an on-chain Launch Certificate as a real Metaplex Core NFT on devnet.'
+  'Tell SolBorn’s AI agent what your meme is. It writes the lore, the landing page, and a 7-tweet launch thread for X. Claim yourticker.solborn.xyz, share, ship.'
 const SHORT_DESCRIPTION =
-  'Your AI co-founder interviews you, finds your startup idea, and ships it on Solana devnet.'
+  'AI memecoin launchpad on Solana — lore, landing page, and launch thread in one chat.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -22,17 +22,15 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   keywords: [
     'Solana',
-    'AI co-founder',
+    'memecoin',
+    'AI memecoin generator',
+    'pump.fun launchpad',
+    'memecoin lore',
+    'memecoin landing page',
+    'launch thread generator',
     'AI agent',
-    'startup idea generator',
-    'Solana startup',
-    'Metaplex Core',
-    'NFT passport',
     'Phantom',
     'Privy',
-    'devnet',
-    'hackathon',
-    'Colosseum Frontier',
     'SolBorn',
     '$SBORN',
   ],
@@ -52,7 +50,7 @@ export const metadata: Metadata = {
         url: '/api/og',
         width: 1200,
         height: 630,
-        alt: 'SolBorn — AI co-founder on Solana',
+        alt: 'SolBorn — AI memecoin launchpad on Solana',
       },
     ],
     type: 'website',
