@@ -20,7 +20,13 @@ import { createElement, useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import * as LucideIcons from 'lucide-react'
 import { ArrowRight, Check, ChevronDown, Sparkles } from 'lucide-react'
-import type { LandingContent, LandingFeature, LandingStep, LandingFaqItem } from '@/lib/types'
+import type {
+  LandingContent,
+  LandingFeature,
+  LandingStep,
+  LandingFaqItem,
+  TokenomicsRow,
+} from '@/lib/types'
 
 interface RenderedLandingProps {
   landing: LandingContent
@@ -28,14 +34,161 @@ interface RenderedLandingProps {
 }
 
 export function RenderedLanding({ landing, accentColor }: RenderedLandingProps) {
+  // New memecoin layout uses lore + tokenomics + howToBuy.
+  // Legacy projects (pre-pivot) used features + howItWorks. We render whichever
+  // is present so older subdomains keep working without regeneration.
+  const hasMemecoinLayout = Boolean(
+    (landing.lore && landing.lore.length > 0) ||
+      (landing.tokenomics && landing.tokenomics.length > 0) ||
+      (landing.howToBuy && landing.howToBuy.length > 0)
+  )
+
   return (
     <section className="space-y-5" data-testid="rendered-landing">
       <HeroSection hero={landing.hero} accentColor={accentColor} />
-      <FeaturesSection features={landing.features} accentColor={accentColor} />
-      <HowItWorksSection steps={landing.howItWorks} accentColor={accentColor} />
+
+      {hasMemecoinLayout ? (
+        <>
+          {landing.lore && landing.lore.length > 0 && (
+            <LoreSection lore={landing.lore} accentColor={accentColor} />
+          )}
+          {landing.tokenomics && landing.tokenomics.length > 0 && (
+            <TokenomicsSection rows={landing.tokenomics} accentColor={accentColor} />
+          )}
+          {landing.howToBuy && landing.howToBuy.length > 0 && (
+            <HowToBuySection steps={landing.howToBuy} accentColor={accentColor} />
+          )}
+        </>
+      ) : (
+        <>
+          {landing.features && landing.features.length > 0 && (
+            <FeaturesSection features={landing.features} accentColor={accentColor} />
+          )}
+          {landing.howItWorks && landing.howItWorks.length > 0 && (
+            <HowItWorksSection steps={landing.howItWorks} accentColor={accentColor} />
+          )}
+        </>
+      )}
+
       <FaqSection faq={landing.faq} accentColor={accentColor} />
       <CtaSection cta={landing.cta} accentColor={accentColor} />
+
+      {landing.riskDisclosure && (
+        <p className="text-center text-[11px] text-zinc-600 leading-relaxed max-w-md mx-auto pt-2">
+          {landing.riskDisclosure}
+        </p>
+      )}
     </section>
+  )
+}
+
+// ─── Lore (new) ──────────────────────────────────────────────────────────────
+
+function LoreSection({
+  lore,
+  accentColor,
+}: {
+  lore: string[]
+  accentColor: string
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="glass rounded-2xl p-7 sm:p-9 border border-white/10"
+      style={{ background: 'rgba(255,255,255,0.02)' }}
+    >
+      <h3
+        className="text-xs uppercase tracking-wider mb-5"
+        style={{ color: accentColor }}
+      >
+        Lore
+      </h3>
+      <div className="space-y-4 max-w-3xl">
+        {lore.map((para, i) => (
+          <p key={i} className="text-base text-zinc-200 leading-relaxed">
+            {para}
+          </p>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
+// ─── Tokenomics (new) ────────────────────────────────────────────────────────
+
+function TokenomicsSection({
+  rows,
+  accentColor,
+}: {
+  rows: TokenomicsRow[]
+  accentColor: string
+}) {
+  return (
+    <div
+      className="glass rounded-2xl p-6 border border-white/10"
+      style={{ background: 'rgba(255,255,255,0.02)' }}
+    >
+      <h3 className="text-xs uppercase tracking-wider text-zinc-500 mb-4">Tokenomics</h3>
+      <dl className="grid sm:grid-cols-2 gap-3">
+        {rows.map((row, i) => (
+          <div
+            key={i}
+            className="rounded-xl px-3.5 py-2.5 border"
+            style={{
+              background: 'rgba(255,255,255,0.02)',
+              borderColor: 'rgba(255,255,255,0.06)',
+            }}
+          >
+            <dt className="text-[10px] uppercase tracking-wider text-zinc-500 mb-0.5">
+              {row.label}
+            </dt>
+            <dd className="text-sm font-semibold" style={{ color: accentColor }}>
+              {row.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  )
+}
+
+// ─── How to buy (new) ────────────────────────────────────────────────────────
+
+function HowToBuySection({
+  steps,
+  accentColor,
+}: {
+  steps: LandingStep[]
+  accentColor: string
+}) {
+  return (
+    <div
+      className="glass rounded-2xl p-6 border border-white/10"
+      style={{ background: 'rgba(255,255,255,0.02)' }}
+    >
+      <h3 className="text-xs uppercase tracking-wider text-zinc-500 mb-5">How to buy</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {steps.map((step, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.05 * i }}
+          >
+            <div
+              className="text-3xl font-bold mb-2 tabular-nums"
+              style={{ color: accentColor }}
+            >
+              {String(step.stepNumber).padStart(2, '0')}
+            </div>
+            <h4 className="text-sm font-semibold text-zinc-100 mb-1">{step.title}</h4>
+            <p className="text-xs text-zinc-400 leading-relaxed">{step.body}</p>
+          </motion.div>
+        ))}
+      </div>
+    </div>
   )
 }
 

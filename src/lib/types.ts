@@ -46,6 +46,42 @@ export interface ProductBrief {
   launchPlan: string[]
 }
 
+/**
+ * Memecoin-specific brief generated through the AI agent chat.
+ * Drives the new landing template (lore + tokenomics + how-to-buy)
+ * after the 2026-06 pivot from "AI co-founder for Solana startups"
+ * to "AI memecoin launchpad on Solana".
+ */
+export interface MemecoinBrief {
+  /** Token ticker without leading $, e.g. "PEPE". */
+  ticker: string
+  /** pump.fun / mint contract address if launched, optional pre-launch. */
+  contractAddress?: string
+  /** One-line vibe — "satirical", "wholesome cult", "anti-trend", etc. */
+  vibe: string
+  /** Who the coin is for / target community. */
+  targetCommunity: string
+  /** 1-3 sentence backstory — what is the joke / meta / movement here. */
+  lore: string
+  /**
+   * Why-this-coin pitch — what makes it stand out vs the next twenty
+   * launches today. One paragraph. The agent fights to make this concrete.
+   */
+  edge: string
+  /** Optional pump.fun bonding-curve URL (https://pump.fun/coin/...). */
+  pumpFunUrl?: string
+}
+
+/** AI-generated launch thread for X/Twitter, drives the "Share thread" flow. */
+export interface LaunchTweetThread {
+  /** 5-7 tweets, each already validated ≤280 chars. */
+  tweets: string[]
+  /** Suggested hashtags separated out (so the body text stays clean). */
+  hashtags: string[]
+  /** When the thread was last generated. */
+  generatedAt: number
+}
+
 export interface MembershipOffer {
   title: string
   priceUsd: number
@@ -91,6 +127,14 @@ export interface GeneratedProject {
    */
   landingContent?: LandingContent
   /**
+   * Memecoin-specific structured brief (post-pivot 2026-06).
+   * Coexists with ProductBrief for backward compat — old projects keep
+   * showing their brief; new memecoin flows populate memecoinBrief.
+   */
+  memecoinBrief?: MemecoinBrief
+  /** AI-generated launch-thread for X / Twitter. */
+  launchThread?: LaunchTweetThread
+  /**
    * Claimed subdomain slug, e.g. "harmonia" → harmonia.solborn.xyz.
    * Lowercase alphanumeric + hyphens, 3-32 chars, unique across all
    * projects (validated server-side via Upstash Redis SETNX).
@@ -124,8 +168,21 @@ export interface LandingFaqItem {
 }
 
 /**
+ * Tokenomics row on the memecoin landing — small table of fairness signals.
+ * Optional rows: empty array = no tokenomics section rendered.
+ */
+export interface TokenomicsRow {
+  label: string
+  value: string
+}
+
+/**
  * Full AI-generated landing page structure.
- * Renders as Hero → Features → How it works → FAQ → CTA via <RenderedLanding>.
+ *
+ * Post-pivot (2026-06): renders as Hero → Lore → Tokenomics → HowToBuy →
+ * FAQ → CTA. The legacy features/howItWorks fields stay optional for
+ * backward-compat with existing demo subdomains; new generations populate
+ * lore/tokenomics/howToBuy instead.
  */
 export interface LandingContent {
   hero: {
@@ -135,10 +192,19 @@ export interface LandingContent {
     /** Optional CTA target; falls back to productUrl or scrollTo("request-access"). */
     ctaHref?: string
   }
-  /** Exactly 4 cards. */
-  features: LandingFeature[]
-  /** Exactly 4 steps. */
-  howItWorks: LandingStep[]
+  /**
+   * 2-3 paragraphs of memecoin backstory. The narrative heart of the page.
+   * Each entry is one paragraph.
+   */
+  lore?: string[]
+  /** Tokenomics rows — supply, dev allocation, fairness signals. */
+  tokenomics?: TokenomicsRow[]
+  /** Exactly 4 steps showing how to buy (pump.fun / Jupiter / Phantom etc.). */
+  howToBuy?: LandingStep[]
+  /** Legacy: 4 product feature cards. Pre-pivot generations only. */
+  features?: LandingFeature[]
+  /** Legacy: 4 "how it works" steps. Pre-pivot generations only. */
+  howItWorks?: LandingStep[]
   /** Exactly 4 Q+A items. */
   faq: LandingFaqItem[]
   cta: {
@@ -147,6 +213,8 @@ export interface LandingContent {
     buttonText: string
     href?: string
   }
+  /** Optional one-line risk disclaimer at the bottom of the page. */
+  riskDisclosure?: string
   /** When this generation was produced. */
   generatedAt: number
   /** Mainnet tx signature proving the 0.05 SOL payment for this generation. */

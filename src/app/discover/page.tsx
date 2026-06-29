@@ -72,11 +72,11 @@ export default async function DiscoverPage({ searchParams }: Props) {
 
         <section className="mb-7">
           <h2 className="text-2xl sm:text-3xl font-bold text-zinc-50 leading-tight">
-            Products shipped by AI co-founders on Solana
+            Memecoins launched by AI agents on Solana
           </h2>
           <p className="text-sm text-zinc-400 max-w-2xl mt-2">
-            Every card is a landing page built by an agent through a conversation, then claimed
-            at its own subdomain. Click any card to visit.
+            Each card is a coin shipped through SolBorn — the agent wrote the lore, landing,
+            and launch thread, then the creator claimed a subdomain. Click any to dive in.
           </p>
         </section>
 
@@ -87,10 +87,10 @@ export default async function DiscoverPage({ searchParams }: Props) {
           />
         ) : page.items.length === 0 ? (
           <EmptyState
-            title="Nobody has shipped a public subdomain yet"
-            body="Be first. Build a project in the Forge, then claim your slug in the Edit modal."
+            title="No memecoins launched here yet"
+            body="Be first. Talk to the agent in the Forge, ship your lore, landing and thread, then claim a subdomain."
             ctaHref="/forge"
-            ctaLabel="Open the Forge"
+            ctaLabel="Launch your memecoin"
           />
         ) : (
           <>

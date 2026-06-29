@@ -704,7 +704,7 @@ export default function HomePage() {
               transition={{ duration: 0.5, delay: 0.12 }}
               className="text-xs font-mono text-zinc-500 tracking-[0.22em] uppercase mb-5"
             >
-              Solana founder agents
+              Solana memecoin agents
             </motion.p>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -712,9 +712,9 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mb-6 text-4xl font-bold leading-[1.06] tracking-normal text-zinc-100 sm:text-6xl lg:text-7xl"
             >
-              Your Solana startup,
+              Launch your Solana memecoin,
               <br />
-              found in 5 minutes of chat.
+              one chat away.
             </motion.h1>
 
             <motion.p
@@ -723,7 +723,7 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-lg text-zinc-400 max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed"
             >
-              Your AI co-founder asks who you are and what you&apos;d build. Then it ships the idea, with proof on Solana devnet.
+              The AI agent interviews you about your meme. Then it ships your lore, landing page, and launch thread — at <span className="text-zinc-200">yourticker.solborn.xyz</span>.
             </motion.p>
 
             <motion.div
@@ -733,16 +733,16 @@ export default function HomePage() {
               className="flex items-center justify-center lg:justify-start gap-3 flex-wrap"
             >
               <GradientCTA onClick={() => setModalOpen(true)} large>
-                Create Agent
+                Launch a memecoin
                 <ArrowRight size={16} />
               </GradientCTA>
               <Button
                 size="lg"
                 variant="secondary"
-                onClick={() => router.push('/demo')}
+                onClick={() => router.push('/discover')}
                 className="border border-violet-300/15 bg-violet-400/[0.045] hover:bg-violet-400/[0.09] text-violet-50"
               >
-                View Demo
+                Discover launches
               </Button>
               {agents.length > 0 && (
                 <Button
@@ -751,7 +751,7 @@ export default function HomePage() {
                   onClick={() => router.push('/forge')}
                   className="border border-violet-300/15 bg-violet-400/[0.045] hover:bg-violet-400/[0.09] text-violet-50"
                 >
-                  My Agents
+                  My agents
                 </Button>
               )}
             </motion.div>
@@ -762,11 +762,11 @@ export default function HomePage() {
               transition={{ delay: 0.7 }}
               className="flex items-center justify-center lg:justify-start gap-5 mt-10 text-xs text-zinc-600 flex-wrap"
             >
-              <span>Devnet transactions</span>
+              <span>pump.fun ready</span>
               <span className="text-zinc-800">/</span>
               <span>Open source</span>
               <span className="text-zinc-800">/</span>
-              <span>No teaching required</span>
+              <span>Free during early access</span>
             </motion.div>
           </div>
 
