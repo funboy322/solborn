@@ -9,6 +9,7 @@ import { WalletButton } from '@/components/wallet/WalletButton'
 import { TipButton } from '@/components/agent/TipButton'
 import { EditProductModal } from '@/components/agent/EditProductModal'
 import { GenerateLandingModal } from '@/components/agent/GenerateLandingModal'
+import { GenerateThreadModal } from '@/components/agent/GenerateThreadModal'
 import { RenderedLanding } from '@/components/agent/RenderedLanding'
 import { useForgeStore } from '@/lib/store'
 import { STAGE_CONFIG } from '@/lib/constants'
@@ -108,6 +109,7 @@ function ProductContent({
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null)
   const [editOpen, setEditOpen] = useState(false)
   const [generateOpen, setGenerateOpen] = useState(false)
+  const [threadOpen, setThreadOpen] = useState(false)
   const updateGeneratedProject = useForgeStore((s) => s.updateGeneratedProject)
   const canSubmit = contact.trim().length >= 3 && useCase.trim().length >= 20
   const walletAddress = publicKey?.toBase58() ?? null
@@ -120,6 +122,7 @@ function ProductContent({
   const walletConnected = Boolean(walletAddress)
   const accentColor = STAGE_CONFIG[agentStage]?.color ?? '#8b5cf6'
   const hasLanding = Boolean(project.landingContent)
+  const hasThread = Boolean(project.launchThread)
 
   const artworkUrl = useMemo(() => {
     const params = new URLSearchParams({
@@ -293,6 +296,20 @@ function ProductContent({
               >
                 <Sparkles size={14} />
                 {hasLanding ? 'Regenerate landing' : 'Generate landing'}
+              </button>
+            )}
+            {canEdit && (
+              <button
+                onClick={() => setThreadOpen(true)}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-zinc-200 hover:bg-white/[0.06] transition-colors"
+                title={
+                  hasThread
+                    ? 'Open your launch thread'
+                    : 'Generate a 7-tweet launch thread from your brief'
+                }
+              >
+                <Sparkles size={14} />
+                {hasThread ? 'View launch thread' : 'Generate launch thread'}
               </button>
             )}
           </div>
@@ -513,6 +530,18 @@ function ProductContent({
           onSuccess={(landing) => {
             updateGeneratedProject(agent.id, { landingContent: landing })
             setGenerateOpen(false)
+          }}
+        />
+      )}
+
+      {threadOpen && (
+        <GenerateThreadModal
+          agent={agent}
+          project={project}
+          accentColor={accentColor}
+          onClose={() => setThreadOpen(false)}
+          onSuccess={(thread) => {
+            updateGeneratedProject(agent.id, { launchThread: thread })
           }}
         />
       )}
