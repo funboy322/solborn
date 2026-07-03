@@ -63,41 +63,57 @@ Agent voice (the agent's personality bleeds into the copy):
 
 ${customizedNote}
 
+Voice reference: memecoin Twitter (crypto CT), not startup landing pages. Lowercase, terse, self-aware, jokes not roadmaps. Think shitpost with structure, not press release with jokes.
+
+Good hero examples to imitate the register (not the specific content):
+  "$NGMI. the coin for people who know they aren't gonna make it."
+  "wojak was right. buy $COPE."
+  "the cat is CEO now. deal with it. $GIGACAT."
+
+Bad hero examples to avoid:
+  "Introducing $DOGE, a revolutionary meme coin that empowers..."
+  "The FUTURE of finance. Buy now!"
+
+Good lore paragraph example (this is 68 words, target for each of the 3 paragraphs):
+  "the goblins came out of the tree line in the summer of 2024. nobody knows where they slept the night before. some say the abandoned wework in soho. some say the discord servers of dead nft projects. the goblins don't care. they showed up with terminal windows open, five monitors each, and a look in their eyes that said the party is happening whether you show up or not."
+
+If your paragraph is 20 words, you did not follow this. Go back and write more.
+
 Return EXACTLY one JSON object matching this TypeScript type. No markdown, no code fences, no commentary before or after the JSON:
 
 {
   "hero": {
-    "headline": "<one short line — ticker + the joke, e.g. '$DOGCEO — the dog is in charge now'>",
-    "subhead": "<one supporting sentence — why this exists, who it's for>",
-    "ctaText": "<2-4 words, e.g. 'Buy on pump.fun' or 'Join the cult'>",
+    "headline": "<one short line, ticker + the joke, lowercase, no em-dash>",
+    "subhead": "<one supporting sentence, who it's for, why now>",
+    "ctaText": "<2-4 words, e.g. 'buy on pump.fun' or 'join the cult'>",
     "ctaHref": ${pumpFunUrl ? `"${pumpFunUrl}"` : '"<omit if no contract>"'}
   },
   "lore": [
-    "<paragraph 1 — origin story / inciting moment>",
-    "<paragraph 2 — the world / characters / the joke deepening>",
-    "<paragraph 3 — why now / what's next / call to action>"
+    "<paragraph 1: origin, 60-100 words REQUIRED. concrete: a specific moment, place, or joke. no 'in the world of...'>",
+    "<paragraph 2: deepening, 60-100 words REQUIRED. the joke gets weirder or the world gets sharper. specific detail beats abstract concept>",
+    "<paragraph 3: now, 50-90 words REQUIRED. why the launch matters today. can end on a shitpost line, not a mission statement>"
   ],
   "tokenomics": [
-    {"label": "Supply", "value": "<e.g. 1B total>"},
-    {"label": "Fair launch", "value": "<e.g. 100% to bonding curve, no pre-mine>"},
-    {"label": "Dev allocation", "value": "<e.g. 0% — fair launch>"},
-    {"label": "Liquidity", "value": "<e.g. burned at migration / locked / etc.>"}
+    {"label": "<choose a label that fits the coin, e.g. Supply, Fair launch, Dev bag, Liquidity, Burn, Tax>", "value": "<concrete value, e.g. 1B total>"},
+    {"label": "<label 2>", "value": "<value>"},
+    {"label": "<label 3>", "value": "<value>"},
+    {"label": "<label 4>", "value": "<value>"}
   ],
   "howToBuy": [
-    {"stepNumber": 1, "title": "Get SOL", "body": "<one sentence on getting SOL into wallet>"},
-    {"stepNumber": 2, "title": "Open pump.fun", "body": "<one sentence on the link / search>"},
-    {"stepNumber": 3, "title": "Swap to $${ticker}", "body": "<one sentence on slippage etc.>"},
-    {"stepNumber": 4, "title": "Hold or trade", "body": "<one sentence — the ongoing posture>"}
+    {"stepNumber": 1, "title": "Get SOL", "body": "<one sentence, ≤20 words, on getting SOL into wallet>"},
+    {"stepNumber": 2, "title": "Open pump.fun", "body": "<one sentence, ≤20 words, on the link or search>"},
+    {"stepNumber": 3, "title": "Swap to $${ticker}", "body": "<one sentence, ≤20 words, slippage or route>"},
+    {"stepNumber": 4, "title": "<final step, e.g. 'Hold', 'Post about it', 'Send to the group'>", "body": "<one sentence, ≤20 words, the ongoing posture>"}
   ],
   "faq": [
-    {"question": "<what real buyers would ask>", "answer": "<one paragraph>"},
-    {"question": "<what real buyers would ask>", "answer": "<one paragraph>"},
-    {"question": "<what real buyers would ask>", "answer": "<one paragraph>"},
-    {"question": "<what real buyers would ask>", "answer": "<one paragraph>"}
+    {"question": "<a question a real buyer would actually type, lowercase ok>", "answer": "<30-70 words REQUIRED, one paragraph, direct answer first>"},
+    {"question": "<question 2>", "answer": "<answer 2, 30-70 words>"},
+    {"question": "<question 3>", "answer": "<answer 3, 30-70 words>"},
+    {"question": "<question 4>", "answer": "<answer 4, 30-70 words>"}
   ],
   "cta": {
-    "headline": "<short closing call>",
-    "subhead": "<optional one-line supporting>",
+    "headline": "<short closing call, 3-8 words>",
+    "subhead": "<optional one-line supporting, or omit>",
     "buttonText": "<2-4 words>",
     "href": ${pumpFunUrl ? `"${pumpFunUrl}"` : '"<omit if no contract>"'}
   },
@@ -106,11 +122,16 @@ Return EXACTLY one JSON object matching this TypeScript type. No markdown, no co
 
 Hard rules:
 - EXACTLY 3 lore paragraphs, 4 tokenomics rows, 4 how-to-buy steps, 4 FAQ items. Not 3, not 5.
-- All strings single-line — no \\n inside values, no unescaped quotes.
-- No marketing AI-isms: avoid "delve", "leverage", "robust", "comprehensive", "tapestry", "elevate", "unleash", "seamless", "cutting-edge", "harness", "ecosystem" (as metaphor), em-dashes, three-of-a-kind constructions, hollow "real" / "truly" intensifiers.
-- Headlines lowercase or sentence case — never Title Case.
-- Reference what's concrete in the memecoin brief. Don't invent facts.
-- If a field would be empty or generic, omit ctaHref/href entirely (do not include the key).
-- riskDisclosure must always be present — protects the platform.
+- LENGTH MATTERS: lore paragraphs UNDER 40 words are rejected. FAQ answers UNDER 20 words are rejected. Terse is good, but bare is bad. If you feel like you might be padding, you're at the right length. If it looks like a subtitle, add more.
+- All strings single-line. No \\n inside values, no unescaped quotes.
+- NO em-dashes anywhere. Use commas, periods, or hyphens instead.
+- NO exclamation marks. Crypto CT despises them.
+- NO Title Case in headlines. Lowercase or sentence case only.
+- NO AI-isms: "delve", "leverage", "robust", "comprehensive", "tapestry", "elevate", "unleash", "seamless", "cutting-edge", "harness", "ecosystem" (as metaphor), "in the world of", "in an era where", "meets", hollow "real"/"truly", three-of-a-kind constructions ("built for x, y, and z").
+- NO shill words: "moon", "gem", "hidden gem", "alpha", "1000x", "next 100x", "revolutionary", "game-changing", "future of X".
+- Reference what's CONCRETE in the memecoin brief. If the brief says "vibe is cat cult", write cat cult specifics, not generic "community". Do not invent tokenomics numbers if none given, use "fair launch" language instead.
+- NO invented specific numbers: no burn rates, market caps, price targets, or supply figures unless they appear verbatim in the brief. For tokenomics rows, if a specific number isn't in the brief write "tbd" or "fair launch" rather than fabricating "95% burn" or "1B supply".
+- If a field would be empty or generic filler, omit ctaHref/href entirely (do not include the key).
+- riskDisclosure must always be present, verbatim.
 - Output: JSON only. No prefix text. No code fence. Start with "{" and end with "}".`
 }
