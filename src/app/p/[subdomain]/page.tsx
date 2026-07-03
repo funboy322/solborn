@@ -37,18 +37,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!mirror) return { title: `${subdomain} · SolBorn` }
   const name = mirror.project.name
   const desc = mirror.project.tagline ?? mirror.project.description
+  const ticker = mirror.project.memecoinBrief?.ticker
+  const titleWithTicker = ticker ? `$${ticker.toUpperCase()} · ${name}` : `${name} · SolBorn`
+  const ogImage = `https://solborn.xyz/api/og/product/${subdomain}?v=${mirror.syncedAt}`
   return {
-    title: `${name} · SolBorn`,
+    title: titleWithTicker,
     description: desc,
     openGraph: {
-      title: name,
+      title: titleWithTicker,
       description: desc,
       url: `https://${subdomain}.solborn.xyz/`,
       type: 'website',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `${name} — launched with SolBorn`,
+        },
+      ],
     },
     twitter: {
-      title: name,
+      card: 'summary_large_image',
+      title: titleWithTicker,
       description: desc,
+      images: [ogImage],
     },
     alternates: { canonical: `https://${subdomain}.solborn.xyz/` },
   }
