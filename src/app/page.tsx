@@ -1,14 +1,16 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { Zap, Brain, Rocket, Trophy, ArrowRight, ExternalLink, Coins, BarChart3, Flame, Menu } from 'lucide-react'
+import { Zap, Brain, Rocket, Trophy, ArrowRight, ExternalLink, Coins, BarChart3, Flame, Menu, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CreateAgentModal } from '@/components/forge/CreateAgentModal'
 import { WalletButton } from '@/components/wallet/WalletButton'
 import { PrivyLoginButton } from '@/components/wallet/PrivyLoginButton'
 import { MobileNavDrawer } from '@/components/MobileNavDrawer'
 import { useForgeStore } from '@/lib/store'
+import { STAGE_CONFIG } from '@/lib/constants'
+import type { DiscoverCard } from '@/lib/discover'
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 
@@ -141,6 +143,41 @@ const FLOW_STEPS = [
   {
     label: 'Subdomain',
     desc: 'Claim yourticker.solborn.xyz. Real public URL, no Notion docs.',
+  },
+]
+
+const FAQ_ITEMS: { q: string; a: string }[] = [
+  {
+    q: 'Does SolBorn deploy my token on Solana?',
+    a: 'No — SolBorn does not touch the mint. You deploy the token yourself on pump.fun or Meteora and paste the contract address into the edit form. SolBorn generates the lore, landing page, and launch thread around the token you already control.',
+  },
+  {
+    q: 'Is my launch page really at a real subdomain?',
+    a: 'Yes. Every claimed slug becomes a live subdomain of the form <ticker>.solborn.xyz — server-rendered, SEO-indexed, and mirrored to Upstash Redis so it loads under 300ms globally. Bespoke Open Graph card too, so X and Telegram unfurl it as a memecoin launch.',
+  },
+  {
+    q: 'How is this different from just using pump.fun?',
+    a: 'pump.fun mints the coin. SolBorn writes the story around it — lore paragraphs, tokenomics table, how-to-buy walk-through, FAQ, and a 7-tweet launch thread ready for X. The two are complementary: pump.fun for the mint, SolBorn for the launch narrative.',
+  },
+  {
+    q: 'Do I need to hold $SBORN to use it?',
+    a: 'No. Anyone can generate a landing page and launch thread, and claim a subdomain, for free during early access. Holders (1M+ $SBORN) get a Featured row on /discover, a holder badge on their card, and priority slugs when paid mode returns.',
+  },
+  {
+    q: 'What does the AI actually write?',
+    a: 'Three paragraphs of lore, a four-row tokenomics breakdown, a step-by-step how-to-buy guide, a four-question FAQ tuned to your community, and a 7-tweet launch thread. All from a short interview with your agent — no template copy-paste.',
+  },
+  {
+    q: 'Can I regenerate if the copy is off?',
+    a: 'Yes, one regeneration per minute per agent. The AI takes your feedback via the chat and adjusts. If you regenerate the landing or thread, the previous version is overwritten locally; the public subdomain updates when you Republish.',
+  },
+  {
+    q: 'What if I want to post my thread with real replies, not screenshots?',
+    a: 'The thread modal gives you copy buttons per tweet and an "Open in X" intent link for tweet 1. Post the first, then reply with the next six in order. We do not use OAuth to auto-post — no keys required and no dead threads if X changes its API.',
+  },
+  {
+    q: 'Is SolBorn open source?',
+    a: 'Yes, MIT-licensed. The source and issue tracker are on GitHub at funboy322/solborn. Contributions welcome — especially prompt improvements for the memecoin landing/thread generators.',
   },
 ]
 
@@ -782,6 +819,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <RecentLaunchesStrip />
+
       <ProductFlow />
 
       {/* Scrolling stats bar */}
@@ -939,6 +978,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <FAQSection />
+
       {/* ── Final CTA ── */}
       <section className="py-24 px-6">
         <motion.div
@@ -1058,5 +1099,162 @@ export default function HomePage() {
         onCreated={(id) => router.push(`/forge/${id}`)}
       />
     </main>
+  )
+}
+
+// ─── Recent Launches Strip (social proof under hero) ─────────────────────────
+
+function RecentLaunchesStrip() {
+  const [items, setItems] = useState<DiscoverCard[] | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/discover/list?limit=5')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { items?: DiscoverCard[] } | null) => {
+        if (cancelled) return
+        setItems((d?.items ?? []).slice(0, 5))
+      })
+      .catch(() => !cancelled && setItems([]))
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (items !== null && items.length === 0) return null
+
+  return (
+    <section className="px-6 pb-6 -mt-4 sm:-mt-2">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+            </span>
+            <p className="text-[11px] font-mono text-zinc-500 tracking-[0.22em] uppercase">
+              Live launches
+            </p>
+          </div>
+          <a
+            href="/discover"
+            className="text-[11px] text-zinc-500 hover:text-zinc-200 transition-colors inline-flex items-center gap-1"
+          >
+            All on /discover
+            <ArrowRight size={11} />
+          </a>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+          {items === null
+            ? Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 h-[92px] animate-pulse"
+                />
+              ))
+            : items.map((c) => {
+                const accent = STAGE_CONFIG[c.agentStage]?.color ?? '#8b5cf6'
+                return (
+                  <a
+                    key={c.subdomain}
+                    href={`https://${c.subdomain}.solborn.xyz/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 hover:bg-white/[0.05] hover:border-white/[0.14] transition-colors flex items-center gap-3 relative overflow-hidden"
+                    style={{ boxShadow: `inset 0 0 0 1px ${accent}18` }}
+                  >
+                    <div
+                      className="w-11 h-11 rounded-lg flex items-center justify-center text-2xl flex-shrink-0"
+                      style={{ background: `${accent}18`, border: `1px solid ${accent}30` }}
+                    >
+                      {c.agentEmoji}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs text-zinc-500 font-mono truncate group-hover:text-zinc-300 transition-colors">
+                        {c.subdomain}.solborn.xyz
+                      </div>
+                      <div className="text-sm font-semibold text-zinc-100 truncate">
+                        {c.projectName}
+                      </div>
+                    </div>
+                    {c.ownerIsHolder && (
+                      <span
+                        className="absolute top-2 right-2 text-[9px] font-bold tracking-wide text-amber-200"
+                        title="$SBORN holder"
+                      >
+                        ★
+                      </span>
+                    )}
+                  </a>
+                )
+              })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── FAQ Section ─────────────────────────────────────────────────────────────
+
+function FAQSection() {
+  return (
+    <section className="py-24 px-6">
+      <div className="max-w-3xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-10"
+        >
+          <p className="text-xs font-mono text-violet-400 tracking-widest uppercase mb-3">
+            Questions we hear
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-100">
+            The obvious things first.
+          </h2>
+        </motion.div>
+
+        <div className="space-y-2">
+          {FAQ_ITEMS.map((item, i) => (
+            <motion.details
+              key={i}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.03, duration: 0.35 }}
+              className="group rounded-xl border border-white/[0.08] bg-white/[0.015] hover:bg-white/[0.03] transition-colors overflow-hidden"
+            >
+              <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer list-none">
+                <span className="text-[15px] font-semibold text-zinc-100">{item.q}</span>
+                <ChevronDown
+                  size={16}
+                  className="text-zinc-500 transition-transform duration-200 group-open:rotate-180 flex-shrink-0"
+                />
+              </summary>
+              <div className="px-5 pb-5 pt-1 text-sm text-zinc-400 leading-relaxed">
+                {item.a}
+              </div>
+            </motion.details>
+          ))}
+        </div>
+      </div>
+
+      {/* SEO / AI-citation: FAQPage JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: FAQ_ITEMS.map((item) => ({
+              '@type': 'Question',
+              name: item.q,
+              acceptedAnswer: { '@type': 'Answer', text: item.a },
+            })),
+          }),
+        }}
+      />
+    </section>
   )
 }
