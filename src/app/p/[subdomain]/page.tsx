@@ -15,7 +15,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, ExternalLink, Rocket, ShieldCheck, Sparkles } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Rocket, ShieldCheck, Share2, Sparkles } from 'lucide-react'
 import { RenderedLanding } from '@/components/agent/RenderedLanding'
 import { getProductMirror, isRedisConfigured } from '@/lib/redis'
 import { STAGE_CONFIG } from '@/lib/constants'
@@ -170,6 +170,13 @@ export default async function PublicSubdomainPage({ params }: Props) {
                   )}
                 </a>
               ) : null}
+              <ShareOnXButton
+                subdomain={subdomain}
+                projectName={project.name}
+                ticker={project.memecoinBrief?.ticker}
+                tagline={project.tagline ?? null}
+                accentColor={accentColor}
+              />
               {project.txHash && (
                 <a
                   href={`https://explorer.solana.com/tx/${project.txHash}?cluster=devnet`}
@@ -296,6 +303,51 @@ export default async function PublicSubdomainPage({ params }: Props) {
         </div>
       </div>
     </main>
+  )
+}
+
+function ShareOnXButton({
+  subdomain,
+  projectName,
+  ticker,
+  tagline,
+  accentColor,
+}: {
+  subdomain: string
+  projectName: string
+  ticker?: string
+  tagline: string | null
+  accentColor: string
+}) {
+  const url = `https://${subdomain}.solborn.xyz/`
+  const tickerTag = ticker ? `$${ticker.toUpperCase()}` : projectName
+  // Voice consistency with the site: lowercase, no em-dash, no three-of-a-kind.
+  // Twitter's intent URL preserves newlines when we encode \n.
+  const openingLine = tagline ? `${tickerTag}. ${tagline}` : `${tickerTag} is live.`
+  const lines: string[] = [
+    openingLine,
+    '',
+    url,
+    '',
+    'launched with @solborn_xyz',
+  ]
+  const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(lines.join('\n'))}`
+
+  return (
+    <a
+      href={intentUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-zinc-100 transition-transform hover:scale-[1.02]"
+      style={{
+        background: `${accentColor}22`,
+        border: `1px solid ${accentColor}55`,
+      }}
+      title="Share this launch on X"
+    >
+      <Share2 size={14} style={{ color: accentColor }} />
+      Share on X
+    </a>
   )
 }
 
