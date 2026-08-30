@@ -43,10 +43,13 @@ export function RenderedLanding({ landing, accentColor }: RenderedLandingProps) 
       (landing.howToBuy && landing.howToBuy.length > 0)
   )
 
+  // Legacy pages (pre-pivot) still render their AI hero + CTA sections because
+  // that layout was designed around them. Memecoin pages skip both: the mirror
+  // page already renders a big hero with ticker+emoji, and the Share on X
+  // button in that hero replaces the AI CTA. Rendering both was reading as
+  // duplicated content.
   return (
     <section className="space-y-5" data-testid="rendered-landing">
-      <HeroSection hero={landing.hero} accentColor={accentColor} />
-
       {hasMemecoinLayout ? (
         <>
           {landing.lore && landing.lore.length > 0 && (
@@ -61,6 +64,7 @@ export function RenderedLanding({ landing, accentColor }: RenderedLandingProps) 
         </>
       ) : (
         <>
+          <HeroSection hero={landing.hero} accentColor={accentColor} />
           {landing.features && landing.features.length > 0 && (
             <FeaturesSection features={landing.features} accentColor={accentColor} />
           )}
@@ -71,7 +75,7 @@ export function RenderedLanding({ landing, accentColor }: RenderedLandingProps) 
       )}
 
       <FaqSection faq={landing.faq} accentColor={accentColor} />
-      <CtaSection cta={landing.cta} accentColor={accentColor} />
+      {!hasMemecoinLayout && <CtaSection cta={landing.cta} accentColor={accentColor} />}
 
       {landing.riskDisclosure && (
         <p className="text-center text-[11px] text-zinc-600 leading-relaxed max-w-md mx-auto pt-2">
@@ -96,20 +100,42 @@ function LoreSection({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="glass rounded-2xl p-7 sm:p-9 border border-white/10"
-      style={{ background: 'rgba(255,255,255,0.02)' }}
+      className="relative overflow-hidden rounded-3xl p-8 sm:p-12 border border-white/10"
+      style={{
+        background: `radial-gradient(ellipse at 100% 0%, ${accentColor}0e 0%, transparent 55%), rgba(15,15,20,0.55)`,
+      }}
     >
+      <div
+        className="pointer-events-none absolute -top-24 -right-20 select-none opacity-[0.035]"
+        aria-hidden
+        style={{ fontSize: '18rem', fontWeight: 900, color: accentColor, lineHeight: 1 }}
+      >
+        LORE
+      </div>
       <h3
-        className="text-xs uppercase tracking-wider mb-5"
+        className="text-[11px] font-mono uppercase tracking-[0.25em] mb-8"
         style={{ color: accentColor }}
       >
-        Lore
+        The lore
       </h3>
-      <div className="space-y-4 max-w-3xl">
+      <div className="relative space-y-9 max-w-3xl">
         {lore.map((para, i) => (
-          <p key={i} className="text-base text-zinc-200 leading-relaxed">
-            {para}
-          </p>
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -8 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.08 * i }}
+            className="flex gap-5 sm:gap-7"
+          >
+            <div
+              className="flex-shrink-0 font-mono text-2xl sm:text-3xl font-bold tabular-nums select-none pt-1"
+              style={{ color: `${accentColor}55` }}
+            >
+              {String(i + 1).padStart(2, '0')}
+            </div>
+            <p className="text-[15px] sm:text-base text-zinc-200 leading-[1.75] flex-1">{para}</p>
+          </motion.div>
         ))}
       </div>
     </motion.div>
@@ -127,27 +153,39 @@ function TokenomicsSection({
 }) {
   return (
     <div
-      className="glass rounded-2xl p-6 border border-white/10"
-      style={{ background: 'rgba(255,255,255,0.02)' }}
+      className="rounded-3xl p-8 sm:p-10 border border-white/10"
+      style={{ background: 'rgba(15,15,20,0.55)' }}
     >
-      <h3 className="text-xs uppercase tracking-wider text-zinc-500 mb-4">Tokenomics</h3>
-      <dl className="grid sm:grid-cols-2 gap-3">
+      <h3
+        className="text-[11px] font-mono uppercase tracking-[0.25em] mb-7"
+        style={{ color: accentColor }}
+      >
+        Tokenomics
+      </h3>
+      <dl className="grid grid-cols-2 gap-3 sm:gap-4">
         {rows.map((row, i) => (
-          <div
+          <motion.div
             key={i}
-            className="rounded-xl px-3.5 py-2.5 border"
+            initial={{ opacity: 0, y: 6 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.3, delay: 0.05 * i }}
+            className="relative overflow-hidden rounded-2xl p-5 sm:p-6"
             style={{
-              background: 'rgba(255,255,255,0.02)',
-              borderColor: 'rgba(255,255,255,0.06)',
+              background: `linear-gradient(160deg, ${accentColor}08 0%, rgba(255,255,255,0.02) 100%)`,
+              border: `1px solid ${accentColor}22`,
             }}
           >
-            <dt className="text-[10px] uppercase tracking-wider text-zinc-500 mb-0.5">
+            <dt className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-medium mb-2">
               {row.label}
             </dt>
-            <dd className="text-sm font-semibold" style={{ color: accentColor }}>
+            <dd
+              className="text-xl sm:text-2xl font-bold leading-tight break-words"
+              style={{ color: '#fafafa' }}
+            >
               {row.value}
             </dd>
-          </div>
+          </motion.div>
         ))}
       </dl>
     </div>
@@ -165,28 +203,50 @@ function HowToBuySection({
 }) {
   return (
     <div
-      className="glass rounded-2xl p-6 border border-white/10"
-      style={{ background: 'rgba(255,255,255,0.02)' }}
+      className="rounded-3xl p-8 sm:p-10 border border-white/10"
+      style={{ background: 'rgba(15,15,20,0.55)' }}
     >
-      <h3 className="text-xs uppercase tracking-wider text-zinc-500 mb-5">How to buy</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {steps.map((step, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, delay: 0.05 * i }}
-          >
-            <div
-              className="text-3xl font-bold mb-2 tabular-nums"
-              style={{ color: accentColor }}
+      <h3
+        className="text-[11px] font-mono uppercase tracking-[0.25em] mb-8"
+        style={{ color: accentColor }}
+      >
+        How to buy
+      </h3>
+      <div className="relative">
+        {/* connecting line behind the numbered circles, hidden on mobile */}
+        <div
+          className="pointer-events-none absolute top-6 left-6 right-6 h-px hidden sm:block"
+          style={{
+            background: `linear-gradient(90deg, ${accentColor}00, ${accentColor}55 15%, ${accentColor}55 85%, ${accentColor}00)`,
+          }}
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-4 relative">
+          {steps.map((step, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.35, delay: 0.08 * i }}
+              className="flex flex-col items-start"
             >
-              {String(step.stepNumber).padStart(2, '0')}
-            </div>
-            <h4 className="text-sm font-semibold text-zinc-100 mb-1">{step.title}</h4>
-            <p className="text-xs text-zinc-400 leading-relaxed">{step.body}</p>
-          </motion.div>
-        ))}
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center mb-4 font-mono text-sm font-bold tabular-nums"
+                style={{
+                  background: 'rgba(15,15,20,1)',
+                  border: `1.5px solid ${accentColor}`,
+                  color: accentColor,
+                }}
+              >
+                {String(step.stepNumber).padStart(2, '0')}
+              </div>
+              <h4 className="text-base font-semibold text-zinc-100 mb-2 leading-tight">
+                {step.title}
+              </h4>
+              <p className="text-[13px] text-zinc-400 leading-relaxed">{step.body}</p>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -336,9 +396,17 @@ function FaqSection({
   accentColor: string
 }) {
   return (
-    <div className="glass rounded-2xl p-6 border border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
-      <h3 className="text-xs uppercase tracking-wider text-zinc-500 mb-4">FAQ</h3>
-      <div className="space-y-2">
+    <div
+      className="rounded-3xl p-8 sm:p-10 border border-white/10"
+      style={{ background: 'rgba(15,15,20,0.55)' }}
+    >
+      <h3
+        className="text-[11px] font-mono uppercase tracking-[0.25em] mb-7"
+        style={{ color: accentColor }}
+      >
+        FAQ
+      </h3>
+      <div className="space-y-2.5">
         {faq.map((item, i) => (
           <FaqItem key={i} item={item} accentColor={accentColor} defaultOpen={i === 0} />
         ))}
@@ -358,19 +426,26 @@ function FaqItem({
 }) {
   const [open, setOpen] = useState(defaultOpen)
   return (
-    <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+    <div
+      className="rounded-2xl overflow-hidden transition-colors"
+      style={{
+        border: open ? `1px solid ${accentColor}55` : '1px solid rgba(255,255,255,0.06)',
+        background: open ? `${accentColor}0a` : 'rgba(255,255,255,0.015)',
+      }}
+    >
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between gap-3 text-left px-4 py-3 hover:bg-white/[0.02] transition-colors"
+        className="w-full flex items-center justify-between gap-3 text-left px-5 py-4 hover:bg-white/[0.02] transition-colors"
         aria-expanded={open}
       >
-        <span className="text-sm text-zinc-100 font-medium">{item.question}</span>
+        <span className="text-[15px] text-zinc-100 font-semibold">{item.question}</span>
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
-          transition={{ duration: 0.18 }}
+          transition={{ duration: 0.2 }}
           style={{ color: open ? accentColor : 'rgb(113,113,122)' }}
+          className="flex-shrink-0"
         >
-          <ChevronDown size={16} />
+          <ChevronDown size={18} />
         </motion.span>
       </button>
       {open && (
@@ -378,8 +453,8 @@ function FaqItem({
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.18 }}
-          className="px-4 pb-4 text-sm text-zinc-400 leading-relaxed"
+          transition={{ duration: 0.2 }}
+          className="px-5 pb-5 text-[14px] text-zinc-300 leading-relaxed"
         >
           {item.answer}
         </motion.div>
