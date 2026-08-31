@@ -10,6 +10,7 @@ import { TipButton } from '@/components/agent/TipButton'
 import { EditProductModal } from '@/components/agent/EditProductModal'
 import { GenerateLandingModal } from '@/components/agent/GenerateLandingModal'
 import { GenerateThreadModal } from '@/components/agent/GenerateThreadModal'
+import { DeployTokenModal } from '@/components/agent/DeployTokenModal'
 import { RenderedLanding } from '@/components/agent/RenderedLanding'
 import { useForgeStore } from '@/lib/store'
 import { STAGE_CONFIG } from '@/lib/constants'
@@ -110,6 +111,7 @@ function ProductContent({
   const [editOpen, setEditOpen] = useState(false)
   const [generateOpen, setGenerateOpen] = useState(false)
   const [threadOpen, setThreadOpen] = useState(false)
+  const [deployOpen, setDeployOpen] = useState(false)
   const updateGeneratedProject = useForgeStore((s) => s.updateGeneratedProject)
   const canSubmit = contact.trim().length >= 3 && useCase.trim().length >= 20
   const walletAddress = publicKey?.toBase58() ?? null
@@ -123,6 +125,14 @@ function ProductContent({
   const accentColor = STAGE_CONFIG[agentStage]?.color ?? '#8b5cf6'
   const hasLanding = Boolean(project.landingContent)
   const hasThread = Boolean(project.launchThread)
+  const contractAddress = project.memecoinBrief?.contractAddress
+  const isDeployed = Boolean(contractAddress)
+  const canDeploy = Boolean(
+    !isDeployed && project.subdomain && project.memecoinBrief?.ticker,
+  )
+  const pumpFunUrl =
+    project.memecoinBrief?.pumpFunUrl ||
+    (contractAddress ? `https://pump.fun/coin/${contractAddress}` : null)
 
   const artworkUrl = useMemo(() => {
     const params = new URLSearchParams({
@@ -311,6 +321,36 @@ function ProductContent({
                 <Sparkles size={14} />
                 {hasThread ? 'View launch thread' : 'Generate launch thread'}
               </button>
+            )}
+            {canEdit && canDeploy && (
+              <button
+                onClick={() => setDeployOpen(true)}
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-zinc-900 transition-transform hover:scale-[1.02]"
+                style={{
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  boxShadow: '0 8px 24px rgba(16,185,129,0.35)',
+                }}
+                title={`Mint $${project.memecoinBrief?.ticker?.toUpperCase()} on pump.fun mainnet`}
+              >
+                <Rocket size={14} />
+                Deploy on pump.fun
+              </button>
+            )}
+            {isDeployed && pumpFunUrl && (
+              <a
+                href={pumpFunUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-zinc-900 transition-transform hover:scale-[1.02]"
+                style={{
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  boxShadow: '0 8px 24px rgba(16,185,129,0.35)',
+                }}
+              >
+                <Rocket size={14} />
+                Live on pump.fun
+                <ExternalLink size={12} />
+              </a>
             )}
           </div>
           <div className="flex flex-wrap gap-2 mt-6">
@@ -542,6 +582,20 @@ function ProductContent({
           onClose={() => setThreadOpen(false)}
           onSuccess={(thread) => {
             updateGeneratedProject(agent.id, { launchThread: thread })
+          }}
+        />
+      )}
+
+      {deployOpen && project.subdomain && (
+        <DeployTokenModal
+          agent={agent}
+          project={project}
+          subdomain={project.subdomain}
+          accentColor={accentColor}
+          onClose={() => setDeployOpen(false)}
+          onSuccess={() => {
+            // Local store already patched inside the modal; keep modal open
+            // on the success screen until the user closes it explicitly.
           }}
         />
       )}
