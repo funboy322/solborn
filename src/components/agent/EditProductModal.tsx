@@ -51,6 +51,7 @@ const SUBDOMAIN_ERROR_MESSAGES: Record<string, string> = {
 
 interface FormState {
   name: string
+  ticker: string
   tagline: string
   description: string
   productUrl: string
@@ -63,6 +64,7 @@ interface FormState {
 function toForm(project: GeneratedProject): FormState {
   return {
     name: project.name ?? '',
+    ticker: project.memecoinBrief?.ticker ?? '',
     tagline: project.tagline ?? '',
     description: project.description ?? '',
     productUrl: project.productUrl ?? '',
@@ -74,9 +76,21 @@ function toForm(project: GeneratedProject): FormState {
 }
 
 const NAME_MAX = 32
+const TICKER_MAX = 10
 const TAGLINE_MAX = 90
 const DESCRIPTION_MAX = 500
 const BRIEF_FIELD_MAX = 280
+
+/**
+ * Clamp ticker input to what pump.fun's mint accepts and what CT expects:
+ * uppercase alphanumerics, no leading digit, no whitespace, no punctuation.
+ */
+function normaliseTicker(raw: string): string {
+  return raw
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, TICKER_MAX)
+}
 
 export function EditProductModal({
   project,
@@ -306,6 +320,26 @@ export function EditProductModal({
         launchPlan: project.brief?.launchPlan ?? [],
       }
 
+      // Only touch memecoinBrief if the ticker actually changed or one exists
+      // — we don't want to blow away contractAddress or vibe/lore fields on
+      // an unrelated edit. If there's no brief yet, seed it with the ticker
+      // and empty defaults so the API layers can rely on the shape.
+      const tickerNormalised = normaliseTicker(form.ticker)
+      const existingBrief = project.memecoinBrief
+      const briefChanged = tickerNormalised !== (existingBrief?.ticker ?? '')
+      const memecoinBriefPatch = briefChanged
+        ? existingBrief
+          ? { ...existingBrief, ticker: tickerNormalised }
+          : {
+              ticker: tickerNormalised,
+              contractAddress: '',
+              vibe: '',
+              targetCommunity: '',
+              lore: '',
+              edge: '',
+            }
+        : existingBrief
+
       updateGeneratedProject(agentId, {
         name: form.name.trim().slice(0, NAME_MAX),
         tagline: form.tagline.trim().slice(0, TAGLINE_MAX) || undefined,
@@ -314,6 +348,7 @@ export function EditProductModal({
         productUrlVerified: productUrlRaw ? verified : false,
         productUrlVerifiedAt: productUrlRaw ? verifiedAt : undefined,
         brief: briefPatch as ProductBrief,
+        memecoinBrief: memecoinBriefPatch,
       })
 
       setSaving(false)
@@ -380,6 +415,15 @@ export function EditProductModal({
                 placeholder={project.name}
                 maxLength={NAME_MAX}
                 required
+              />
+
+              <Field
+                label="Ticker"
+                value={form.ticker}
+                onChange={(e) => setForm((f) => ({ ...f, ticker: normaliseTicker(e.target.value) }))}
+                placeholder="e.g. GIGACAT"
+                maxLength={TICKER_MAX}
+                hint="Token symbol, letters and digits only. Required to deploy on pump.fun."
               />
 
               <Field
