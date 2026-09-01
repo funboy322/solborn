@@ -96,6 +96,27 @@ export function DeployTokenModal({
 
     setState({ kind: 'preparing' })
 
+    // The server reads name+ticker+description from the Redis mirror. If the
+    // owner edited any of those since the last Republish, the mirror is stale
+    // and prepare-create would either fail (ticker-missing) or bake the OLD
+    // metadata into the mint. Sync first, ignore errors (best-effort — if the
+    // caller isn't the owner, sync 403s but prepare-create still works when
+    // the mirror already has a ticker).
+    try {
+      await fetch('/api/subdomain/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subdomain,
+          walletAddress: signer.walletAddress,
+          agent,
+          project,
+        }),
+      })
+    } catch (e) {
+      console.warn('[deploy] pre-deploy mirror sync failed, continuing', e)
+    }
+
     // Ephemeral mint keypair — used once, never persisted.
     const mintKeypair = Keypair.generate()
 
