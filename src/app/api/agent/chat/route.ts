@@ -22,8 +22,14 @@ const groq = createGroq({
   apiKey: process.env.GROQ_API_KEY ?? '',
 })
 
-const PRIMARY_MODEL = 'llama-3.3-70b-versatile'
-const FALLBACK_MODEL = 'llama-3.1-8b-instant'
+// Groq deprecated llama-3.3-70b-versatile and llama-3.1-8b-instant in
+// mid-2026. Qwen 3.8 is a good direct swap for streaming chat: same 27B
+// class, non-reasoning, emits content immediately (no <think> tags, no
+// reasoning-first burst that breaks the streaming UX). gpt-oss-20b is
+// the fallback — reasoning model but works well enough as a stop-gap
+// when the primary rate-limits.
+const PRIMARY_MODEL = 'qwen/qwen3.8-27b'
+const FALLBACK_MODEL = 'openai/gpt-oss-20b'
 
 type ChatMsg = { role: 'user' | 'assistant'; content: string }
 

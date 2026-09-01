@@ -39,7 +39,9 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 30
 
 const groq = createGroq({ apiKey: process.env.GROQ_API_KEY ?? '' })
-const PRIMARY_MODEL = 'llama-3.3-70b-versatile'
+// Groq deprecated llama-3.3-70b-versatile in 2026. gpt-oss-120b is the
+// direct replacement for high-quality JSON generation on this tier.
+const PRIMARY_MODEL = 'openai/gpt-oss-120b'
 
 // ── in-memory per-agent rate limit (cooldown 60s) ──────────────────────────
 const COOLDOWN_MS = 60_000

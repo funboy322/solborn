@@ -20,7 +20,9 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 30
 
 const groq = createGroq({ apiKey: process.env.GROQ_API_KEY ?? '' })
-const PRIMARY_MODEL = 'llama-3.3-70b-versatile'
+// Groq deprecated llama-3.3-70b-versatile in 2026. gpt-oss-120b handles
+// the one-shot JSON output for the launch thread.
+const PRIMARY_MODEL = 'openai/gpt-oss-120b'
 
 const COOLDOWN_MS = 60_000
 const lastRunAt = new Map<string, number>()

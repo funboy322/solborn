@@ -65,7 +65,10 @@ const groq = createGroq({
   apiKey: process.env.GROQ_API_KEY ?? '',
 })
 
-const EXTRACTION_MODEL = 'llama-3.1-8b-instant' // fast + cheap
+// Groq deprecated llama-3.1-8b-instant in 2026. Swap to gpt-oss-20b for
+// the fact-extraction pass — still fast and cheap, works for the tiny
+// JSON payload we ask for.
+const EXTRACTION_MODEL = 'openai/gpt-oss-20b'
 
 const EXTRACTOR_PROMPT = `You extract durable facts from a conversation turn between a human TEACHER and an AI agent being trained.
 

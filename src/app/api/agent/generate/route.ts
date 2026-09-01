@@ -11,8 +11,11 @@ export const dynamic = 'force-dynamic'
 
 const groq = createGroq({ apiKey: process.env.GROQ_API_KEY ?? '' })
 
-const PRIMARY = 'llama-3.3-70b-versatile'
-const FALLBACK = 'llama-3.1-8b-instant'
+// Groq deprecated the llama-3 family in mid-2026. gpt-oss-120b handles
+// the one-shot JSON generation better than qwen; qwen 3.8-27b is the
+// fallback if gpt-oss rate-limits.
+const PRIMARY = 'openai/gpt-oss-120b'
+const FALLBACK = 'qwen/qwen3.8-27b'
 
 function safeBlink(raw: unknown, agentName: string): BlinkSpec {
   const r = (raw ?? {}) as Partial<BlinkSpec>
