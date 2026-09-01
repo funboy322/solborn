@@ -20,9 +20,10 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 30
 
 const groq = createGroq({ apiKey: process.env.GROQ_API_KEY ?? '' })
-// Groq deprecated llama-3.3-70b-versatile in 2026. gpt-oss-120b handles
-// the one-shot JSON output for the launch thread.
-const PRIMARY_MODEL = 'openai/gpt-oss-120b'
+// Qwen 3.8-27b for the same reason as landing/generate: non-reasoning
+// model that returns JSON within our 30s budget. gpt-oss-120b was
+// timing out at 504 because reasoning ate the whole window.
+const PRIMARY_MODEL = 'qwen/qwen3.8-27b'
 
 const COOLDOWN_MS = 60_000
 const lastRunAt = new Map<string, number>()

@@ -322,20 +322,42 @@ function ProductContent({
                 {hasThread ? 'View launch thread' : 'Generate launch thread'}
               </button>
             )}
-            {canEdit && canDeploy && (
-              <button
-                onClick={() => setDeployOpen(true)}
-                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-zinc-900 transition-transform hover:scale-[1.02]"
-                style={{
-                  background: 'linear-gradient(135deg, #10b981, #059669)',
-                  boxShadow: '0 8px 24px rgba(16,185,129,0.35)',
-                }}
-                title={`Mint $${project.memecoinBrief?.ticker?.toUpperCase()} on pump.fun mainnet`}
-              >
-                <Rocket size={14} />
-                Deploy on pump.fun
-              </button>
-            )}
+            {/*
+             * Deploy button — three visual states so an owner never wonders
+             * where it went. Enabled when the coin can actually be minted;
+             * disabled with a tooltip when the prerequisite is missing;
+             * replaced with a "Live on pump.fun" link once deployed.
+             */}
+            {canEdit && !isDeployed && (() => {
+              const missingTicker = !project.memecoinBrief?.ticker
+              const missingSubdomain = !project.subdomain
+              const disabled = missingTicker || missingSubdomain
+              const disabledReason = missingSubdomain
+                ? 'Claim your subdomain first (Edit page → Subdomain)'
+                : missingTicker
+                  ? 'Set a ticker first (Edit page → Ticker)'
+                  : ''
+              return (
+                <button
+                  type="button"
+                  onClick={() => !disabled && setDeployOpen(true)}
+                  disabled={disabled}
+                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-zinc-900 transition-transform hover:scale-[1.02] disabled:opacity-45 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    boxShadow: disabled ? 'none' : '0 8px 24px rgba(16,185,129,0.35)',
+                  }}
+                  title={
+                    disabled
+                      ? disabledReason
+                      : `Mint $${project.memecoinBrief?.ticker?.toUpperCase()} on pump.fun mainnet`
+                  }
+                >
+                  <Rocket size={14} />
+                  {disabled ? 'Deploy on pump.fun' : `Deploy $${project.memecoinBrief?.ticker?.toUpperCase()} on pump.fun`}
+                </button>
+              )
+            })()}
             {isDeployed && pumpFunUrl && (
               <a
                 href={pumpFunUrl}

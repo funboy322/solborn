@@ -39,9 +39,12 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 30
 
 const groq = createGroq({ apiKey: process.env.GROQ_API_KEY ?? '' })
-// Groq deprecated llama-3.3-70b-versatile in 2026. gpt-oss-120b is the
-// direct replacement for high-quality JSON generation on this tier.
-const PRIMARY_MODEL = 'openai/gpt-oss-120b'
+// Qwen 3.8-27b is non-reasoning and returns the JSON in one shot within
+// our 30s Vercel Function budget. gpt-oss-120b technically writes better
+// prose but its reasoning-first behaviour burns through the whole timeout
+// before emitting content, and landing/generate has no place to stream.
+const PRIMARY_MODEL = 'qwen/qwen3.8-27b'
+const FALLBACK_MODEL = 'openai/gpt-oss-20b'
 
 // ── in-memory per-agent rate limit (cooldown 60s) ──────────────────────────
 const COOLDOWN_MS = 60_000

@@ -30,11 +30,20 @@ export async function GET(_req: Request, { params }: Props) {
 
   const { project } = mirror
   const ticker = project.memecoinBrief?.ticker?.toUpperCase() ?? project.name.slice(0, 10)
-  // Description: prefer the first lore paragraph, fall back to tagline/description.
-  const description =
-    project.landingContent?.lore?.[0]?.slice(0, 500) ??
+
+  // Description: prefer the first lore paragraph, fall back to tagline /
+  // description. Always append the solborn.xyz attribution — it shows up in
+  // the pump.fun coin page and every downstream aggregator that crawls the
+  // metadata. Truncate the source text so the whole payload stays under
+  // 500 chars (pump.fun's rendered description caps around there).
+  const ATTRIBUTION = ' | created with solborn.xyz — AI memecoin launchpad'
+  const rawBody =
+    project.landingContent?.lore?.[0] ??
     project.tagline ??
-    project.description.slice(0, 500)
+    project.description
+  const bodyRoom = 500 - ATTRIBUTION.length
+  const body = rawBody.length > bodyRoom ? `${rawBody.slice(0, bodyRoom - 1).trim()}…` : rawBody
+  const description = `${body}${ATTRIBUTION}`
 
   const metadata = {
     name: project.name.slice(0, 32),

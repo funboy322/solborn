@@ -11,11 +11,11 @@ export const dynamic = 'force-dynamic'
 
 const groq = createGroq({ apiKey: process.env.GROQ_API_KEY ?? '' })
 
-// Groq deprecated the llama-3 family in mid-2026. gpt-oss-120b handles
-// the one-shot JSON generation better than qwen; qwen 3.8-27b is the
-// fallback if gpt-oss rate-limits.
-const PRIMARY = 'openai/gpt-oss-120b'
-const FALLBACK = 'qwen/qwen3.8-27b'
+// Qwen 3.8-27b — non-reasoning, returns full JSON payload within Vercel's
+// 30s Function budget. gpt-oss-120b was hitting 504s because its
+// reasoning-first output ate the whole timeout window.
+const PRIMARY = 'qwen/qwen3.8-27b'
+const FALLBACK = 'openai/gpt-oss-20b'
 
 function safeBlink(raw: unknown, agentName: string): BlinkSpec {
   const r = (raw ?? {}) as Partial<BlinkSpec>
