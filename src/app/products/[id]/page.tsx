@@ -332,29 +332,39 @@ function ProductContent({
               const missingTicker = !project.memecoinBrief?.ticker
               const missingSubdomain = !project.subdomain
               const disabled = missingTicker || missingSubdomain
-              const disabledReason = missingSubdomain
-                ? 'Claim your subdomain first (Edit page → Subdomain)'
-                : missingTicker
-                  ? 'Set a ticker first (Edit page → Ticker)'
-                  : ''
+              // When disabled, name the blocker in the button label itself
+              // so nobody has to hover the tooltip to figure it out. Clicking
+              // the disabled button opens the Edit modal at the right field.
+              const label = disabled
+                ? missingSubdomain && missingTicker
+                  ? 'Claim subdomain + set ticker to deploy'
+                  : missingSubdomain
+                    ? 'Claim subdomain to deploy'
+                    : 'Set ticker to deploy'
+                : `Deploy $${project.memecoinBrief?.ticker?.toUpperCase()} on pump.fun`
               return (
                 <button
                   type="button"
-                  onClick={() => !disabled && setDeployOpen(true)}
-                  disabled={disabled}
-                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-zinc-900 transition-transform hover:scale-[1.02] disabled:opacity-45 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  onClick={() => {
+                    if (disabled) setEditOpen(true)
+                    else setDeployOpen(true)
+                  }}
+                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-zinc-900 transition-transform hover:scale-[1.02]"
                   style={{
-                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    background: disabled
+                      ? 'linear-gradient(135deg, rgba(16,185,129,0.35), rgba(5,150,105,0.35))'
+                      : 'linear-gradient(135deg, #10b981, #059669)',
                     boxShadow: disabled ? 'none' : '0 8px 24px rgba(16,185,129,0.35)',
+                    color: disabled ? 'rgb(212,212,216)' : 'rgb(24,24,27)',
                   }}
                   title={
                     disabled
-                      ? disabledReason
+                      ? 'Click to open the Edit modal and fill in what is missing'
                       : `Mint $${project.memecoinBrief?.ticker?.toUpperCase()} on pump.fun mainnet`
                   }
                 >
                   <Rocket size={14} />
-                  {disabled ? 'Deploy on pump.fun' : `Deploy $${project.memecoinBrief?.ticker?.toUpperCase()} on pump.fun`}
+                  {label}
                 </button>
               )
             })()}
