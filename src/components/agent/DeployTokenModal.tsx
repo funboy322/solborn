@@ -26,7 +26,7 @@ import { AlertTriangle, Check, ExternalLink, Loader2, Rocket, X } from 'lucide-r
 import {
   Connection,
   Keypair,
-  Transaction,
+  VersionedTransaction,
   clusterApiUrl,
 } from '@solana/web3.js'
 import { useSolanaSigner } from '@/lib/hooks/useSolanaSigner'
@@ -51,6 +51,22 @@ type FlowState =
   | { kind: 'done'; mintAddress: string; signature: string; pumpFunUrl: string }
   | { kind: 'error'; message: string }
 
+// pump.fun coins have 6 decimals. Raw token amount from the SDK includes
+// them, so divide when we surface a "human" figure.
+const TOKEN_DECIMALS = 6
+
+const DEV_BUY_PRESETS: { sol: number; label: string }[] = [
+  { sol: 0, label: 'Fair' },
+  { sol: 0.05, label: '0.05 SOL' },
+  { sol: 0.1, label: '0.1 SOL' },
+  { sol: 0.5, label: '0.5 SOL' },
+]
+
+// Rough approximation of "network fee for the create tx". pump.fun's create
+// is ~0.02 SOL, buy adds a small extra. Shown to the user so the total isn't
+// a surprise; not used for the actual transaction.
+const CREATE_FEE_SOL = 0.02
+
 const CLIENT_RPC =
   (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_HELIUS_RPC_MAINNET) ||
   clusterApiUrl('mainnet-beta')
@@ -64,8 +80,11 @@ export function DeployTokenModal({
   accentColor = '#8b5cf6',
 }: DeployTokenModalProps) {
   const [state, setState] = useState<FlowState>({ kind: 'confirm' })
+  const [devBuySol, setDevBuySol] = useState<number>(0.05)
+  const [receivedTokens, setReceivedTokens] = useState<string | null>(null)
   const signer = useSolanaSigner()
   const ticker = project.memecoinBrief?.ticker?.toUpperCase() ?? ''
+  const totalCostSol = CREATE_FEE_SOL + devBuySol
 
   const inFlight = ['preparing', 'signing', 'broadcasting', 'confirming'].includes(state.kind)
 
@@ -85,6 +104,7 @@ export function DeployTokenModal({
       mintPubkey: string
       blockhash: string
       lastValidBlockHeight: number
+      estimatedTokens: string | null
     }
     try {
       const res = await fetch('/api/pump/prepare-create', {
@@ -94,6 +114,7 @@ export function DeployTokenModal({
           subdomain,
           mintPubkey: mintKeypair.publicKey.toBase58(),
           userPubkey: signer.publicKey.toBase58(),
+          devBuySol,
         }),
       })
       if (!res.ok) {
@@ -102,6 +123,7 @@ export function DeployTokenModal({
         return
       }
       prepared = await res.json()
+      setReceivedTokens(prepared.estimatedTokens)
     } catch (e) {
       setState({
         kind: 'error',
@@ -112,11 +134,14 @@ export function DeployTokenModal({
 
     setState({ kind: 'signing' })
 
-    let signedTx: Transaction
+    let signedTx: VersionedTransaction
     try {
       const raw = Uint8Array.from(atob(prepared.txBase64), (c) => c.charCodeAt(0))
-      const tx = Transaction.from(raw)
-      tx.partialSign(mintKeypair)
+      const tx = VersionedTransaction.deserialize(raw)
+      // v0 tx.sign takes an array of signers; adds one signature per pubkey
+      // matching the message's staticAccountKeys. This lays down the mint
+      // signature; the wallet supplies the user signature next.
+      tx.sign([mintKeypair])
       signedTx = await signer.signTransaction(tx)
     } catch (e) {
       setState({
@@ -293,6 +318,52 @@ export function DeployTokenModal({
                 <Row label="Wallet" value={signer.walletAddress ?? '(not connected)'} mono />
               </div>
 
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] uppercase tracking-wider text-zinc-500">
+                    Dev-buy
+                  </span>
+                  <span className="text-[10px] text-zinc-600">
+                    buy your own coin in the same tx
+                  </span>
+                </div>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {DEV_BUY_PRESETS.map((p) => {
+                    const active = devBuySol === p.sol
+                    return (
+                      <button
+                        key={p.sol}
+                        type="button"
+                        onClick={() => setDevBuySol(p.sol)}
+                        className="rounded-lg px-2 py-2 text-xs font-semibold transition-colors"
+                        style={{
+                          background: active
+                            ? `${accentColor}22`
+                            : 'rgba(255,255,255,0.03)',
+                          border: active
+                            ? `1px solid ${accentColor}77`
+                            : '1px solid rgba(255,255,255,0.06)',
+                          color: active ? accentColor : 'rgb(212,212,216)',
+                        }}
+                      >
+                        {p.label}
+                      </button>
+                    )
+                  })}
+                </div>
+                <div className="flex items-center justify-between pt-1 border-t border-white/[0.05]">
+                  <span className="text-[11px] text-zinc-500">Total cost</span>
+                  <span className="text-sm font-bold text-zinc-100 tabular-nums">
+                    ~{totalCostSol.toFixed(2)} SOL
+                  </span>
+                </div>
+                <p className="text-[10px] text-zinc-600 leading-relaxed">
+                  Fair = 0 dev-buy (zero devbag, all supply on the curve). Any other option
+                  spends that SOL to buy $${ticker} in the same tx, so the coin starts with
+                  liquidity and you hold the first bag.
+                </p>
+              </div>
+
               <p className="text-[11px] text-zinc-500 leading-relaxed">
                 Your wallet signs once. We do not touch your keys. The mint keypair is generated
                 in your browser, used once, and discarded.
@@ -367,6 +438,15 @@ export function DeployTokenModal({
                   <p className="text-[11px] font-mono text-zinc-400 truncate">
                     {state.mintAddress}
                   </p>
+                  {receivedTokens && (
+                    <p className="text-[11px] text-zinc-300 mt-2">
+                      you bought ~
+                      <span className="font-bold" style={{ color: accentColor }}>
+                        {formatTokenAmount(receivedTokens)}
+                      </span>{' '}
+                      ${ticker} in the launch tx
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -406,6 +486,25 @@ export function DeployTokenModal({
       </motion.div>
     </motion.div>
   )
+}
+
+/**
+ * Format a raw pump.fun token amount (6 decimals) as a compact "12.4M" style
+ * figure. Uses BigInt for the divide because tokens can easily overflow the
+ * safe integer range.
+ */
+function formatTokenAmount(raw: string): string {
+  try {
+    const divisor = BigInt(10) ** BigInt(TOKEN_DECIMALS)
+    const whole = BigInt(raw) / divisor
+    const n = Number(whole)
+    if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`
+    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`
+    return `${n}`
+  } catch {
+    return raw
+  }
 }
 
 function Row({

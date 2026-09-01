@@ -18,8 +18,20 @@
  * pubkey. That means we can't accidentally leak or reuse it. Mainnet-only.
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { Connection, PublicKey, Transaction } from '@solana/web3.js'
-import { PumpSdk } from '@pump-fun/pump-sdk'
+import {
+  Connection,
+  PublicKey,
+  TransactionMessage,
+  VersionedTransaction,
+} from '@solana/web3.js'
+import { NATIVE_MINT } from '@solana/spl-token'
+import {
+  OnlinePumpSdk,
+  PumpSdk,
+  getBuyTokenAmountFromSolAmount,
+} from '@pump-fun/pump-sdk'
+// @coral-xyz/anchor re-exports BN with proper types, avoids @types/bn.js dep.
+import { BN } from '@coral-xyz/anchor'
 import { getProductMirror, isRedisConfigured } from '@/lib/redis'
 
 export const runtime = 'nodejs'
@@ -30,7 +42,14 @@ interface Body {
   subdomain: string
   mintPubkey: string
   userPubkey: string
+  /** SOL amount for the initial dev-buy in the same tx. 0 = create-only. */
+  devBuySol?: number
 }
+
+const LAMPORTS_PER_SOL = 1_000_000_000
+// Hard-cap the dev-buy at 5 SOL so a fat-fingered "500" cannot drain a wallet
+// silently. pump.fun's bonding curve absorbs a lot, but this is a UX guard.
+const MAX_DEV_BUY_SOL = 5
 
 function bad(error: string, status = 400) {
   return NextResponse.json({ error }, { status })
@@ -48,6 +67,9 @@ export async function POST(req: NextRequest) {
 
   const { subdomain, mintPubkey, userPubkey } = body
   if (!subdomain || !mintPubkey || !userPubkey) return bad('missing-fields')
+
+  const devBuySol = typeof body.devBuySol === 'number' && body.devBuySol > 0 ? body.devBuySol : 0
+  if (devBuySol > MAX_DEV_BUY_SOL) return bad('dev-buy-too-large')
 
   let mint: PublicKey
   let user: PublicKey
@@ -70,43 +92,86 @@ export async function POST(req: NextRequest) {
   const symbol = ticker.slice(0, 10)
   const uri = `https://solborn.xyz/api/pump/metadata/${subdomain}`
 
-  // PumpSdk builds instructions offline — no RPC needed here. We still need
-  // a Connection for the latest blockhash and lastValidBlockHeight so the
-  // client can broadcast without staleness.
+  // PumpSdk builds most instructions offline. For create+dev-buy we need
+  // OnlinePumpSdk (fetches Global + FeeConfig from chain) so the token
+  // amount comes out correctly for the current bonding curve params.
   const rpcUrl =
     process.env.NEXT_PUBLIC_HELIUS_RPC_MAINNET ??
     process.env.HELIUS_RPC_URL ??
     'https://api.mainnet-beta.solana.com'
   const connection = new Connection(rpcUrl, 'confirmed')
-  const sdk = new PumpSdk()
 
-  let instruction
+  const instructions: import('@solana/web3.js').TransactionInstruction[] = []
+  let estimatedTokens: string | null = null
+
   try {
-    instruction = await sdk.createV2Instruction({
-      mint,
-      name,
-      symbol,
-      uri,
-      creator: user,
-      user,
-      mayhemMode: false,
-    })
+    if (devBuySol > 0) {
+      const onlineSdk = new OnlinePumpSdk(connection)
+      const [global, feeConfig] = await Promise.all([
+        onlineSdk.fetchGlobal(),
+        onlineSdk.fetchFeeConfig(),
+      ])
+
+      const quoteAmount = new BN(Math.floor(devBuySol * LAMPORTS_PER_SOL))
+      // Fresh curve — mintSupply=null, bondingCurve=null. Returns the token
+      // amount the user will receive for `quoteAmount` SOL as the first buy.
+      const tokenAmount = getBuyTokenAmountFromSolAmount({
+        global,
+        feeConfig,
+        mintSupply: null,
+        bondingCurve: null,
+        amount: quoteAmount,
+        quoteMint: NATIVE_MINT,
+      })
+      estimatedTokens = tokenAmount.toString()
+
+      // V1 create+buy is materially smaller than V2 (fewer accounts, no
+      // fee-sharing/cashback plumbing) and fits in a single VersionedTransaction
+      // without needing an Address Lookup Table. V2 requires an ALT which the
+      // SDK doesn't expose a canonical one for.
+      const sdk = new PumpSdk()
+      const buyInstructions = await sdk.createAndBuyInstructions({
+        global,
+        mint,
+        name,
+        symbol,
+        uri,
+        creator: user,
+        user,
+        amount: tokenAmount,
+        solAmount: quoteAmount,
+      })
+      instructions.push(...buyInstructions)
+    } else {
+      const sdk = new PumpSdk()
+      const createOnly = await sdk.createV2Instruction({
+        mint,
+        name,
+        symbol,
+        uri,
+        creator: user,
+        user,
+        mayhemMode: false,
+      })
+      instructions.push(createOnly)
+    }
   } catch (e) {
-    console.error('[pump] createV2Instruction failed', e)
+    console.error('[pump] SDK failed', e)
     return bad('sdk-failed', 502)
   }
 
   const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed')
-  const tx = new Transaction({
-    feePayer: user,
-    blockhash,
-    lastValidBlockHeight,
-  })
-  tx.add(instruction)
 
-  // Serialize WITHOUT requiring any signatures — the mint keypair (client
-  // side) and the user wallet will both add theirs in the browser.
-  const serialized = tx.serialize({ requireAllSignatures: false, verifySignatures: false })
+  // VersionedTransaction (v0). Legacy Transaction packs less efficiently and
+  // create+dev-buy overflows the 1232-byte per-tx limit; v0's message format
+  // is a bit tighter and typically fits without needing an ALT here.
+  const message = new TransactionMessage({
+    payerKey: user,
+    recentBlockhash: blockhash,
+    instructions,
+  }).compileToV0Message()
+  const tx = new VersionedTransaction(message)
+  const serialized = tx.serialize()
   const txBase64 = Buffer.from(serialized).toString('base64')
 
   return NextResponse.json({
@@ -117,5 +182,8 @@ export async function POST(req: NextRequest) {
     uri,
     blockhash,
     lastValidBlockHeight,
+    devBuySol,
+    /** Raw token amount (with decimals baked in) the user will receive from the dev-buy; null if none. */
+    estimatedTokens,
   })
 }
